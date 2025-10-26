@@ -545,13 +545,27 @@ class PromptMetadataExtractor:
         self.__embeddings[embedding_name] = sha
 
     def __extract_lora_information(self, lora: str):
-        # Use basename to remove any path, then stem to remove extension for Civitai key
-        lora_base = Path(lora).stem
-        lora_name = civitai_lora_key_name(lora_base)
+        # Get the full path first
         lora_path = full_lora_path_for(lora)
         if lora_path is None or not os.path.exists(lora_path):
             cstr(f"Lora file not found for hash: {lora}").warning.print()
             return
+        
+        # Extract filename without extension, preserving dots in the name
+        # e.g., "flux\standard\FLUX.1-Turbo-Alpha.safetensors" -> "FLUX.1-Turbo-Alpha"
+        lora_filename = os.path.basename(lora_path)
+        # Remove extension manually to preserve dots in filename
+        if lora_filename.lower().endswith('.safetensors'):
+            lora_base = lora_filename[:-12]  # Remove .safetensors
+        elif lora_filename.lower().endswith('.pt'):
+            lora_base = lora_filename[:-3]  # Remove .pt
+        elif lora_filename.lower().endswith('.bin'):
+            lora_base = lora_filename[:-4]  # Remove .bin
+        else:
+            # Fallback to splitext
+            lora_base = os.path.splitext(lora_filename)[0]
+        
+        lora_name = civitai_lora_key_name(lora_base)
         sha_full = get_sha256(lora_path)
         if sha_full:
             sha = sha_full[:10]
