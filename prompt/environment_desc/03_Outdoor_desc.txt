@@ -1,0 +1,85 @@
+airfield: A wide open area with runways, hangars, and open skies, surrounded by flat terrain and distant buildings.
+alley: A narrow passage between tall buildings, with shadowy walls, scattered debris, and urban textures.
+amusement park: A vibrant outdoor space filled with colorful rides, bright lights, and lively crowds, set against open skies.
+aqueduct: A grand stone structure with arches, stretching across the landscape, surrounded by greenery or cityscape.
+bamboo forest: A dense forest of tall, slender bamboo stalks, with dappled sunlight and lush green undergrowth.
+beach: A sandy shoreline with gentle waves, seashells, and open sky, bordered by dunes or rocky outcrops.
+bridge: A prominent structure spanning water or land, with railings, supports, and scenic surroundings.
+canal: A tranquil waterway lined with stone paths, small boats, and picturesque buildings or trees.
+canyon: A dramatic landscape of steep, rocky cliffs and winding paths, with layered earth tones and sparse vegetation.
+carousel: A circular ride with ornate horses and bright lights, set in a festive plaza or park.
+cave: A dark, enclosed natural space with rugged rock walls, stalactites, and a mysterious entrance.
+city: A dense urban environment with tall buildings, busy streets, neon signs, and varied architectural styles.
+cliff: A high, sheer rock face overlooking land or sea, with jagged edges and dramatic views.
+crosswalk: A marked pedestrian crossing with white stripes, surrounded by city buildings and bustling activity.
+dam: A massive concrete structure with water flowing below, set in a rugged landscape with industrial details.
+desert: A vast expanse of sand dunes, rocky outcrops, and sparse vegetation under a blazing sun.
+dirt road: A winding, unpaved path through fields or forests, bordered by grass and wildflowers.
+dock: A wooden or concrete platform extending over water, with moored boats and nautical elements nearby.
+drydock: An open area with large vessels, scaffolding, and industrial equipment, set beside water or shipyards.
+ferris wheel: A towering wheel with colorful cabins, set against the sky in a lively park or fairground.
+field: A wide, open area of grass or crops, bordered by trees, fences, or distant hills.
+floating city: A fantastical city suspended above ground or water, with intricate buildings and clouds below.
+floating island: A magical landmass hovering in the air, with lush greenery, waterfalls, and misty surroundings.
+flower field: A vibrant expanse of blooming flowers, with varied colors and gentle breezes under open skies.
+forest: A dense area of tall trees, thick undergrowth, and dappled sunlight filtering through the canopy.
+garden: A cultivated outdoor space with arranged plants, flowers, pathways, and decorative features.
+geyser: A natural hot spring erupting with water and steam, surrounded by rocky terrain and mineral deposits.
+glacier: A massive river of ice with jagged edges, set in a cold, mountainous landscape.
+graveyard: An outdoor area with weathered tombstones, overgrown grass, and somber trees, often misty.
+harbor: A sheltered area with docks, boats, and waterfront buildings, set against open water and cityscape.
+highway: A long, paved road stretching through open landscapes, bordered by signs, barriers, and distant scenery.
+hill: A gentle rise in the land with grassy slopes, wildflowers, and panoramic views of the surroundings.
+island: A scenic piece of land surrounded by water, with beaches, cliffs, and lush vegetation.
+jetty: A narrow structure extending into water, with wooden planks, railings, and waves below.
+jungle: A wild area with dense, tangled vegetation, towering trees, and vibrant greenery.
+lake: A calm body of freshwater, bordered by trees, reeds, and reflective surfaces under open sky.
+market stall: A small booth with colorful displays, set in a lively outdoor market with crowds and banners.
+market: A bustling outdoor area with rows of stalls, vibrant colors, and energetic crowds.
+meadow: A grassy field dotted with wildflowers, bordered by trees and gently rolling hills.
+mountain: A towering natural formation with rocky peaks, snowcaps, and dramatic slopes.
+nature: A versatile outdoor setting with varied plants, trees, rocks, and wildlife, open to interpretation.
+oasis: A lush, green area with palm trees and water, surrounded by desert sands and bright sunlight.
+ocean bottom: An underwater landscape with sandy floor, rocks, and marine life, illuminated by filtered light.
+ocean: A vast expanse of water with rolling waves, distant horizons, and changing sky colors.
+paper lantern: A decorative lantern with soft glow, hanging in outdoor spaces during festivals or celebrations.
+park: A public outdoor space with trees, walking paths, benches, and open grassy areas.
+parking lot: A wide paved area with marked spaces, surrounded by buildings, cars, and urban features.
+path: A walkway winding through nature or city, bordered by plants, stones, or fences.
+phone booth: A small, glass-walled structure with a payphone, set on a city sidewalk or plaza.
+plain: A broad, flat expanse of land with low vegetation, open skies, and distant horizons.
+playground: An outdoor area with colorful play equipment, soft surfaces, and cheerful surroundings.
+pond: A small, tranquil body of water with lily pads, reeds, and reflections of nearby trees.
+poolside: The area beside a swimming pool, with lounge chairs, umbrellas, and sunlit surfaces.
+railroad crossing: A marked intersection of train tracks and road, with barriers, signals, and urban context.
+railroad tracks: Parallel steel rails stretching through open landscapes, bordered by gravel and wild plants.
+rice paddy: A flooded field with rows of green rice plants, bordered by earthen paths and distant hills.
+river: A winding body of water with gentle banks, rocks, and trees lining the edges.
+road: A paved or dirt route with markings, bordered by trees, fields, or city buildings.
+roller coaster: A twisting track with steep drops and curves, set in a lively amusement park.
+rope bridge: A suspended bridge made of ropes and planks, stretching over a ravine or river with dramatic views.
+running track: A circular or oval path with marked lanes, set in a sports field or park.
+runway: A long, flat strip of pavement with markings, set in open terrain near hangars or control towers.
+rural: A countryside setting with scattered houses, fields, and winding roads, surrounded by nature.
+savannah: A grassy plain with scattered trees, warm colors, and open skies, often with wildlife.
+shipyard: An industrial area with large vessels, cranes, and warehouses, set beside water.
+shore: The edge of land meeting water, with sand, rocks, and gentle waves under open sky.
+sidewalk: A paved path for pedestrians, lined with trees, benches, and city buildings.
+soccer field: A large, grassy area with white markings, goals, and open surroundings.
+stone walkway: A path made of stone slabs, bordered by plants, lanterns, or garden features.
+stream: A small, flowing body of water with pebbled banks, surrounded by greenery and wildflowers.
+street: A road lined with buildings, streetlights, and bustling activity, set in an urban environment.
+town: A small urban area with houses, shops, and winding streets, surrounded by countryside.
+trench: A deep, narrow excavation with exposed earth, set in a rugged or utilitarian landscape.
+tunnel: A passageway through rock or earth, with arched walls and dim lighting, connecting two areas.
+village: A quaint rural community with small houses, winding paths, and lush gardens.
+volcano: A towering mountain with a crater, rocky slopes, and dramatic clouds or smoke above.
+wasteland: A barren, desolate area with cracked earth, sparse vegetation, and harsh lighting.
+water: A general outdoor water feature, such as a pond, stream, or fountain, adaptable to many scenes.
+waterfall: A cascade of water tumbling from a height, surrounded by rocks, mist, and lush greenery.
+waterpark: An outdoor area with pools, slides, and colorful structures, set in a lively recreational space.
+well: A stone or brick structure with a circular opening, set in a garden or rural landscape.
+wetland: A marshy area with tall grasses, shallow water, and abundant wildlife.
+wheat field: A golden field of ripening wheat, bordered by farmhouses, trees, or distant hills.
+wooden bridge: A rustic bridge made of wood, spanning a stream or ravine, surrounded by natural scenery.
+zoo: An outdoor park with animal enclosures, winding paths, and lush landscaping.

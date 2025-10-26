@@ -1,0 +1,67 @@
+anaglyph 3d photography
+anaglyph
+backlighting
+blending
+bloom effect
+bloom
+blurry
+bokeh effect
+bokeh
+caustics
+chiaroscuro
+chromatic aberration abuse
+chromatic aberration
+cinematic lighting
+daguerrotype
+defocused
+depth of field
+desaturated grunge filter
+diffraction spikes effect
+diffraction spikes
+dithering
+double exposure
+drop shadow
+emphasis lines
+film grain
+foreshortening effect
+foreshortening
+glitch style
+glowing light
+god rays
+gradient effect
+halftone effect
+halftone
+high speed liquid
+hologram effect
+image fill
+infrared filter
+jpeg artifacts
+lens flare abuse
+lens flare
+lomo effect
+long exposure
+medium depth of field
+motion blur
+motion lines
+multiple exposure
+multiple monochrome
+neutral density filters
+optical illusion
+overexposed
+overexposure
+ray tracing
+reflection light
+scanlines
+selective color
+sepia tone
+short exposure
+silhouette
+soft focus
+solarized
+sparkle
+speed lines
+split tone
+stereogram
+technicolor
+tintype photography
+vignetting

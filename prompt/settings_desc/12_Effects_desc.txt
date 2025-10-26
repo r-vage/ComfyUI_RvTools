@@ -1,0 +1,67 @@
+anaglyph 3d photography, creates stereoscopic 3D effect with red-cyan color separation
+anaglyph, overlapping red and blue channels for retro 3D look
+backlighting, subject illuminated from behind for dramatic silhouette and glow
+blending, smooth transition between colors or images for seamless composition
+bloom effect, soft glow around bright areas for dreamy atmosphere
+bloom, highlights appear to glow for ethereal effect
+blurry, intentionally unfocused for soft or abstract visuals
+bokeh effect, out-of-focus light points for artistic background
+bokeh, blurred background lights for visual interest
+caustics, light patterns created by reflection or refraction through water or glass
+chiaroscuro, strong contrasts between light and dark for dramatic effect
+chromatic aberration abuse, exaggerated color fringing for glitchy or surreal style
+chromatic aberration, colored edges from lens distortion for artistic effect
+cinematic lighting, stylized and moody illumination for film-like visuals
+daguerrotype, vintage photographic process with metallic sheen
+defocused, soft and out-of-focus for dreamy or abstract look
+depth of field, selective focus to isolate subject from background
+desaturated grunge filter, muted colors and rough textures for gritty mood
+diffraction spikes effect, star-like rays from bright light sources
+diffraction spikes, pointed rays around lights for dramatic highlights
+dithering, pixelated color transitions for retro or stylized effect
+double exposure, two images superimposed for surreal composition
+drop shadow, shadow cast by object for depth and separation
+emphasis lines, dynamic lines to highlight motion or focus
+film grain, textured speckles for vintage or cinematic feel
+foreshortening effect, exaggerated perspective for dynamic composition
+foreshortening, perspective distortion for dramatic depth
+glitch style, digital errors and distortions for experimental visuals
+glowing light, radiant illumination for magical or surreal effect
+god rays, beams of light streaming through clouds or objects
+gradient effect, smooth color transitions for modern or abstract look
+halftone effect, dot patterns for comic or print style
+halftone, patterned dots for retro or graphic effect
+high speed liquid, frozen motion of splashing fluids for dynamic scenes
+hologram effect, shimmering and multi-colored light for futuristic style
+image fill, area covered with repeated or solid imagery
+infrared filter, surreal colors and glowing foliage for dreamlike scenes
+jpeg artifacts, blocky compression errors for lo-fi or glitchy look
+lens flare abuse, excessive light streaks for stylized or cinematic effect
+lens flare, bright streaks from light sources for dramatic highlights
+lomo effect, saturated colors and vignetting for retro style
+long exposure, motion blur and light trails for creative effects
+medium depth of field, moderate focus separation for balanced composition
+motion blur, streaks from moving subjects for dynamic energy
+motion lines, drawn or digital lines to emphasize movement
+multiple exposure, several images layered for surreal or narrative effect
+multiple monochrome, various shades of gray for artistic mood
+neutral density filters, reduces light for long exposures or balanced highlights
+optical illusion, visual tricks that challenge perception
+overexposed, extremely bright areas for washed-out or high-key look
+overexposure, loss of detail in bright regions for stylized effect
+ray tracing, realistic light simulation for photorealistic rendering
+reflection light, mirrored surfaces for depth and complexity
+scanlines, horizontal lines for retro or digital screen effect
+selective color, highlights specific hues for dramatic contrast
+sepia tone, warm brown tint for vintage or nostalgic mood
+short exposure, crisp and sharp images with minimal motion blur
+silhouette, dark subject against bright background for striking outline
+soft focus, gentle blur for romantic or dreamy atmosphere
+solarized, inverted and surreal colors for experimental look
+sparkle, bright points of light for magical or festive effect
+speed lines, dynamic streaks to convey rapid movement
+split tone, two contrasting colors for artistic mood
+stereogram, hidden 3D image within patterned background
+technicolor, vivid and saturated colors for classic film style
+tintype photography, antique photographic process with unique texture
+vignetting, darkened edges for focus and mood

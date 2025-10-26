@@ -1,0 +1,21 @@
+[project]
+name = "ComfyUI_RvTools"
+description = "ComfyUI custom nodes and utilities for workflow building, type conversions, checkpoint/pipe loaders and file utilities."
+version = "1.0.15"
+license = { file = "LICENSE" }
+
+authors = [
+	{ name = "r-vage" }
+]
+
+keywords = ["ComfyUI","custom_nodes","workflow","conversion","combo","checkpoint loader","pipeline","save_generation_data","RvTools"]
+
+readme = "README.md"
+
+[project.urls]
+Repository = "https://github.com/r-vage/ComfyUI_RvTools"
+
+[tool.comfy]
+PublisherId = "rvage"
+DisplayName = "ComfyUI_RvTools"
+Icon = ""

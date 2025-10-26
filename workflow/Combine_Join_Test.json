@@ -1,0 +1,1835 @@
+{
+  "id": "00000000-0000-0000-0000-000000000000",
+  "revision": 0,
+  "last_node_id": 38,
+  "last_link_id": 91,
+  "nodes": [
+    {
+      "id": 14,
+      "type": "easy showAnything",
+      "pos": [
+        1501,
+        631
+      ],
+      "size": [
+        339,
+        89
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "anything",
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 76
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "output",
+          "type": "*",
+          "links": []
+        }
+      ],
+      "title": "rel_Path",
+      "properties": {
+        "cnr_id": "comfyui-easy-use",
+        "ver": "1.3.0",
+        "Node name for S&R": "easy showAnything",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": [
+        ".\\WAN\\2025-08-28\\batch_1\\Video"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 20,
+      "type": "easy showAnything",
+      "pos": [
+        1501,
+        1461
+      ],
+      "size": [
+        459,
+        89
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "anything",
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 83
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "output",
+          "type": "*",
+          "links": []
+        }
+      ],
+      "title": "rel_Path",
+      "properties": {
+        "cnr_id": "comfyui-easy-use",
+        "ver": "1.3.0",
+        "Node name for S&R": "easy showAnything",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": [
+        ".\\WAN\\2025-08-28\\batch_1\\Video"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 19,
+      "type": "easy showAnything",
+      "pos": [
+        1501,
+        1331
+      ],
+      "size": [
+        459,
+        89
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "anything",
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 82
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "output",
+          "type": "*",
+          "links": []
+        }
+      ],
+      "title": "Path",
+      "properties": {
+        "cnr_id": "comfyui-easy-use",
+        "ver": "1.3.0",
+        "Node name for S&R": "easy showAnything",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": [
+        "D:\\AI\\ComfyUI_windows_portable\\ComfyUI\\output\\WAN\\2025-08-28\\batch_1\\Video"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 15,
+      "type": "easy showAnything",
+      "pos": [
+        1501,
+        761
+      ],
+      "size": [
+        607,
+        108
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "anything",
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 81
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "output",
+          "type": "*",
+          "links": []
+        }
+      ],
+      "title": "files",
+      "properties": {
+        "cnr_id": "comfyui-easy-use",
+        "ver": "1.3.0",
+        "Node name for S&R": "easy showAnything",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": [
+        "D:\\\\AI\\\\ComfyUI_windows_portable\\\\ComfyUI\\\\output\\\\WAN\\\\2025-08-28\\\\batch_1\\\\Video\\\\vc_1stPass_00001.webm, D:\\\\AI\\\\ComfyUI_windows_portable\\\\ComfyUI\\\\output\\\\WAN\\\\2025-08-28\\\\batch_1\\\\Video\\\\vc_1stPass_00002.webm"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 21,
+      "type": "easy showAnything",
+      "pos": [
+        1501,
+        1591
+      ],
+      "size": [
+        613,
+        204
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "anything",
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 90
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "output",
+          "type": "*",
+          "links": []
+        }
+      ],
+      "title": "files",
+      "properties": {
+        "cnr_id": "comfyui-easy-use",
+        "ver": "1.3.0",
+        "Node name for S&R": "easy showAnything",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": [
+        "D:\\\\AI\\\\ComfyUI_windows_portable\\\\ComfyUI\\\\output\\\\WAN\\\\2025-08-28\\\\batch_1\\\\Video\\\\vc_1stPass_00001.webm, D:\\\\AI\\\\ComfyUI_windows_portable\\\\ComfyUI\\\\output\\\\WAN\\\\2025-08-28\\\\batch_1\\\\Video\\\\vc_1stPass_00002.webm, D:\\\\AI\\\\ComfyUI_windows_portable\\\\ComfyUI\\\\output\\\\WAN\\\\2025-08-28\\\\batch_1\\\\Video\\\\vc_1stPass_00003.webm, D:\\\\AI\\\\ComfyUI_windows_portable\\\\ComfyUI\\\\output\\\\WAN\\\\2025-08-28\\\\batch_1\\\\Video\\\\vc_1stPass_00004.webm, D:\\\\AI\\\\ComfyUI_windows_portable\\\\ComfyUI\\\\output\\\\WAN\\\\2025-08-28\\\\batch_1\\\\Video\\\\vc_1stPass_00005.webm, D:\\\\AI\\\\ComfyUI_windows_portable\\\\ComfyUI\\\\output\\\\WAN\\\\2025-08-28\\\\batch_1\\\\Video\\\\vc_1stPass_00006.webm, D:\\\\AI\\\\ComfyUI_windows_portable\\\\ComfyUI\\\\output\\\\WAN\\\\2025-08-28\\\\batch_1\\\\Video\\\\vc_1stPass_00007.webm, D:\\\\AI\\\\ComfyUI_windows_portable\\\\ComfyUI\\\\output\\\\WAN\\\\2025-08-28\\\\batch_1\\\\Video\\\\vc_1stPass_00008.webm, D:\\\\AI\\\\ComfyUI_windows_portable\\\\ComfyUI\\\\output\\\\WAN\\\\2025-08-28\\\\batch_1\\\\Video\\\\vc_1stPass_00009.webm"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 22,
+      "type": "easy showAnything",
+      "pos": [
+        1501,
+        1841
+      ],
+      "size": [
+        636,
+        193
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "anything",
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 91
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "output",
+          "type": "*",
+          "links": []
+        }
+      ],
+      "title": "join files",
+      "properties": {
+        "cnr_id": "comfyui-easy-use",
+        "ver": "1.3.0",
+        "Node name for S&R": "easy showAnything",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": [
+        "D:\\\\AI\\\\ComfyUI_windows_portable\\\\ComfyUI\\\\output\\\\WAN\\\\2025-08-28\\\\batch_1\\\\Video\\\\vc_1stPass_join_00001.webm, D:\\\\AI\\\\ComfyUI_windows_portable\\\\ComfyUI\\\\output\\\\WAN\\\\2025-08-28\\\\batch_1\\\\Video\\\\vc_1stPass_join_00002.webm, D:\\\\AI\\\\ComfyUI_windows_portable\\\\ComfyUI\\\\output\\\\WAN\\\\2025-08-28\\\\batch_1\\\\Video\\\\vc_1stPass_join_00003.webm, D:\\\\AI\\\\ComfyUI_windows_portable\\\\ComfyUI\\\\output\\\\WAN\\\\2025-08-28\\\\batch_1\\\\Video\\\\vc_1stPass_join_00004.webm, D:\\\\AI\\\\ComfyUI_windows_portable\\\\ComfyUI\\\\output\\\\WAN\\\\2025-08-28\\\\batch_1\\\\Video\\\\vc_1stPass_join_00005.webm, D:\\\\AI\\\\ComfyUI_windows_portable\\\\ComfyUI\\\\output\\\\WAN\\\\2025-08-28\\\\batch_1\\\\Video\\\\vc_1stPass_join_00006.webm, D:\\\\AI\\\\ComfyUI_windows_portable\\\\ComfyUI\\\\output\\\\WAN\\\\2025-08-28\\\\batch_1\\\\Video\\\\vc_1stPass_join_00007.webm, D:\\\\AI\\\\ComfyUI_windows_portable\\\\ComfyUI\\\\output\\\\WAN\\\\2025-08-28\\\\batch_1\\\\Video\\\\vc_1stPass_join_00008.webm, D:\\\\AI\\\\ComfyUI_windows_portable\\\\ComfyUI\\\\output\\\\WAN\\\\2025-08-28\\\\batch_1\\\\Video\\\\vc_1stPass_join_00009.webm"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 5,
+      "type": "VHS_VideoCombine",
+      "pos": [
+        2451,
+        291
+      ],
+      "size": [
+        259,
+        334
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 17,
+      "mode": 4,
+      "inputs": [
+        {
+          "localized_name": "images",
+          "name": "images",
+          "type": "IMAGE",
+          "link": 52
+        },
+        {
+          "localized_name": "audio",
+          "name": "audio",
+          "shape": 7,
+          "type": "AUDIO",
+          "link": null
+        },
+        {
+          "localized_name": "meta_batch",
+          "name": "meta_batch",
+          "shape": 7,
+          "type": "VHS_BatchManager",
+          "link": null
+        },
+        {
+          "localized_name": "vae",
+          "name": "vae",
+          "shape": 7,
+          "type": "VAE",
+          "link": null
+        },
+        {
+          "localized_name": "frame_rate",
+          "name": "frame_rate",
+          "type": "FLOAT",
+          "widget": {
+            "name": "frame_rate"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "loop_count",
+          "name": "loop_count",
+          "type": "INT",
+          "widget": {
+            "name": "loop_count"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "filename_prefix",
+          "name": "filename_prefix",
+          "type": "STRING",
+          "widget": {
+            "name": "filename_prefix"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "format",
+          "name": "format",
+          "type": "COMBO",
+          "widget": {
+            "name": "format"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "pingpong",
+          "name": "pingpong",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "pingpong"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "save_output",
+          "name": "save_output",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "save_output"
+          },
+          "link": null
+        },
+        {
+          "name": "pix_fmt",
+          "type": [
+            "yuv420p",
+            "yuv420p10le"
+          ],
+          "widget": {
+            "name": "pix_fmt"
+          },
+          "link": null
+        },
+        {
+          "name": "crf",
+          "type": "INT",
+          "widget": {
+            "name": "crf"
+          },
+          "link": null
+        },
+        {
+          "name": "save_metadata",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "save_metadata"
+          },
+          "link": null
+        },
+        {
+          "name": "trim_to_audio",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "trim_to_audio"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "Filenames",
+          "name": "Filenames",
+          "type": "VHS_FILENAMES",
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-videohelpersuite",
+        "ver": "1.6.1",
+        "Node name for S&R": "VHS_VideoCombine",
+        "widget_ue_connectable": {
+          "frame_rate": true,
+          "loop_count": true,
+          "filename_prefix": true,
+          "format": true,
+          "pingpong": true,
+          "save_output": true
+        }
+      },
+      "widgets_values": {
+        "frame_rate": 30,
+        "loop_count": 0,
+        "filename_prefix": "vc_mask",
+        "format": "video/h264-mp4",
+        "pix_fmt": "yuv420p",
+        "crf": 19,
+        "save_metadata": false,
+        "trim_to_audio": false,
+        "pingpong": false,
+        "save_output": false,
+        "videopreview": {
+          "hidden": false,
+          "paused": true,
+          "params": {
+            "filename": "vc_mask_00003.mp4",
+            "subfolder": "",
+            "type": "temp",
+            "format": "video/h264-mp4",
+            "frame_rate": 30,
+            "workflow": "vc_mask_00003.png",
+            "fullpath": "D:\\AI\\ComfyUI_windows_portable\\ComfyUI\\temp\\vc_mask_00003.mp4"
+          }
+        }
+      },
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 13,
+      "type": "easy showAnything",
+      "pos": [
+        1501,
+        501
+      ],
+      "size": [
+        454,
+        88
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "anything",
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 75
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "output",
+          "type": "*",
+          "links": []
+        }
+      ],
+      "title": "Path",
+      "properties": {
+        "cnr_id": "comfyui-easy-use",
+        "ver": "1.3.0",
+        "Node name for S&R": "easy showAnything",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": [
+        "D:\\AI\\ComfyUI_windows_portable\\ComfyUI\\output\\WAN\\2025-08-28\\batch_1\\Video"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 30,
+      "type": "VHS_LoadAudioUpload",
+      "pos": [
+        1211,
+        1441
+      ],
+      "size": [
+        259,
+        204
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "audio",
+          "name": "audio",
+          "type": "COMBO",
+          "widget": {
+            "name": "audio"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "start_time",
+          "name": "start_time",
+          "shape": 7,
+          "type": "FLOAT",
+          "widget": {
+            "name": "start_time"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "duration",
+          "name": "duration",
+          "shape": 7,
+          "type": "FLOAT",
+          "widget": {
+            "name": "duration"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "audio",
+          "name": "audio",
+          "type": "AUDIO",
+          "links": [
+            46
+          ]
+        },
+        {
+          "localized_name": "duration",
+          "name": "duration",
+          "type": "FLOAT",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-videohelpersuite",
+        "ver": "1.7.2",
+        "Node name for S&R": "VHS_LoadAudioUpload"
+      },
+      "widgets_values": {
+        "audio": "Rvage_I Let you drown.mp3",
+        "start_time": 0,
+        "duration": 0,
+        "choose audio to upload": "image",
+        "audiopreview": {
+          "params": {
+            "start_time": 0,
+            "duration": 0,
+            "filename": "Rvage_I Let you drown.mp3",
+            "type": "input"
+          }
+        }
+      },
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 23,
+      "type": "Note",
+      "pos": [
+        901,
+        561
+      ],
+      "size": [
+        279,
+        109
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": [
+        "Gen I is used to create a transition between two clips, thats why there is only the start number: the 2nd file is always start + 1:\n\nsuffix start = 1: clip_1 + clip_2\nsuffix start = 2: clip_2 + clip_3"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 31,
+      "type": "Seamless Join Video Clips [RvTools]",
+      "pos": [
+        1501,
+        291
+      ],
+      "size": [
+        270,
+        150
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "frame_load_cap",
+          "name": "frame_load_cap",
+          "type": "INT",
+          "widget": {
+            "name": "frame_load_cap"
+          },
+          "link": 77
+        },
+        {
+          "localized_name": "mask_first_frames",
+          "name": "mask_first_frames",
+          "type": "INT",
+          "widget": {
+            "name": "mask_first_frames"
+          },
+          "link": 78
+        },
+        {
+          "localized_name": "mask_last_frames",
+          "name": "mask_last_frames",
+          "type": "INT",
+          "widget": {
+            "name": "mask_last_frames"
+          },
+          "link": 79
+        },
+        {
+          "localized_name": "video_filelist",
+          "name": "video_filelist",
+          "shape": 7,
+          "type": "STRING",
+          "widget": {
+            "name": "video_filelist"
+          },
+          "link": 80
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            51
+          ]
+        },
+        {
+          "localized_name": "mask",
+          "name": "mask",
+          "type": "IMAGE",
+          "links": [
+            52
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "6969f025f468096d289cbd89afdd995eb083e8ad",
+        "Node name for S&R": "Seamless Join Video Clips [RvTools]"
+      },
+      "widgets_values": [
+        81,
+        10,
+        0,
+        ""
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 34,
+      "type": "Combine Video Clips [RvTools]",
+      "pos": [
+        1501,
+        1131
+      ],
+      "size": [
+        269,
+        159
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "frame_load_cap",
+          "name": "frame_load_cap",
+          "type": "INT",
+          "widget": {
+            "name": "frame_load_cap"
+          },
+          "link": 84
+        },
+        {
+          "localized_name": "simple_combine",
+          "name": "simple_combine",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "simple_combine"
+          },
+          "link": 85
+        },
+        {
+          "localized_name": "video_filelist",
+          "name": "video_filelist",
+          "shape": 7,
+          "type": "STRING",
+          "widget": {
+            "name": "video_filelist"
+          },
+          "link": 86
+        },
+        {
+          "localized_name": "joined_filelist",
+          "name": "joined_filelist",
+          "shape": 7,
+          "type": "STRING",
+          "widget": {
+            "name": "joined_filelist"
+          },
+          "link": 87
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "IMAGE",
+          "links": null
+        },
+        {
+          "localized_name": "fps",
+          "name": "fps",
+          "type": "FLOAT",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI_RvTools",
+        "ver": "80934985ff7d068974d8da434c4bbd529fab4d44",
+        "Node name for S&R": "Combine Video Clips [RvTools]"
+      },
+      "widgets_values": [
+        81,
+        false,
+        "",
+        ""
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 27,
+      "type": "VC-Filename Generator I [RvTools]",
+      "pos": [
+        901,
+        291
+      ],
+      "size": [
+        279,
+        229
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "path",
+          "name": "path",
+          "type": "STRING",
+          "widget": {
+            "name": "path"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "filename_prefix",
+          "name": "filename_prefix",
+          "type": "STRING",
+          "widget": {
+            "name": "filename_prefix"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "filename_suffix_start",
+          "name": "filename_suffix_start",
+          "type": "INT",
+          "widget": {
+            "name": "filename_suffix_start"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "file_extension",
+          "name": "file_extension",
+          "type": "STRING",
+          "widget": {
+            "name": "file_extension"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "frame_load_cap",
+          "name": "frame_load_cap",
+          "type": "INT",
+          "widget": {
+            "name": "frame_load_cap"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "mask_first_frames",
+          "name": "mask_first_frames",
+          "type": "INT",
+          "widget": {
+            "name": "mask_first_frames"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "mask_last_frames",
+          "name": "mask_last_frames",
+          "type": "INT",
+          "widget": {
+            "name": "mask_last_frames"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "pipe",
+          "name": "pipe",
+          "type": "pipe",
+          "links": [
+            73
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "994eaf2129f473afc42eb42c160e7e7cec644dd6",
+        "Node name for S&R": "VC-Filename Generator I [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "D:\\AI\\ComfyUI_windows_portable\\ComfyUI\\output\\WAN\\2025-08-28\\batch_1\\Video",
+        "vc_1stPass",
+        1,
+        "fixed",
+        ".webm",
+        81,
+        10,
+        0
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 7,
+      "type": "VC-Filename Generator II [RvTools]",
+      "pos": [
+        901,
+        1131
+      ],
+      "size": [
+        279,
+        229
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "path",
+          "name": "path",
+          "type": "STRING",
+          "widget": {
+            "name": "path"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "filename_prefix",
+          "name": "filename_prefix",
+          "type": "STRING",
+          "widget": {
+            "name": "filename_prefix"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "filename_suffix_start",
+          "name": "filename_suffix_start",
+          "type": "INT",
+          "widget": {
+            "name": "filename_suffix_start"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "filename_suffix_end",
+          "name": "filename_suffix_end",
+          "type": "INT",
+          "widget": {
+            "name": "filename_suffix_end"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "join_suffix_start",
+          "name": "join_suffix_start",
+          "type": "INT",
+          "widget": {
+            "name": "join_suffix_start"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "simple_combine",
+          "name": "simple_combine",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "simple_combine"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "file_extension",
+          "name": "file_extension",
+          "type": "STRING",
+          "widget": {
+            "name": "file_extension"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "frame_load_cap",
+          "name": "frame_load_cap",
+          "type": "INT",
+          "widget": {
+            "name": "frame_load_cap"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "pipe",
+          "name": "pipe",
+          "type": "pipe",
+          "links": [
+            74
+          ]
+        }
+      ],
+      "title": "VC-Filename Generator II (Combine)",
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "ba41d8fedbd635e1961821b5c321a19d1fb3b40d",
+        "Node name for S&R": "VC-Filename Generator II [RvTools]",
+        "cnr_id": "ComfyUI-RvTools",
+        "widget_ue_connectable": {}
+      },
+      "widgets_values": [
+        "D:\\AI\\ComfyUI_windows_portable\\ComfyUI\\output\\WAN\\2025-08-28\\batch_1\\Video",
+        "vc_1stPass",
+        1,
+        9,
+        1,
+        false,
+        ".webm",
+        81
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 37,
+      "type": "Pipe Out VC Name Generator [RvTools]",
+      "pos": [
+        1211,
+        291
+      ],
+      "size": [
+        259,
+        169
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "pipe",
+          "name": "pipe",
+          "type": "pipe",
+          "link": 73
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "path",
+          "name": "path",
+          "type": "STRING",
+          "links": [
+            75
+          ]
+        },
+        {
+          "localized_name": "rel_path",
+          "name": "rel_path",
+          "type": "STRING",
+          "links": [
+            76
+          ]
+        },
+        {
+          "localized_name": "frame_load_cap",
+          "name": "frame_load_cap",
+          "type": "INT",
+          "links": [
+            77
+          ]
+        },
+        {
+          "localized_name": "mask_first_frames",
+          "name": "mask_first_frames",
+          "type": "INT",
+          "links": [
+            78
+          ]
+        },
+        {
+          "localized_name": "mask_last_frames",
+          "name": "mask_last_frames",
+          "type": "INT",
+          "links": [
+            79
+          ]
+        },
+        {
+          "localized_name": "simple_combine",
+          "name": "simple_combine",
+          "type": "BOOLEAN",
+          "links": null
+        },
+        {
+          "localized_name": "files",
+          "name": "files",
+          "type": "STRING",
+          "links": [
+            80,
+            81
+          ]
+        },
+        {
+          "localized_name": "files_join",
+          "name": "files_join",
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI_RvTools",
+        "ver": "80934985ff7d068974d8da434c4bbd529fab4d44",
+        "Node name for S&R": "Pipe Out VC Name Generator [RvTools]"
+      },
+      "widgets_values": [],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 29,
+      "type": "Add Folder [RvTools]",
+      "pos": [
+        1211,
+        1341
+      ],
+      "size": [
+        259,
+        59
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "path",
+          "name": "path",
+          "type": "STRING",
+          "link": 89
+        },
+        {
+          "localized_name": "folder_name",
+          "name": "folder_name",
+          "type": "STRING",
+          "widget": {
+            "name": "folder_name"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "string",
+          "name": "string",
+          "type": "STRING",
+          "links": [
+            45
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "994eaf2129f473afc42eb42c160e7e7cec644dd6",
+        "Node name for S&R": "Add Folder [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "combined\\vc_combined"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 25,
+      "type": "VHS_VideoCombine",
+      "pos": [
+        2161,
+        1131
+      ],
+      "size": [
+        259,
+        334
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 18,
+      "mode": 4,
+      "inputs": [
+        {
+          "localized_name": "images",
+          "name": "images",
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "localized_name": "audio",
+          "name": "audio",
+          "shape": 7,
+          "type": "AUDIO",
+          "link": 46
+        },
+        {
+          "localized_name": "meta_batch",
+          "name": "meta_batch",
+          "shape": 7,
+          "type": "VHS_BatchManager",
+          "link": null
+        },
+        {
+          "localized_name": "vae",
+          "name": "vae",
+          "shape": 7,
+          "type": "VAE",
+          "link": null
+        },
+        {
+          "localized_name": "frame_rate",
+          "name": "frame_rate",
+          "type": "FLOAT",
+          "widget": {
+            "name": "frame_rate"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "loop_count",
+          "name": "loop_count",
+          "type": "INT",
+          "widget": {
+            "name": "loop_count"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "filename_prefix",
+          "name": "filename_prefix",
+          "type": "STRING",
+          "widget": {
+            "name": "filename_prefix"
+          },
+          "link": 45
+        },
+        {
+          "localized_name": "format",
+          "name": "format",
+          "type": "COMBO",
+          "widget": {
+            "name": "format"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "pingpong",
+          "name": "pingpong",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "pingpong"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "save_output",
+          "name": "save_output",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "save_output"
+          },
+          "link": null
+        },
+        {
+          "name": "pix_fmt",
+          "type": [
+            "yuv420p",
+            "yuv420p10le"
+          ],
+          "widget": {
+            "name": "pix_fmt"
+          },
+          "link": null
+        },
+        {
+          "name": "crf",
+          "type": "INT",
+          "widget": {
+            "name": "crf"
+          },
+          "link": null
+        },
+        {
+          "name": "save_metadata",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "save_metadata"
+          },
+          "link": null
+        },
+        {
+          "name": "trim_to_audio",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "trim_to_audio"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "Filenames",
+          "name": "Filenames",
+          "type": "VHS_FILENAMES",
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-videohelpersuite",
+        "ver": "1.6.1",
+        "Node name for S&R": "VHS_VideoCombine",
+        "widget_ue_connectable": {
+          "frame_rate": true,
+          "loop_count": true,
+          "filename_prefix": true,
+          "format": true,
+          "pingpong": true,
+          "save_output": true
+        }
+      },
+      "widgets_values": {
+        "frame_rate": 16,
+        "loop_count": 1,
+        "filename_prefix": "vc_combined",
+        "format": "video/h264-mp4",
+        "pix_fmt": "yuv420p",
+        "crf": 19,
+        "save_metadata": false,
+        "trim_to_audio": true,
+        "pingpong": false,
+        "save_output": true,
+        "videopreview": {
+          "hidden": false,
+          "paused": false,
+          "params": {
+            "filename": "vc_combined_00002-audio.mp4",
+            "subfolder": "WAN\\2025-08-28\\batch_1\\Video\\combined",
+            "type": "output",
+            "format": "video/h264-mp4",
+            "frame_rate": 16,
+            "workflow": "vc_combined_00002.png",
+            "fullpath": "D:\\AI\\ComfyUI_windows_portable\\ComfyUI\\output\\WAN\\2025-08-28\\batch_1\\Video\\combined\\vc_combined_00002-audio.mp4"
+          }
+        }
+      },
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 4,
+      "type": "VHS_VideoCombine",
+      "pos": [
+        2161,
+        291
+      ],
+      "size": [
+        259,
+        334
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 16,
+      "mode": 4,
+      "inputs": [
+        {
+          "localized_name": "images",
+          "name": "images",
+          "type": "IMAGE",
+          "link": 51
+        },
+        {
+          "localized_name": "audio",
+          "name": "audio",
+          "shape": 7,
+          "type": "AUDIO",
+          "link": null
+        },
+        {
+          "localized_name": "meta_batch",
+          "name": "meta_batch",
+          "shape": 7,
+          "type": "VHS_BatchManager",
+          "link": null
+        },
+        {
+          "localized_name": "vae",
+          "name": "vae",
+          "shape": 7,
+          "type": "VAE",
+          "link": null
+        },
+        {
+          "localized_name": "frame_rate",
+          "name": "frame_rate",
+          "type": "FLOAT",
+          "widget": {
+            "name": "frame_rate"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "loop_count",
+          "name": "loop_count",
+          "type": "INT",
+          "widget": {
+            "name": "loop_count"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "filename_prefix",
+          "name": "filename_prefix",
+          "type": "STRING",
+          "widget": {
+            "name": "filename_prefix"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "format",
+          "name": "format",
+          "type": "COMBO",
+          "widget": {
+            "name": "format"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "pingpong",
+          "name": "pingpong",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "pingpong"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "save_output",
+          "name": "save_output",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "save_output"
+          },
+          "link": null
+        },
+        {
+          "name": "pix_fmt",
+          "type": [
+            "yuv420p",
+            "yuv420p10le"
+          ],
+          "widget": {
+            "name": "pix_fmt"
+          },
+          "link": null
+        },
+        {
+          "name": "crf",
+          "type": "INT",
+          "widget": {
+            "name": "crf"
+          },
+          "link": null
+        },
+        {
+          "name": "save_metadata",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "save_metadata"
+          },
+          "link": null
+        },
+        {
+          "name": "trim_to_audio",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "trim_to_audio"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "Filenames",
+          "name": "Filenames",
+          "type": "VHS_FILENAMES",
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-videohelpersuite",
+        "ver": "1.6.1",
+        "Node name for S&R": "VHS_VideoCombine",
+        "widget_ue_connectable": {
+          "frame_rate": true,
+          "loop_count": true,
+          "filename_prefix": true,
+          "format": true,
+          "pingpong": true,
+          "save_output": true
+        }
+      },
+      "widgets_values": {
+        "frame_rate": 30,
+        "loop_count": 0,
+        "filename_prefix": "vc_masked",
+        "format": "video/h264-mp4",
+        "pix_fmt": "yuv420p",
+        "crf": 19,
+        "save_metadata": false,
+        "trim_to_audio": false,
+        "pingpong": false,
+        "save_output": false,
+        "videopreview": {
+          "hidden": false,
+          "paused": true,
+          "params": {
+            "filename": "vc_masked_00003.mp4",
+            "subfolder": "",
+            "type": "temp",
+            "format": "video/h264-mp4",
+            "frame_rate": 30,
+            "workflow": "vc_masked_00003.png",
+            "fullpath": "D:\\AI\\ComfyUI_windows_portable\\ComfyUI\\temp\\vc_masked_00003.mp4"
+          }
+        }
+      },
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 38,
+      "type": "Pipe Out VC Name Generator [RvTools]",
+      "pos": [
+        1211,
+        1131
+      ],
+      "size": [
+        259,
+        169
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "pipe",
+          "name": "pipe",
+          "type": "pipe",
+          "link": 74
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "path",
+          "name": "path",
+          "type": "STRING",
+          "links": [
+            82,
+            89
+          ]
+        },
+        {
+          "localized_name": "rel_path",
+          "name": "rel_path",
+          "type": "STRING",
+          "links": [
+            83
+          ]
+        },
+        {
+          "localized_name": "frame_load_cap",
+          "name": "frame_load_cap",
+          "type": "INT",
+          "links": [
+            84
+          ]
+        },
+        {
+          "localized_name": "mask_first_frames",
+          "name": "mask_first_frames",
+          "type": "INT",
+          "links": null
+        },
+        {
+          "localized_name": "mask_last_frames",
+          "name": "mask_last_frames",
+          "type": "INT",
+          "links": null
+        },
+        {
+          "localized_name": "simple_combine",
+          "name": "simple_combine",
+          "type": "BOOLEAN",
+          "links": [
+            85
+          ]
+        },
+        {
+          "localized_name": "files",
+          "name": "files",
+          "type": "STRING",
+          "links": [
+            86,
+            90
+          ]
+        },
+        {
+          "localized_name": "files_join",
+          "name": "files_join",
+          "type": "STRING",
+          "links": [
+            87,
+            91
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI_RvTools",
+        "ver": "80934985ff7d068974d8da434c4bbd529fab4d44",
+        "Node name for S&R": "Pipe Out VC Name Generator [RvTools]"
+      },
+      "widgets_values": [],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    }
+  ],
+  "links": [
+    [
+      45,
+      29,
+      0,
+      25,
+      6,
+      "STRING"
+    ],
+    [
+      46,
+      30,
+      0,
+      25,
+      1,
+      "AUDIO"
+    ],
+    [
+      51,
+      31,
+      0,
+      4,
+      0,
+      "IMAGE"
+    ],
+    [
+      52,
+      31,
+      1,
+      5,
+      0,
+      "IMAGE"
+    ],
+    [
+      73,
+      27,
+      0,
+      37,
+      0,
+      "pipe"
+    ],
+    [
+      74,
+      7,
+      0,
+      38,
+      0,
+      "pipe"
+    ],
+    [
+      75,
+      37,
+      0,
+      13,
+      0,
+      "*"
+    ],
+    [
+      76,
+      37,
+      1,
+      14,
+      0,
+      "*"
+    ],
+    [
+      77,
+      37,
+      2,
+      31,
+      0,
+      "INT"
+    ],
+    [
+      78,
+      37,
+      3,
+      31,
+      1,
+      "INT"
+    ],
+    [
+      79,
+      37,
+      4,
+      31,
+      2,
+      "INT"
+    ],
+    [
+      80,
+      37,
+      6,
+      31,
+      3,
+      "STRING"
+    ],
+    [
+      81,
+      37,
+      6,
+      15,
+      0,
+      "*"
+    ],
+    [
+      82,
+      38,
+      0,
+      19,
+      0,
+      "*"
+    ],
+    [
+      83,
+      38,
+      1,
+      20,
+      0,
+      "*"
+    ],
+    [
+      84,
+      38,
+      2,
+      34,
+      0,
+      "INT"
+    ],
+    [
+      85,
+      38,
+      5,
+      34,
+      1,
+      "BOOLEAN"
+    ],
+    [
+      86,
+      38,
+      6,
+      34,
+      2,
+      "STRING"
+    ],
+    [
+      87,
+      38,
+      7,
+      34,
+      3,
+      "STRING"
+    ],
+    [
+      89,
+      38,
+      0,
+      29,
+      0,
+      "STRING"
+    ],
+    [
+      90,
+      38,
+      6,
+      21,
+      0,
+      "*"
+    ],
+    [
+      91,
+      38,
+      7,
+      22,
+      0,
+      "*"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.6303940863128489,
+      "offset": [
+        189.74363691883215,
+        -37.20465928530287
+      ]
+    },
+    "ue_links": [],
+    "links_added_by_ue": []
+  },
+  "version": 0.4
+}

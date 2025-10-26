@@ -1,0 +1,39 @@
+agfa apx 400
+agfa vista
+agfacolor pro 200
+cinestill 50
+cinestill 800t
+ektar 100
+fine grain
+fomapan 400
+fuji superia 400
+fujichrome provia 100f
+fujicolor c200
+fujicolor fujichrome velvia 100
+fujicolor pro 400h
+fujicolor pro
+fujicolor superia x-tra 400
+fujifilm neopan 100
+fujifilm xt3
+ilford fp4 125
+ilford hp5 plus 400
+ilford hp5 plus b&w
+ilford hp5
+ilford xp2 400
+kodak ektachrome e100
+kodak ektar 100
+kodak gold 200
+kodak portra 160
+kodak portra 400
+kodak portra 800
+kodak tri-x 400 b&w
+kodak tri-x 400
+kodak ultra max 400
+kodak ultra max 800
+kodak vision3 imax
+kodak vision3
+lomochrome color film
+lomography color 100
+muted low grain
+prominent grain
+velvia 100

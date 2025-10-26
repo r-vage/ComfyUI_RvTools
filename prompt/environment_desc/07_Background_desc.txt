@@ -1,0 +1,22 @@
+beautiful detailed water: In the background is beautifully rendered water, with shimmering reflections, gentle ripples, and rich blue tones.
+christmas: In the background is a festive Christmas scene with twinkling lights, decorated trees, and a cozy, wintry atmosphere.
+feather: In the background are delicate, floating feathers in light, airy colors.
+gradient background: In the background is a smooth gradient blending harmonious colors, creating a modern and elegant effect.
+halloween: In the background is a spooky Halloween scene with pumpkins, bats, and eerie moonlight, evoking a mysterious mood.
+indoors: In the background is an indoor setting with subtle furniture, soft lighting, and warm tones.
+landscape: In the background is a scenic landscape with rolling hills, trees, and a distant horizon under open sky.
+magic circle: In the background are glowing magic circles, runes, and ethereal light effects.
+outdoors: In the background is an outdoor scene with natural elements like grass, trees, and open sky, providing fresh ambiance.
+pentagram: In the background is a glowing pentagram, mystical symbols, and a dark, magical atmosphere.
+science fiction: In the background is a futuristic sci-fi scene with sleek technology, neon lights, and imaginative space elements.
+simple background: In the background is a clean, uncluttered space with soft colors or subtle textures, keeping focus on the subject.
+transparent background: In the background is a transparent space, allowing the subject to stand out without visual distractions.
+valentine: In the background are romantic Valentine elements with hearts, soft pink hues, and gentle light, evoking love and warmth.
+white background: In the background is a pure white space, bright and minimal, perfect for highlighting the subject.
+starry night: In the background are twinkling stars and a deep blue night sky, creating a dreamy, celestial effect.
+autumn leaves: In the background are colorful autumn leaves, warm tones, and a seasonal atmosphere.
+city skyline: In the background is a distant city skyline with glowing windows and silhouetted buildings against the sky.
+forest canopy: In the background is a lush canopy of overlapping tree branches and leaves, with dappled sunlight filtering through.
+mountain mist: In the background are misty mountains, soft clouds, and layered peaks fading into the distance.
+sunset glow: In the background is warm sunset light, with soft gradients and gentle colors.
+bokeh lights: In the background are blurred, glowing bokeh lights in various colors, adding depth and atmosphere.

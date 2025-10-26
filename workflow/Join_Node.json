@@ -1,0 +1,616 @@
+{
+  "id": "00000000-0000-0000-0000-000000000000",
+  "revision": 0,
+  "last_node_id": 13,
+  "last_link_id": 13,
+  "nodes": [
+    {
+      "id": 5,
+      "type": "Show Any [RvTools]",
+      "pos": [
+        1520,
+        355
+      ],
+      "size": [
+        443,
+        601
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 4
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Show Any [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "show",
+        "tensor([[[[0.3255, 0.3098, 0.2627],\n          [0.3176, 0.3020, 0.2510],\n          [0.3176, 0.3020, 0.2510],\n          ...,\n          [0.3451, 0.3490, 0.3059],\n          [0.3529, 0.3529, 0.3137],\n          [0.3804, 0.3686, 0.3451]],\n\n         [[0.3216, 0.3098, 0.2549],\n          [0.3216, 0.3098, 0.2549],\n          [0.3216, 0.3098, 0.2588],\n          ...,\n          [0.3098, 0.3176, 0.2784],\n          [0.3333, 0.3412, 0.3098],\n          [0.3569, 0.3569, 0.3255]],\n\n         [[0.3216, 0.3098, 0.2588],\n          [0.3255, 0.3098, 0.2588],\n          [0.3216, 0.3059, 0.2588],\n          ...,\n          [0.3255, 0.3294, 0.2902],\n          [0.3373, 0.3412, 0.3137],\n          [0.3451, 0.3412, 0.3137]],\n\n         ...,\n\n         [[0.2863, 0.3294, 0.3882],\n          [0.2863, 0.3333, 0.3961],\n          [0.2941, 0.3373, 0.4000],\n          ...,\n          [0.0784, 0.1020, 0.1216],\n          [0.0824, 0.1098, 0.1255],\n          [0.0902, 0.1176, 0.1412]],\n\n         [[0.2824, 0.3255, 0.3843],\n          [0.2863, 0.3333, 0.3961],\n          [0.2902, 0.3333, 0.4000],\n          ...,\n          [0.0784, 0.1020, 0.1216],\n          [0.0824, 0.1059, 0.1255],\n          [0.0980, 0.1176, 0.1490]],\n\n         [[0.2980, 0.3255, 0.3922],\n          [0.2824, 0.3255, 0.4000],\n          [0.2824, 0.3255, 0.4078],\n          ...,\n          [0.0627, 0.0941, 0.1059],\n          [0.0706, 0.1098, 0.1176],\n          [0.0824, 0.1137, 0.1373]]],\n\n\n        [[[0.1098, 0.1020, 0.0745],\n          [0.1119, 0.1040, 0.0786],\n          [0.1121, 0.1051, 0.0799],\n          ...,\n          [0.1866, 0.2423, 0.2580],\n          [0.1845, 0.2357, 0.2495],\n          [0.1804, 0.2275, 0.2392]],\n\n         [[0.1077, 0.1020, 0.0767],\n          [0.1086, 0.1018, 0.0796],\n          [0.1087, 0.1017, 0.0808],\n          ...,\n          [0.1888, 0.2488, 0.2645],\n          [0.1907, 0.2452, 0.2611],\n          [0.1911, 0.2404, 0.2564]],\n\n         [[0.1030, 0.0990, 0.0755],\n          [0.1040, 0.0985, 0.0786],\n          [0.1049, 0.0986, 0.0808],\n          ...,\n          [0.1935, 0.2568, 0.2735],\n          [0.1983, 0.2559, 0.2745],\n          [0.2019, 0.2539, 0.2745]],\n\n         ...,\n\n         [[0.8794, 0.8824, 0.8892],\n          [0.8784, 0.8818, 0.8851],\n          [0.8777, 0.8818, 0.8824],\n          ...,\n          [0.7416, 0.6396, 0.6087],\n          [0.7531, 0.6516, 0.6165],\n          [0.7598, 0.6588, 0.6206]],\n\n         [[0.8767, 0.8824, 0.8884],\n          [0.8776, 0.8824, 0.8871],\n          [0.8792, 0.8827, 0.8863],\n          ...,\n          [0.7476, 0.6488, 0.6186],\n          [0.7556, 0.6581, 0.6238],\n          [0.7590, 0.6624, 0.6249]],\n\n         [[0.8745, 0.8824, 0.8863],\n          [0.8766, 0.8824, 0.8883],\n          [0.8800, 0.8832, 0.8902],\n          ...,\n          [0.7536, 0.6587, 0.6281],\n          [0.7569, 0.6646, 0.6314],\n          [0.7569, 0.6667, 0.6314]]],\n\n\n        [[[0.8431, 0.8745, 0.9255],\n          [0.8431, 0.8745, 0.9255],\n          [0.8431, 0.8745, 0.9255],\n          ...,\n          [0.9446, 0.6667, 0.9020],\n          [0.9425, 0.6667, 0.9020],\n          [0.9412, 0.6667, 0.9020]],\n\n         [[0.8431, 0.8745, 0.9255],\n          [0.8431, 0.8745, 0.9255],\n          [0.8431, 0.8745, 0.9255],\n          ...,\n          [0.9446, 0.6667, 0.9020],\n          [0.9425, 0.6667, 0.9020],\n          [0.9412, 0.6667, 0.9020]],\n\n         [[0.8431, 0.8745, 0.9255],\n          [0.8431, 0.8745, 0.9255],\n          [0.8431, 0.8745, 0.9255],\n          ...,\n          [0.9446, 0.6667, 0.9020],\n          [0.9425, 0.6667, 0.9020],\n          [0.9412, 0.6667, 0.9020]],\n\n         ...,\n\n         [[0.8495, 0.8770, 0.9162],\n          [0.8441, 0.8715, 0.9107],\n          [0.8350, 0.8624, 0.9016],\n          ...,\n          [0.5438, 0.5085, 0.5125],\n          [0.5313, 0.4960, 0.4999],\n          [0.5238, 0.4885, 0.4924]],\n\n         [[0.7866, 0.8140, 0.8532],\n          [0.7805, 0.8079, 0.8471],\n          [0.7702, 0.7977, 0.8369],\n          ...,\n          [0.5278, 0.4925, 0.4965],\n          [0.5164, 0.4811, 0.4850],\n          [0.5096, 0.4743, 0.4782]],\n\n         [[0.7529, 0.7804, 0.8196],\n          [0.7465, 0.7739, 0.8131],\n          [0.7356, 0.7631, 0.8023],\n          ...,\n          [0.5193, 0.4840, 0.4879],\n          [0.5084, 0.4731, 0.4771],\n          [0.5020, 0.4667, 0.4706]]]])"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 12,
+      "type": "Join [RvTools]",
+      "pos": [
+        1210,
+        1033
+      ],
+      "size": [
+        270,
+        142
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "input_1",
+          "shape": 7,
+          "type": "STRING",
+          "link": 6
+        },
+        {
+          "name": "input_2",
+          "shape": 7,
+          "type": "STRING",
+          "link": 7
+        },
+        {
+          "name": "input_3",
+          "type": "STRING",
+          "link": 8
+        },
+        {
+          "name": "input_4",
+          "type": "STRING",
+          "link": 9
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            10
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        4,
+        ", "
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 13,
+      "type": "Show Any [RvTools]",
+      "pos": [
+        1514,
+        1018
+      ],
+      "size": [
+        449,
+        155
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 10
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Show Any [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "hide",
+        "text2, text4"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 8,
+      "type": "String Multiline [RvTools]",
+      "pos": [
+        912,
+        1038
+      ],
+      "size": [
+        210,
+        108
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "string",
+          "type": "STRING",
+          "links": [
+            7
+          ]
+        },
+        {
+          "name": "string_list",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "String Multiline [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "text2"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 10,
+      "type": "String Multiline [RvTools]",
+      "pos": [
+        915,
+        1311
+      ],
+      "size": [
+        210,
+        108
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "string",
+          "type": "STRING",
+          "links": [
+            9
+          ]
+        },
+        {
+          "name": "string_list",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "String Multiline [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "text4"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 2,
+      "type": "Join [RvTools]",
+      "pos": [
+        1225,
+        355
+      ],
+      "size": [
+        270,
+        122
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "input_1",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 11
+        },
+        {
+          "name": "input_2",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 13
+        },
+        {
+          "name": "input_3",
+          "type": "IMAGE",
+          "link": 12
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            4
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        3,
+        ", "
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 1,
+      "type": "Load Image (Metadata Pipe) [RvTools]",
+      "pos": [
+        611,
+        356
+      ],
+      "size": [
+        275,
+        497
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            11
+          ]
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "links": []
+        },
+        {
+          "name": "pipe",
+          "type": "pipe",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Load Image (Metadata Pipe) [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "image_0011.png",
+        "image"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 6,
+      "type": "Load Image (Metadata Pipe) [RvTools]",
+      "pos": [
+        612,
+        905
+      ],
+      "size": [
+        275,
+        497
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            12
+          ]
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "links": []
+        },
+        {
+          "name": "pipe",
+          "type": "pipe",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Load Image (Metadata Pipe) [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "-5134583881851316823_121.jpg",
+        "image"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 3,
+      "type": "Load Image (Metadata Pipe) [RvTools]",
+      "pos": [
+        907,
+        355
+      ],
+      "size": [
+        275,
+        497
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            13
+          ]
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "links": []
+        },
+        {
+          "name": "pipe",
+          "type": "pipe",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Load Image (Metadata Pipe) [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "31073378-2039823409431-photo of beautiful age 18 girl, blonde hair, sexy, beautiful, naked, perfect breasts, big boobs, nipples, dslr, 8k, 4k, cinemati.png",
+        "image"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 7,
+      "type": "String Multiline [RvTools]",
+      "pos": [
+        910,
+        907
+      ],
+      "size": [
+        210,
+        108
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 4,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "string",
+          "type": "STRING",
+          "links": [
+            6
+          ]
+        },
+        {
+          "name": "string_list",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "String Multiline [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "text1"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 9,
+      "type": "String Multiline [RvTools]",
+      "pos": [
+        913,
+        1171
+      ],
+      "size": [
+        210,
+        108
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 4,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "string",
+          "type": "STRING",
+          "links": [
+            8
+          ]
+        },
+        {
+          "name": "string_list",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "String Multiline [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "text3"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    }
+  ],
+  "links": [
+    [
+      4,
+      2,
+      0,
+      5,
+      0,
+      "*"
+    ],
+    [
+      6,
+      7,
+      0,
+      12,
+      0,
+      "*"
+    ],
+    [
+      7,
+      8,
+      0,
+      12,
+      1,
+      "STRING"
+    ],
+    [
+      8,
+      9,
+      0,
+      12,
+      2,
+      "STRING"
+    ],
+    [
+      9,
+      10,
+      0,
+      12,
+      3,
+      "STRING"
+    ],
+    [
+      10,
+      12,
+      0,
+      13,
+      0,
+      "*"
+    ],
+    [
+      11,
+      1,
+      0,
+      2,
+      0,
+      "IMAGE"
+    ],
+    [
+      12,
+      6,
+      0,
+      2,
+      2,
+      "IMAGE"
+    ],
+    [
+      13,
+      3,
+      0,
+      2,
+      1,
+      "IMAGE"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 1,
+      "offset": [
+        -24.03886346560961,
+        -153.73697151833863
+      ]
+    },
+    "frontendVersion": "1.30.0",
+    "VHS_latentpreview": false,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true
+  },
+  "version": 0.4
+}

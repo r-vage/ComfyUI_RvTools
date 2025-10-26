@@ -1,0 +1,5213 @@
+{
+  "id": "00000000-0000-0000-0000-000000000000",
+  "revision": 0,
+  "last_node_id": 288,
+  "last_link_id": 432,
+  "nodes": [
+    {
+      "id": 154,
+      "type": "easy showAnything",
+      "pos": [
+        -2209,
+        806
+      ],
+      "size": [
+        229,
+        89
+      ],
+      "flags": {},
+      "order": 52,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "anything",
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 137
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-easy-use",
+        "ver": "1.3.3",
+        "Node name for S&R": "easy showAnything"
+      },
+      "widgets_values": [
+        "SD15\\Standard\\hd_helper_v1.safetensors"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 178,
+      "type": "Preview Image [RvTools]",
+      "pos": [
+        -5030,
+        -25
+      ],
+      "size": [
+        326,
+        290
+      ],
+      "flags": {},
+      "order": 43,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "images",
+          "name": "images",
+          "type": "IMAGE",
+          "link": 340
+        },
+        {
+          "localized_name": "Show_Images",
+          "name": "Show_Images",
+          "type": "INT",
+          "widget": {
+            "name": "Show_Images"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "IMAGE",
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": []
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "bb52e8d4e6db9afc74c4b56f37017ae6921fa554",
+        "Node name for S&R": "Preview Image [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        -1
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 180,
+      "type": "Preview Image [RvTools]",
+      "pos": [
+        -5030,
+        372
+      ],
+      "size": [
+        326,
+        290
+      ],
+      "flags": {},
+      "order": 39,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "images",
+          "name": "images",
+          "type": "IMAGE",
+          "link": 342
+        },
+        {
+          "localized_name": "Show_Images",
+          "name": "Show_Images",
+          "type": "INT",
+          "widget": {
+            "name": "Show_Images"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "IMAGE",
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": []
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "bb52e8d4e6db9afc74c4b56f37017ae6921fa554",
+        "Node name for S&R": "Preview Image [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        -1
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 182,
+      "type": "Preview Image [RvTools]",
+      "pos": [
+        -5033,
+        767
+      ],
+      "size": [
+        326,
+        290
+      ],
+      "flags": {},
+      "order": 40,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "images",
+          "name": "images",
+          "type": "IMAGE",
+          "link": 344
+        },
+        {
+          "localized_name": "Show_Images",
+          "name": "Show_Images",
+          "type": "INT",
+          "widget": {
+            "name": "Show_Images"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "IMAGE",
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": []
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "bb52e8d4e6db9afc74c4b56f37017ae6921fa554",
+        "Node name for S&R": "Preview Image [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        -1
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 183,
+      "type": "Preview Image [RvTools]",
+      "pos": [
+        -5030,
+        1163
+      ],
+      "size": [
+        326,
+        290
+      ],
+      "flags": {},
+      "order": 41,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "images",
+          "name": "images",
+          "type": "IMAGE",
+          "link": 346
+        },
+        {
+          "localized_name": "Show_Images",
+          "name": "Show_Images",
+          "type": "INT",
+          "widget": {
+            "name": "Show_Images"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "IMAGE",
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": []
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "bb52e8d4e6db9afc74c4b56f37017ae6921fa554",
+        "Node name for S&R": "Preview Image [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        -1
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 186,
+      "type": "Preview Image [RvTools]",
+      "pos": [
+        -5028,
+        1563
+      ],
+      "size": [
+        326,
+        290
+      ],
+      "flags": {},
+      "order": 42,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "images",
+          "name": "images",
+          "type": "IMAGE",
+          "link": 348
+        },
+        {
+          "localized_name": "Show_Images",
+          "name": "Show_Images",
+          "type": "INT",
+          "widget": {
+            "name": "Show_Images"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "IMAGE",
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": []
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "bb52e8d4e6db9afc74c4b56f37017ae6921fa554",
+        "Node name for S&R": "Preview Image [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        -1
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 190,
+      "type": "Preview Mask [RvTools]",
+      "pos": [
+        -4680,
+        1565
+      ],
+      "size": [
+        270,
+        270.00006103515625
+      ],
+      "flags": {},
+      "order": 22,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "masks",
+          "name": "masks",
+          "type": "MASK",
+          "link": 198
+        },
+        {
+          "localized_name": "Show_Masks",
+          "name": "Show_Masks",
+          "type": "INT",
+          "widget": {
+            "name": "Show_Masks"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "MASK",
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Preview Mask [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        -1
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 189,
+      "type": "Preview Mask [RvTools]",
+      "pos": [
+        -4683,
+        372
+      ],
+      "size": [
+        271,
+        288
+      ],
+      "flags": {},
+      "order": 18,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "masks",
+          "name": "masks",
+          "type": "MASK",
+          "link": 197
+        },
+        {
+          "localized_name": "Show_Masks",
+          "name": "Show_Masks",
+          "type": "INT",
+          "widget": {
+            "name": "Show_Masks"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "MASK",
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Preview Mask [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        -1
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 211,
+      "type": "Show Any [RvTools]",
+      "pos": [
+        -1489,
+        616
+      ],
+      "size": [
+        269,
+        249
+      ],
+      "flags": {},
+      "order": 47,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "anything",
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 270
+        },
+        {
+          "localized_name": "show_images",
+          "name": "show_images",
+          "type": "COMBO",
+          "widget": {
+            "name": "show_images"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Show Any [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "hide",
+        "for prompt traveling"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 144,
+      "type": "String from List [RvTools]",
+      "pos": [
+        -1769,
+        616
+      ],
+      "size": [
+        269,
+        99
+      ],
+      "flags": {},
+      "order": 31,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "list_input",
+          "name": "list_input",
+          "type": "STRING",
+          "link": 423
+        },
+        {
+          "localized_name": "index",
+          "name": "index",
+          "type": "INT",
+          "widget": {
+            "name": "index"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "list item",
+          "name": "list item",
+          "shape": 6,
+          "type": "STRING",
+          "links": [
+            270
+          ]
+        },
+        {
+          "localized_name": "size",
+          "name": "size",
+          "type": "INT",
+          "links": null
+        },
+        {
+          "localized_name": "wraps",
+          "name": "wraps",
+          "shape": 6,
+          "type": "INT",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "4c53d98eb8a3d530309385fc46aa2ed313cae06a",
+        "Node name for S&R": "String from List [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        3
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 210,
+      "type": "Show Any [RvTools]",
+      "pos": [
+        -1489,
+        -24
+      ],
+      "size": [
+        269,
+        119
+      ],
+      "flags": {},
+      "order": 25,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "anything",
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 417
+        },
+        {
+          "localized_name": "show_images",
+          "name": "show_images",
+          "type": "COMBO",
+          "widget": {
+            "name": "show_images"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Show Any [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "hide",
+        "string list can be used for prompt traveling"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 213,
+      "type": "Show Any [RvTools]",
+      "pos": [
+        -1489,
+        136
+      ],
+      "size": [
+        269,
+        250
+      ],
+      "flags": {},
+      "order": 26,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "anything",
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 418
+        },
+        {
+          "localized_name": "show_images",
+          "name": "show_images",
+          "type": "COMBO",
+          "widget": {
+            "name": "show_images"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Show Any [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "hide",
+        "string",
+        "list",
+        "can be used",
+        "for prompt traveling"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 212,
+      "type": "Show Any [RvTools]",
+      "pos": [
+        -1489,
+        426
+      ],
+      "size": [
+        269,
+        149
+      ],
+      "flags": {},
+      "order": 51,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "anything",
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 271
+        },
+        {
+          "localized_name": "show_images",
+          "name": "show_images",
+          "type": "COMBO",
+          "widget": {
+            "name": "show_images"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Show Any [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "hide",
+        "<lora:SD15\\Standard\\hd_helper_v1.safetensors> <lora:SDXL\\Style\\SDXL_plaster_Test_Sa_May.safetensors> <lora:flux\\standard\\aidmaHyperrealism-FLUX-v0.3.safetensors>"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 137,
+      "type": "Lora Stack to String [RvTools]",
+      "pos": [
+        -1710,
+        426
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 34,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "lora_stack",
+          "name": "lora_stack",
+          "type": "LORA_STACK",
+          "link": 430
+        },
+        {
+          "localized_name": "remove_weight",
+          "name": "remove_weight",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "remove_weight"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "LoRA string",
+          "name": "LoRA string",
+          "type": "STRING",
+          "links": [
+            271
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "4c53d98eb8a3d530309385fc46aa2ed313cae06a",
+        "Node name for S&R": "Lora Stack to String [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        true
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 219,
+      "type": "Show Any [RvTools]",
+      "pos": [
+        -1499,
+        966
+      ],
+      "size": [
+        279,
+        119
+      ],
+      "flags": {},
+      "order": 36,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "anything",
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 281
+        },
+        {
+          "localized_name": "show_images",
+          "name": "show_images",
+          "type": "COMBO",
+          "widget": {
+            "name": "show_images"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Show Any [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "hide",
+        "10"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 214,
+      "type": "Convert Primitive [RvTools]",
+      "pos": [
+        -1779,
+        966
+      ],
+      "size": [
+        269,
+        59
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "input",
+          "name": "input",
+          "type": "STRING",
+          "link": 274
+        },
+        {
+          "localized_name": "convert_to",
+          "name": "convert_to",
+          "type": "COMBO",
+          "widget": {
+            "name": "convert_to"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            281
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Convert Primitive [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "STRING"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 221,
+      "type": "Show Any [RvTools]",
+      "pos": [
+        -1499,
+        1286
+      ],
+      "size": [
+        279,
+        119
+      ],
+      "flags": {},
+      "order": 38,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "anything",
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 282
+        },
+        {
+          "localized_name": "show_images",
+          "name": "show_images",
+          "type": "COMBO",
+          "widget": {
+            "name": "show_images"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Show Any [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "hide",
+        "('10', ['10'])"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 220,
+      "type": "Show Any [RvTools]",
+      "pos": [
+        -1499,
+        1126
+      ],
+      "size": [
+        279,
+        119
+      ],
+      "flags": {},
+      "order": 37,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "anything",
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 284
+        },
+        {
+          "localized_name": "show_images",
+          "name": "show_images",
+          "type": "COMBO",
+          "widget": {
+            "name": "show_images"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Show Any [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "hide",
+        "10.0"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 216,
+      "type": "Convert Primitive [RvTools]",
+      "pos": [
+        -1779,
+        1286
+      ],
+      "size": [
+        269,
+        59
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "input",
+          "name": "input",
+          "type": "STRING",
+          "link": 278
+        },
+        {
+          "localized_name": "convert_to",
+          "name": "convert_to",
+          "type": "COMBO",
+          "widget": {
+            "name": "convert_to"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "COMBO",
+          "type": "COMBO",
+          "links": [
+            282
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Convert Primitive [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "COMBO"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 131,
+      "type": "String Multiline [RvTools]",
+      "pos": [
+        -2209,
+        966
+      ],
+      "size": [
+        399,
+        199
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "string",
+          "name": "string",
+          "type": "STRING",
+          "widget": {
+            "name": "string"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "string",
+          "name": "string",
+          "type": "STRING",
+          "links": [
+            274,
+            276,
+            278
+          ]
+        },
+        {
+          "localized_name": "string_list",
+          "name": "string_list",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "4c53d98eb8a3d530309385fc46aa2ed313cae06a",
+        "Node name for S&R": "String Multiline [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "10"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 153,
+      "type": "Widget to String [RvTools]",
+      "pos": [
+        -2209,
+        606
+      ],
+      "size": [
+        228,
+        159
+      ],
+      "flags": {},
+      "order": 35,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "any_input",
+          "name": "any_input",
+          "shape": 7,
+          "type": "*",
+          "link": 431
+        },
+        {
+          "localized_name": "id",
+          "name": "id",
+          "type": "INT",
+          "widget": {
+            "name": "id"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "widget_name",
+          "name": "widget_name",
+          "type": "STRING",
+          "widget": {
+            "name": "widget_name"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "return_all",
+          "name": "return_all",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "return_all"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "node_title",
+          "name": "node_title",
+          "shape": 7,
+          "type": "STRING",
+          "widget": {
+            "name": "node_title"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "allowed_float_decimals",
+          "name": "allowed_float_decimals",
+          "shape": 7,
+          "type": "INT",
+          "widget": {
+            "name": "allowed_float_decimals"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "STRING",
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            137
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "4c53d98eb8a3d530309385fc46aa2ed313cae06a",
+        "Node name for S&R": "Widget to String [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        0,
+        "lora_name_1",
+        false,
+        "",
+        2
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 222,
+      "type": "Show Any [RvTools]",
+      "pos": [
+        -1499,
+        1446
+      ],
+      "size": [
+        279,
+        119
+      ],
+      "flags": {},
+      "order": 44,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "anything",
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 283
+        },
+        {
+          "localized_name": "show_images",
+          "name": "show_images",
+          "type": "COMBO",
+          "widget": {
+            "name": "show_images"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Show Any [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "hide",
+        "1.0"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 218,
+      "type": "Convert Primitive [RvTools]",
+      "pos": [
+        -1779,
+        1446
+      ],
+      "size": [
+        269,
+        59
+      ],
+      "flags": {},
+      "order": 24,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "input",
+          "name": "input",
+          "type": "FLOAT",
+          "link": 280
+        },
+        {
+          "localized_name": "convert_to",
+          "name": "convert_to",
+          "type": "COMBO",
+          "widget": {
+            "name": "convert_to"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            283
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Convert Primitive [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "STRING"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 215,
+      "type": "Convert Primitive [RvTools]",
+      "pos": [
+        -1779,
+        1126
+      ],
+      "size": [
+        269,
+        59
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "input",
+          "name": "input",
+          "type": "STRING",
+          "link": 276
+        },
+        {
+          "localized_name": "convert_to",
+          "name": "convert_to",
+          "type": "COMBO",
+          "widget": {
+            "name": "convert_to"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "FLOAT",
+          "type": "FLOAT",
+          "links": [
+            284
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Convert Primitive [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "FLOAT"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 173,
+      "type": "Load Image (Metadata Pipe) [RvTools]",
+      "pos": [
+        -5689,
+        372
+      ],
+      "size": [
+        277.2833251953125,
+        334
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "COMBO",
+          "widget": {
+            "name": "image"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "upload",
+          "name": "upload",
+          "type": "IMAGEUPLOAD",
+          "widget": {
+            "name": "upload"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            341
+          ]
+        },
+        {
+          "localized_name": "mask",
+          "name": "mask",
+          "type": "MASK",
+          "links": [
+            197
+          ]
+        },
+        {
+          "localized_name": "pipe",
+          "name": "pipe",
+          "type": "pipe",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Load Image (Metadata Pipe) [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "test_grayscale_alpha.png",
+        "image"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 174,
+      "type": "Load Image (Metadata Pipe) [RvTools]",
+      "pos": [
+        -5688,
+        768
+      ],
+      "size": [
+        277.2833251953125,
+        334.0000305175781
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "COMBO",
+          "widget": {
+            "name": "image"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "upload",
+          "name": "upload",
+          "type": "IMAGEUPLOAD",
+          "widget": {
+            "name": "upload"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            343
+          ]
+        },
+        {
+          "localized_name": "mask",
+          "name": "mask",
+          "type": "MASK",
+          "links": null
+        },
+        {
+          "localized_name": "pipe",
+          "name": "pipe",
+          "type": "pipe",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Load Image (Metadata Pipe) [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "test_palette.png",
+        "image"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 175,
+      "type": "Load Image (Metadata Pipe) [RvTools]",
+      "pos": [
+        -5683,
+        1162
+      ],
+      "size": [
+        277.2833251953125,
+        334.0000305175781
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "COMBO",
+          "widget": {
+            "name": "image"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "upload",
+          "name": "upload",
+          "type": "IMAGEUPLOAD",
+          "widget": {
+            "name": "upload"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            345
+          ]
+        },
+        {
+          "localized_name": "mask",
+          "name": "mask",
+          "type": "MASK",
+          "links": null
+        },
+        {
+          "localized_name": "pipe",
+          "name": "pipe",
+          "type": "pipe",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Load Image (Metadata Pipe) [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "test_rgb.png",
+        "image"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 250,
+      "type": "Image Convert [RvTools]",
+      "pos": [
+        -5350,
+        -25
+      ],
+      "size": [
+        270,
+        154
+      ],
+      "flags": {},
+      "order": 23,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "images",
+          "name": "images",
+          "type": "IMAGE",
+          "link": 339
+        },
+        {
+          "localized_name": "to_rgb",
+          "name": "to_rgb",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "to_rgb"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "to_grayscale",
+          "name": "to_grayscale",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "to_grayscale"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "remove_alpha",
+          "name": "remove_alpha",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "remove_alpha"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "style",
+          "name": "style",
+          "shape": 7,
+          "type": "COMBO",
+          "widget": {
+            "name": "style"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "images",
+          "name": "images",
+          "type": "IMAGE",
+          "links": [
+            340
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Image Convert [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        false,
+        false,
+        false,
+        "none"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 252,
+      "type": "Image Convert [RvTools]",
+      "pos": [
+        -5358,
+        768
+      ],
+      "size": [
+        270,
+        154
+      ],
+      "flags": {},
+      "order": 19,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "images",
+          "name": "images",
+          "type": "IMAGE",
+          "link": 343
+        },
+        {
+          "localized_name": "to_rgb",
+          "name": "to_rgb",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "to_rgb"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "to_grayscale",
+          "name": "to_grayscale",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "to_grayscale"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "remove_alpha",
+          "name": "remove_alpha",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "remove_alpha"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "style",
+          "name": "style",
+          "shape": 7,
+          "type": "COMBO",
+          "widget": {
+            "name": "style"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "images",
+          "name": "images",
+          "type": "IMAGE",
+          "links": [
+            344
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Image Convert [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        false,
+        true,
+        false,
+        "none"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 251,
+      "type": "Image Convert [RvTools]",
+      "pos": [
+        -5359,
+        373
+      ],
+      "size": [
+        270,
+        154
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "images",
+          "name": "images",
+          "type": "IMAGE",
+          "link": 341
+        },
+        {
+          "localized_name": "to_rgb",
+          "name": "to_rgb",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "to_rgb"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "to_grayscale",
+          "name": "to_grayscale",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "to_grayscale"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "remove_alpha",
+          "name": "remove_alpha",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "remove_alpha"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "style",
+          "name": "style",
+          "shape": 7,
+          "type": "COMBO",
+          "widget": {
+            "name": "style"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "images",
+          "name": "images",
+          "type": "IMAGE",
+          "links": [
+            342
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Image Convert [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        false,
+        false,
+        true,
+        "none"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 253,
+      "type": "Image Convert [RvTools]",
+      "pos": [
+        -5363,
+        1162
+      ],
+      "size": [
+        270,
+        154
+      ],
+      "flags": {},
+      "order": 20,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "images",
+          "name": "images",
+          "type": "IMAGE",
+          "link": 345
+        },
+        {
+          "localized_name": "to_rgb",
+          "name": "to_rgb",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "to_rgb"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "to_grayscale",
+          "name": "to_grayscale",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "to_grayscale"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "remove_alpha",
+          "name": "remove_alpha",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "remove_alpha"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "style",
+          "name": "style",
+          "shape": 7,
+          "type": "COMBO",
+          "widget": {
+            "name": "style"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "images",
+          "name": "images",
+          "type": "IMAGE",
+          "links": [
+            346
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Image Convert [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        false,
+        false,
+        false,
+        "hudson"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 254,
+      "type": "Image Convert [RvTools]",
+      "pos": [
+        -5353,
+        1560
+      ],
+      "size": [
+        270,
+        154
+      ],
+      "flags": {},
+      "order": 21,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "images",
+          "name": "images",
+          "type": "IMAGE",
+          "link": 347
+        },
+        {
+          "localized_name": "to_rgb",
+          "name": "to_rgb",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "to_rgb"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "to_grayscale",
+          "name": "to_grayscale",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "to_grayscale"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "remove_alpha",
+          "name": "remove_alpha",
+          "shape": 7,
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "remove_alpha"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "style",
+          "name": "style",
+          "shape": 7,
+          "type": "COMBO",
+          "widget": {
+            "name": "style"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "images",
+          "name": "images",
+          "type": "IMAGE",
+          "links": [
+            348
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Image Convert [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        true,
+        false,
+        true,
+        "slumber"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 176,
+      "type": "Load Image (Metadata Pipe) [RvTools]",
+      "pos": [
+        -5683,
+        1560
+      ],
+      "size": [
+        277.2833251953125,
+        334.00006103515625
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "COMBO",
+          "widget": {
+            "name": "image"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "upload",
+          "name": "upload",
+          "type": "IMAGEUPLOAD",
+          "widget": {
+            "name": "upload"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            347
+          ]
+        },
+        {
+          "localized_name": "mask",
+          "name": "mask",
+          "type": "MASK",
+          "links": [
+            198
+          ]
+        },
+        {
+          "localized_name": "pipe",
+          "name": "pipe",
+          "type": "pipe",
+          "links": []
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Load Image (Metadata Pipe) [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "test_rgba.png",
+        "image"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 257,
+      "type": "Show Any [RvTools]",
+      "pos": [
+        -4023,
+        503
+      ],
+      "size": [
+        292,
+        336
+      ],
+      "flags": {},
+      "order": 33,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "anything",
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 351
+        },
+        {
+          "localized_name": "show_images",
+          "name": "show_images",
+          "type": "COMBO",
+          "widget": {
+            "name": "show_images"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Show Any [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "show",
+        "{'steps': 30, 'sampler_name': 'euler', 'scheduler': 'simple', 'cfg': 1.0, 'seed': 179126523296676, 'width': 1688, 'height': 2472, 'text_pos': 'a beautiful woman with fair skin, and long, wavy black hair. She has grey eyes and a dark makeup look that accentuates her features, she wears a pink form fitting bikini, skin press, big perky breasts, her expression is cheeky and she is smirking., extreme close-up shot,upper body shot,artificial indoor lighting', 'text_neg': 'bad quality, worst quality, lowres, jpeg artifacts, bad anatomy, bad hands, multiple views, signature, watermark, censored, ugly, broken, glowing eyes', 'model_name': 'flux_dev_pruned', 'path': ''}"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 267,
+      "type": "Preview Mask [RvTools]",
+      "pos": [
+        -3436,
+        1186
+      ],
+      "size": [
+        270,
+        270
+      ],
+      "flags": {},
+      "order": 60,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "masks",
+          "name": "masks",
+          "type": "MASK",
+          "link": 364
+        },
+        {
+          "localized_name": "Show_Masks",
+          "name": "Show_Masks",
+          "type": "INT",
+          "widget": {
+            "name": "Show_Masks"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "MASK",
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Preview Mask [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        -1
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 264,
+      "type": "Preview Mask [RvTools]",
+      "pos": [
+        -2734,
+        1062
+      ],
+      "size": [
+        270,
+        270
+      ],
+      "flags": {},
+      "order": 65,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "masks",
+          "name": "masks",
+          "type": "MASK",
+          "link": 361
+        },
+        {
+          "localized_name": "Show_Masks",
+          "name": "Show_Masks",
+          "type": "INT",
+          "widget": {
+            "name": "Show_Masks"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "MASK",
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Preview Mask [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        -1
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 263,
+      "type": "Convert to List [RvTools]",
+      "pos": [
+        -3278,
+        1059
+      ],
+      "size": [
+        270,
+        58
+      ],
+      "flags": {},
+      "order": 59,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "input",
+          "name": "input",
+          "type": "*",
+          "link": 359
+        },
+        {
+          "localized_name": "convert_to",
+          "name": "convert_to",
+          "type": "COMBO",
+          "widget": {
+            "name": "convert_to"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "MASK",
+          "shape": 6,
+          "type": "MASK",
+          "links": [
+            360,
+            365
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Convert to List [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "MASK_BATCH_TO_LIST"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 62,
+      "type": "ImageRemoveBackground+",
+      "pos": [
+        -3742,
+        1183
+      ],
+      "size": [
+        236.50000610351563,
+        46
+      ],
+      "flags": {},
+      "order": 55,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "rembg_session",
+          "name": "rembg_session",
+          "type": "REMBG_SESSION",
+          "link": 66
+        },
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "IMAGE",
+          "link": 432
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "IMAGE",
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            368
+          ]
+        },
+        {
+          "localized_name": "MASK",
+          "name": "MASK",
+          "type": "MASK",
+          "links": [
+            359,
+            364
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui_essentials_mb",
+        "ver": "1.1.1",
+        "Node name for S&R": "ImageRemoveBackground+"
+      },
+      "widgets_values": [],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 60,
+      "type": "TransparentBGSession+",
+      "pos": [
+        -3744,
+        1050
+      ],
+      "size": [
+        299.066650390625,
+        82
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "mode",
+          "name": "mode",
+          "type": "COMBO",
+          "widget": {
+            "name": "mode"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "use_jit",
+          "name": "use_jit",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "use_jit"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "REMBG_SESSION",
+          "name": "REMBG_SESSION",
+          "type": "REMBG_SESSION",
+          "links": [
+            66
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui_essentials_mb",
+        "ver": "1.1.1",
+        "Node name for S&R": "TransparentBGSession+"
+      },
+      "widgets_values": [
+        "base-nightly",
+        true
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 261,
+      "type": "Convert To Batch [RvTools]",
+      "pos": [
+        -3112,
+        1425
+      ],
+      "size": [
+        270,
+        58
+      ],
+      "flags": {},
+      "order": 63,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "input",
+          "name": "input",
+          "type": "*",
+          "link": 365
+        },
+        {
+          "localized_name": "convert_to",
+          "name": "convert_to",
+          "type": "COMBO",
+          "widget": {
+            "name": "convert_to"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "MASK",
+          "type": "MASK",
+          "links": [
+            367
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Convert To Batch [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "MASK_LIST_TO_BATCH"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 265,
+      "type": "Preview Mask [RvTools]",
+      "pos": [
+        -2560,
+        1412
+      ],
+      "size": [
+        270,
+        270
+      ],
+      "flags": {},
+      "order": 67,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "masks",
+          "name": "masks",
+          "type": "MASK",
+          "link": 372
+        },
+        {
+          "localized_name": "Show_Masks",
+          "name": "Show_Masks",
+          "type": "INT",
+          "widget": {
+            "name": "Show_Masks"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "MASK",
+          "name": "MASK",
+          "type": "MASK",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Preview Mask [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        -1
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 262,
+      "type": "Show Any [RvTools]",
+      "pos": [
+        -2973,
+        1060
+      ],
+      "size": [
+        213,
+        370
+      ],
+      "flags": {},
+      "order": 62,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "anything",
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 360
+        },
+        {
+          "localized_name": "show_images",
+          "name": "show_images",
+          "type": "COMBO",
+          "widget": {
+            "name": "show_images"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "output",
+          "type": "*",
+          "links": [
+            361
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Show Any [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "show",
+        "tensor([[[0., 0., 0.,  ..., 0., 0., 0.],\n         [0., 0., 0.,  ..., 0., 0., 0.],\n         [0., 0., 0.,  ..., 0., 0., 0.],\n         ...,\n         [0., 0., 0.,  ..., 0., 0., 0.],\n         [0., 0., 0.,  ..., 0., 0., 0.],\n         [0., 0., 0.,  ..., 0., 0., 0.]]])",
+        "tensor([[[0., 0., 0.,  ..., 0., 0., 0.],\n         [0., 0., 0.,  ..., 0., 0., 0.],\n         [0., 0., 0.,  ..., 0., 0., 0.],\n         ...,\n         [0., 0., 0.,  ..., 0., 0., 0.],\n         [0., 0., 0.,  ..., 0., 0., 0.],\n         [0., 0., 0.,  ..., 0., 0., 0.]]])"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 172,
+      "type": "Load Image (Metadata Pipe) [RvTools]",
+      "pos": [
+        -5687,
+        -25
+      ],
+      "size": [
+        277.2833251953125,
+        334
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "COMBO",
+          "widget": {
+            "name": "image"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "upload",
+          "name": "upload",
+          "type": "IMAGEUPLOAD",
+          "widget": {
+            "name": "upload"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            339
+          ]
+        },
+        {
+          "localized_name": "mask",
+          "name": "mask",
+          "type": "MASK",
+          "links": null
+        },
+        {
+          "localized_name": "pipe",
+          "name": "pipe",
+          "type": "pipe",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Load Image (Metadata Pipe) [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "test_grayscale.png",
+        "image"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 258,
+      "type": "Load Image (Metadata Pipe) [RvTools]",
+      "pos": [
+        -4331,
+        105
+      ],
+      "size": [
+        277.2833251953125,
+        334.0000305175781
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "COMBO",
+          "widget": {
+            "name": "image"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "upload",
+          "name": "upload",
+          "type": "IMAGEUPLOAD",
+          "widget": {
+            "name": "upload"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            392
+          ]
+        },
+        {
+          "localized_name": "mask",
+          "name": "mask",
+          "type": "MASK",
+          "links": []
+        },
+        {
+          "localized_name": "pipe",
+          "name": "pipe",
+          "type": "pipe",
+          "links": []
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Load Image (Metadata Pipe) [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "-5134583881851316823_121.jpg",
+        "image"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 217,
+      "type": "Float [RvTools]",
+      "pos": [
+        -2209,
+        1206
+      ],
+      "size": [
+        399,
+        59
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "value",
+          "name": "value",
+          "type": "FLOAT",
+          "widget": {
+            "name": "value"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "float",
+          "name": "float",
+          "type": "FLOAT",
+          "links": [
+            280
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Float [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        1
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 270,
+      "type": "Load Image (Metadata Pipe) [RvTools]",
+      "pos": [
+        -4329,
+        1185
+      ],
+      "size": [
+        277.2833251953125,
+        334.0000305175781
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "COMBO",
+          "widget": {
+            "name": "image"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "upload",
+          "name": "upload",
+          "type": "IMAGEUPLOAD",
+          "widget": {
+            "name": "upload"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            405
+          ]
+        },
+        {
+          "localized_name": "mask",
+          "name": "mask",
+          "type": "MASK",
+          "links": []
+        },
+        {
+          "localized_name": "pipe",
+          "name": "pipe",
+          "type": "pipe",
+          "links": []
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Load Image (Metadata Pipe) [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "image_0011.png",
+        "image"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 269,
+      "type": "Preview Image [RvTools]",
+      "pos": [
+        -3740,
+        1271
+      ],
+      "size": [
+        270,
+        270.0000305175781
+      ],
+      "flags": {},
+      "order": 58,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "images",
+          "name": "images",
+          "type": "IMAGE",
+          "link": 368
+        },
+        {
+          "localized_name": "Show_Images",
+          "name": "Show_Images",
+          "type": "INT",
+          "widget": {
+            "name": "Show_Images"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "IMAGE",
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Preview Image [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        -1
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 279,
+      "type": "Join [RvTools]",
+      "pos": [
+        -4001,
+        160
+      ],
+      "size": [
+        210,
+        147
+      ],
+      "flags": {},
+      "order": 32,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "input_1",
+          "name": "input_1",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 392
+        },
+        {
+          "localized_name": "input_2",
+          "name": "input_2",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 393
+        },
+        {
+          "localized_name": "inputcount",
+          "name": "inputcount",
+          "type": "INT",
+          "widget": {
+            "name": "inputcount"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "delimiter",
+          "name": "delimiter",
+          "shape": 7,
+          "type": "STRING",
+          "widget": {
+            "name": "delimiter"
+          },
+          "link": null
+        },
+        {
+          "name": "input_3",
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "input_4",
+          "type": "IMAGE",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            402,
+            404,
+            410
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Join [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        4,
+        " "
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 223,
+      "type": "Show Any [RvTools]",
+      "pos": [
+        -3615,
+        432
+      ],
+      "size": [
+        292,
+        336
+      ],
+      "flags": {},
+      "order": 48,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "anything",
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 402
+        },
+        {
+          "localized_name": "show_images",
+          "name": "show_images",
+          "type": "COMBO",
+          "widget": {
+            "name": "show_images"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Show Any [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "show",
+        "tensor([[[[0.8431, 0.8745, 0.9255],\n          [0.8431, 0.8745, 0.9255],\n          [0.8431, 0.8745, 0.9255],\n          ...,\n          [0.9451, 0.6627, 0.9098],\n          [0.9451, 0.6667, 0.9020],\n          [0.9412, 0.6667, 0.9020]],\n\n         [[0.8431, 0.8745, 0.9255],\n          [0.8431, 0.8745, 0.9255],\n          [0.8431, 0.8745, 0.9255],\n          ...,\n          [0.9529, 0.6627, 0.9098],\n          [0.9451, 0.6667, 0.9020],\n          [0.9412, 0.6667, 0.9020]],\n\n         [[0.8431, 0.8745, 0.9255],\n          [0.8431, 0.8745, 0.9255],\n          [0.8431, 0.8745, 0.9255],\n          ...,\n          [0.9569, 0.6667, 0.9137],\n          [0.9490, 0.6706, 0.9059],\n          [0.9451, 0.6706, 0.9059]],\n\n         ...,\n\n         [[0.7529, 0.7804, 0.8196],\n          [0.7765, 0.8039, 0.8431],\n          [0.7255, 0.7529, 0.7922],\n          ...,\n          [0.5686, 0.5333, 0.5373],\n          [0.5569, 0.5216, 0.5255],\n          [0.5255, 0.4902, 0.4941]],\n\n         [[0.8745, 0.9020, 0.9412],\n          [0.8588, 0.8863, 0.9255],\n          [0.7882, 0.8157, 0.8549],\n          ...,\n          [0.5490, 0.5137, 0.5176],\n          [0.5529, 0.5176, 0.5216],\n          [0.5294, 0.4941, 0.4980]],\n\n         [[0.7529, 0.7804, 0.8196],\n          [0.7333, 0.7608, 0.8000],\n          [0.7804, 0.8078, 0.8471],\n          ...,\n          [0.5176, 0.4824, 0.4863],\n          [0.5216, 0.4863, 0.4902],\n          [0.5020, 0.4667, 0.4706]]],\n\n\n        [[[0.3220, 0.3081, 0.2566],\n          [0.3195, 0.3056, 0.2551],\n          [0.3216, 0.3077, 0.2547],\n          ...,\n          [0.3537, 0.3555, 0.3085],\n          [0.3303, 0.3352, 0.2940],\n          [0.3591, 0.3568, 0.3263]],\n\n         [[0.3219, 0.3076, 0.2573],\n          [0.3208, 0.3048, 0.2578],\n          [0.3200, 0.3043, 0.2557],\n          ...,\n          [0.3380, 0.3419, 0.2964],\n          [0.3376, 0.3403, 0.3023],\n          [0.3382, 0.3369, 0.3082]],\n\n         [[0.3234, 0.3103, 0.2570],\n          [0.3208, 0.3056, 0.2580],\n          [0.3267, 0.3110, 0.2601],\n          ...,\n          [0.3503, 0.3503, 0.3137],\n          [0.3662, 0.3613, 0.3276],\n          [0.3355, 0.3284, 0.3010]],\n\n         ...,\n\n         [[0.2865, 0.3296, 0.3963],\n          [0.2880, 0.3351, 0.3978],\n          [0.2915, 0.3334, 0.4013],\n          ...,\n          [0.0942, 0.1072, 0.1425],\n          [0.0809, 0.1090, 0.1313],\n          [0.0857, 0.1205, 0.1320]],\n\n         [[0.2859, 0.3291, 0.3920],\n          [0.2915, 0.3362, 0.3994],\n          [0.2957, 0.3366, 0.4072],\n          ...,\n          [0.0857, 0.1036, 0.1311],\n          [0.0791, 0.1030, 0.1247],\n          [0.0870, 0.1157, 0.1361]],\n\n         [[0.2881, 0.3270, 0.3924],\n          [0.2880, 0.3304, 0.4049],\n          [0.2959, 0.3370, 0.4075],\n          ...,\n          [0.0783, 0.1038, 0.1257],\n          [0.0705, 0.0983, 0.1141],\n          [0.0842, 0.1125, 0.1341]]]])"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 235,
+      "type": "Show Any [RvTools]",
+      "pos": [
+        -3611,
+        -12
+      ],
+      "size": [
+        273,
+        370
+      ],
+      "flags": {},
+      "order": 56,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "anything",
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 412
+        },
+        {
+          "localized_name": "show_images",
+          "name": "show_images",
+          "type": "COMBO",
+          "widget": {
+            "name": "show_images"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Show Any [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "show",
+        "tensor([[[[0.8431, 0.8745, 0.9255],\n          [0.8431, 0.8745, 0.9255],\n          [0.8431, 0.8745, 0.9255],\n          ...,\n          [0.9451, 0.6627, 0.9098],\n          [0.9451, 0.6667, 0.9020],\n          [0.9412, 0.6667, 0.9020]],\n\n         [[0.8431, 0.8745, 0.9255],\n          [0.8431, 0.8745, 0.9255],\n          [0.8431, 0.8745, 0.9255],\n          ...,\n          [0.9529, 0.6627, 0.9098],\n          [0.9451, 0.6667, 0.9020],\n          [0.9412, 0.6667, 0.9020]],\n\n         [[0.8431, 0.8745, 0.9255],\n          [0.8431, 0.8745, 0.9255],\n          [0.8431, 0.8745, 0.9255],\n          ...,\n          [0.9569, 0.6667, 0.9137],\n          [0.9490, 0.6706, 0.9059],\n          [0.9451, 0.6706, 0.9059]],\n\n         ...,\n\n         [[0.7529, 0.7804, 0.8196],\n          [0.7765, 0.8039, 0.8431],\n          [0.7255, 0.7529, 0.7922],\n          ...,\n          [0.5686, 0.5333, 0.5373],\n          [0.5569, 0.5216, 0.5255],\n          [0.5255, 0.4902, 0.4941]],\n\n         [[0.8745, 0.9020, 0.9412],\n          [0.8588, 0.8863, 0.9255],\n          [0.7882, 0.8157, 0.8549],\n          ...,\n          [0.5490, 0.5137, 0.5176],\n          [0.5529, 0.5176, 0.5216],\n          [0.5294, 0.4941, 0.4980]],\n\n         [[0.7529, 0.7804, 0.8196],\n          [0.7333, 0.7608, 0.8000],\n          [0.7804, 0.8078, 0.8471],\n          ...,\n          [0.5176, 0.4824, 0.4863],\n          [0.5216, 0.4863, 0.4902],\n          [0.5020, 0.4667, 0.4706]]]])",
+        "tensor([[[[0.3220, 0.3081, 0.2566],\n          [0.3195, 0.3056, 0.2551],\n          [0.3216, 0.3077, 0.2547],\n          ...,\n          [0.3537, 0.3555, 0.3085],\n          [0.3303, 0.3352, 0.2940],\n          [0.3591, 0.3568, 0.3263]],\n\n         [[0.3219, 0.3076, 0.2573],\n          [0.3208, 0.3048, 0.2578],\n          [0.3200, 0.3043, 0.2557],\n          ...,\n          [0.3380, 0.3419, 0.2964],\n          [0.3376, 0.3403, 0.3023],\n          [0.3382, 0.3369, 0.3082]],\n\n         [[0.3234, 0.3103, 0.2570],\n          [0.3208, 0.3056, 0.2580],\n          [0.3267, 0.3110, 0.2601],\n          ...,\n          [0.3503, 0.3503, 0.3137],\n          [0.3662, 0.3613, 0.3276],\n          [0.3355, 0.3284, 0.3010]],\n\n         ...,\n\n         [[0.2865, 0.3296, 0.3963],\n          [0.2880, 0.3351, 0.3978],\n          [0.2915, 0.3334, 0.4013],\n          ...,\n          [0.0942, 0.1072, 0.1425],\n          [0.0809, 0.1090, 0.1313],\n          [0.0857, 0.1205, 0.1320]],\n\n         [[0.2859, 0.3291, 0.3920],\n          [0.2915, 0.3362, 0.3994],\n          [0.2957, 0.3366, 0.4072],\n          ...,\n          [0.0857, 0.1036, 0.1311],\n          [0.0791, 0.1030, 0.1247],\n          [0.0870, 0.1157, 0.1361]],\n\n         [[0.2881, 0.3270, 0.3924],\n          [0.2880, 0.3304, 0.4049],\n          [0.2959, 0.3370, 0.4075],\n          ...,\n          [0.0783, 0.1038, 0.1257],\n          [0.0705, 0.0983, 0.1141],\n          [0.0842, 0.1125, 0.1341]]]])"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 240,
+      "type": "Show Any [RvTools]",
+      "pos": [
+        -3072,
+        -12
+      ],
+      "size": [
+        293,
+        394
+      ],
+      "flags": {},
+      "order": 61,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "anything",
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 416
+        },
+        {
+          "localized_name": "show_images",
+          "name": "show_images",
+          "type": "COMBO",
+          "widget": {
+            "name": "show_images"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "output",
+          "type": "*",
+          "links": [
+            319
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Show Any [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "show",
+        "tensor([[[[0.8431, 0.8745, 0.9255],\n          [0.8431, 0.8745, 0.9255],\n          [0.8431, 0.8745, 0.9255],\n          ...,\n          [0.9451, 0.6627, 0.9098],\n          [0.9451, 0.6667, 0.9020],\n          [0.9412, 0.6667, 0.9020]],\n\n         [[0.8431, 0.8745, 0.9255],\n          [0.8431, 0.8745, 0.9255],\n          [0.8431, 0.8745, 0.9255],\n          ...,\n          [0.9529, 0.6627, 0.9098],\n          [0.9451, 0.6667, 0.9020],\n          [0.9412, 0.6667, 0.9020]],\n\n         [[0.8431, 0.8745, 0.9255],\n          [0.8431, 0.8745, 0.9255],\n          [0.8431, 0.8745, 0.9255],\n          ...,\n          [0.9569, 0.6667, 0.9137],\n          [0.9490, 0.6706, 0.9059],\n          [0.9451, 0.6706, 0.9059]],\n\n         ...,\n\n         [[0.7529, 0.7804, 0.8196],\n          [0.7765, 0.8039, 0.8431],\n          [0.7255, 0.7529, 0.7922],\n          ...,\n          [0.5686, 0.5333, 0.5373],\n          [0.5569, 0.5216, 0.5255],\n          [0.5255, 0.4902, 0.4941]],\n\n         [[0.8745, 0.9020, 0.9412],\n          [0.8588, 0.8863, 0.9255],\n          [0.7882, 0.8157, 0.8549],\n          ...,\n          [0.5490, 0.5137, 0.5176],\n          [0.5529, 0.5176, 0.5216],\n          [0.5294, 0.4941, 0.4980]],\n\n         [[0.7529, 0.7804, 0.8196],\n          [0.7333, 0.7608, 0.8000],\n          [0.7804, 0.8078, 0.8471],\n          ...,\n          [0.5176, 0.4824, 0.4863],\n          [0.5216, 0.4863, 0.4902],\n          [0.5020, 0.4667, 0.4706]]],\n\n\n        [[[0.3220, 0.3081, 0.2566],\n          [0.3195, 0.3056, 0.2551],\n          [0.3216, 0.3077, 0.2547],\n          ...,\n          [0.3537, 0.3555, 0.3085],\n          [0.3303, 0.3352, 0.2940],\n          [0.3591, 0.3568, 0.3263]],\n\n         [[0.3219, 0.3076, 0.2573],\n          [0.3208, 0.3048, 0.2578],\n          [0.3200, 0.3043, 0.2557],\n          ...,\n          [0.3380, 0.3419, 0.2964],\n          [0.3376, 0.3403, 0.3023],\n          [0.3382, 0.3369, 0.3082]],\n\n         [[0.3234, 0.3103, 0.2570],\n          [0.3208, 0.3056, 0.2580],\n          [0.3267, 0.3110, 0.2601],\n          ...,\n          [0.3503, 0.3503, 0.3137],\n          [0.3662, 0.3613, 0.3276],\n          [0.3355, 0.3284, 0.3010]],\n\n         ...,\n\n         [[0.2865, 0.3296, 0.3963],\n          [0.2880, 0.3351, 0.3978],\n          [0.2915, 0.3334, 0.4013],\n          ...,\n          [0.0942, 0.1072, 0.1425],\n          [0.0809, 0.1090, 0.1313],\n          [0.0857, 0.1205, 0.1320]],\n\n         [[0.2859, 0.3291, 0.3920],\n          [0.2915, 0.3362, 0.3994],\n          [0.2957, 0.3366, 0.4072],\n          ...,\n          [0.0857, 0.1036, 0.1311],\n          [0.0791, 0.1030, 0.1247],\n          [0.0870, 0.1157, 0.1361]],\n\n         [[0.2881, 0.3270, 0.3924],\n          [0.2880, 0.3304, 0.4049],\n          [0.2959, 0.3370, 0.4075],\n          ...,\n          [0.0783, 0.1038, 0.1257],\n          [0.0705, 0.0983, 0.1141],\n          [0.0842, 0.1125, 0.1341]]]])"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "hsla(0, 0%, 22.7%, 1)",
+      "shape": 1
+    },
+    {
+      "id": 241,
+      "type": "Preview Image [RvTools]",
+      "pos": [
+        -2750,
+        -12
+      ],
+      "size": [
+        270,
+        270.0000305175781
+      ],
+      "flags": {},
+      "order": 64,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "images",
+          "name": "images",
+          "type": "IMAGE",
+          "link": 319
+        },
+        {
+          "localized_name": "Show_Images",
+          "name": "Show_Images",
+          "type": "INT",
+          "widget": {
+            "name": "Show_Images"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "IMAGE",
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Preview Image [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        -1
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 227,
+      "type": "Convert to List [RvTools]",
+      "pos": [
+        -3843,
+        -11
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 50,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "input",
+          "name": "input",
+          "type": "*",
+          "link": 410
+        },
+        {
+          "localized_name": "convert_to",
+          "name": "convert_to",
+          "type": "COMBO",
+          "widget": {
+            "name": "convert_to"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "IMAGE",
+          "shape": 6,
+          "type": "IMAGE",
+          "links": [
+            412,
+            415
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Convert to List [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "IMAGE_BATCH_TO_LIST"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 237,
+      "type": "Convert To Batch [RvTools]",
+      "pos": [
+        -3302,
+        -12
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 57,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "input",
+          "name": "input",
+          "type": "*",
+          "link": 415
+        },
+        {
+          "localized_name": "convert_to",
+          "name": "convert_to",
+          "type": "COMBO",
+          "widget": {
+            "name": "convert_to"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            416
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Convert To Batch [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "IMAGE_LIST_TO_BATCH"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 286,
+      "type": "String Multiline [RvTools]",
+      "pos": [
+        -2209,
+        -24
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "string",
+          "name": "string",
+          "type": "STRING",
+          "widget": {
+            "name": "string"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "string",
+          "name": "string",
+          "type": "STRING",
+          "links": [
+            417
+          ]
+        },
+        {
+          "localized_name": "string_list",
+          "name": "string_list",
+          "shape": 6,
+          "type": "STRING",
+          "links": [
+            418,
+            419,
+            420,
+            421,
+            422,
+            423
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "9ba4549fa8749be80846fa13d2aac2857b4ae3f4",
+        "Node name for S&R": "String Multiline [RvTools]"
+      },
+      "widgets_values": [
+        "string\nlist\ncan be used\nfor prompt traveling"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 256,
+      "type": "Load Image (Metadata Pipe) [RvTools]",
+      "pos": [
+        -4331,
+        500
+      ],
+      "size": [
+        277.2833251953125,
+        334.0000305175781
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "COMBO",
+          "widget": {
+            "name": "image"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "upload",
+          "name": "upload",
+          "type": "IMAGEUPLOAD",
+          "widget": {
+            "name": "upload"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "image",
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            393
+          ]
+        },
+        {
+          "localized_name": "mask",
+          "name": "mask",
+          "type": "MASK",
+          "links": []
+        },
+        {
+          "localized_name": "pipe",
+          "name": "pipe",
+          "type": "pipe",
+          "links": [
+            351
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Load Image (Metadata Pipe) [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "image_0011.png",
+        "image"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 115,
+      "type": "Concat Pipe Multi [RvTools]",
+      "pos": [
+        -2200,
+        1560
+      ],
+      "size": [
+        269,
+        107
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "pipe_1",
+          "name": "pipe_1",
+          "type": "pipe",
+          "link": null
+        },
+        {
+          "localized_name": "pipe_2",
+          "name": "pipe_2",
+          "shape": 7,
+          "type": "pipe",
+          "link": null
+        },
+        {
+          "localized_name": "inputcount",
+          "name": "inputcount",
+          "type": "INT",
+          "widget": {
+            "name": "inputcount"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "merge_strategy",
+          "name": "merge_strategy",
+          "shape": 7,
+          "type": "COMBO",
+          "widget": {
+            "name": "merge_strategy"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "pipe",
+          "name": "pipe",
+          "type": "pipe",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "4c53d98eb8a3d530309385fc46aa2ed313cae06a",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        2,
+        "overwrite"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 275,
+      "type": "String from List [RvTools]",
+      "pos": [
+        -1179,
+        -19
+      ],
+      "size": [
+        269,
+        99
+      ],
+      "flags": {},
+      "order": 27,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "list_input",
+          "name": "list_input",
+          "type": "STRING",
+          "link": 419
+        },
+        {
+          "localized_name": "index",
+          "name": "index",
+          "type": "INT",
+          "widget": {
+            "name": "index"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "list item",
+          "name": "list item",
+          "shape": 6,
+          "type": "STRING",
+          "links": [
+            396,
+            425
+          ]
+        },
+        {
+          "localized_name": "size",
+          "name": "size",
+          "type": "INT",
+          "links": null
+        },
+        {
+          "localized_name": "wraps",
+          "name": "wraps",
+          "shape": 6,
+          "type": "INT",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "4c53d98eb8a3d530309385fc46aa2ed313cae06a",
+        "Node name for S&R": "String from List [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        0
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 274,
+      "type": "String from List [RvTools]",
+      "pos": [
+        -1179,
+        131
+      ],
+      "size": [
+        269,
+        99
+      ],
+      "flags": {},
+      "order": 28,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "list_input",
+          "name": "list_input",
+          "type": "STRING",
+          "link": 420
+        },
+        {
+          "localized_name": "index",
+          "name": "index",
+          "type": "INT",
+          "widget": {
+            "name": "index"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "list item",
+          "name": "list item",
+          "shape": 6,
+          "type": "STRING",
+          "links": [
+            397,
+            426
+          ]
+        },
+        {
+          "localized_name": "size",
+          "name": "size",
+          "type": "INT",
+          "links": null
+        },
+        {
+          "localized_name": "wraps",
+          "name": "wraps",
+          "shape": 6,
+          "type": "INT",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "4c53d98eb8a3d530309385fc46aa2ed313cae06a",
+        "Node name for S&R": "String from List [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        1
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 273,
+      "type": "String from List [RvTools]",
+      "pos": [
+        -1179,
+        274
+      ],
+      "size": [
+        269,
+        99
+      ],
+      "flags": {},
+      "order": 29,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "list_input",
+          "name": "list_input",
+          "type": "STRING",
+          "link": 421
+        },
+        {
+          "localized_name": "index",
+          "name": "index",
+          "type": "INT",
+          "widget": {
+            "name": "index"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "list item",
+          "name": "list item",
+          "shape": 6,
+          "type": "STRING",
+          "links": [
+            398,
+            427
+          ]
+        },
+        {
+          "localized_name": "size",
+          "name": "size",
+          "type": "INT",
+          "links": null
+        },
+        {
+          "localized_name": "wraps",
+          "name": "wraps",
+          "shape": 6,
+          "type": "INT",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "4c53d98eb8a3d530309385fc46aa2ed313cae06a",
+        "Node name for S&R": "String from List [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        2
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 276,
+      "type": "String from List [RvTools]",
+      "pos": [
+        -1179,
+        421
+      ],
+      "size": [
+        269,
+        99
+      ],
+      "flags": {},
+      "order": 30,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "list_input",
+          "name": "list_input",
+          "type": "STRING",
+          "link": 422
+        },
+        {
+          "localized_name": "index",
+          "name": "index",
+          "type": "INT",
+          "widget": {
+            "name": "index"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "list item",
+          "name": "list item",
+          "shape": 6,
+          "type": "STRING",
+          "links": [
+            400,
+            428
+          ]
+        },
+        {
+          "localized_name": "size",
+          "name": "size",
+          "type": "INT",
+          "links": null
+        },
+        {
+          "localized_name": "wraps",
+          "name": "wraps",
+          "shape": 6,
+          "type": "INT",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "4c53d98eb8a3d530309385fc46aa2ed313cae06a",
+        "Node name for S&R": "String from List [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        3
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 287,
+      "type": "Show Any [RvTools]",
+      "pos": [
+        -752,
+        800
+      ],
+      "size": [
+        269,
+        250
+      ],
+      "flags": {},
+      "order": 54,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "anything",
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 429
+        },
+        {
+          "localized_name": "show_images",
+          "name": "show_images",
+          "type": "COMBO",
+          "widget": {
+            "name": "show_images"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Show Any [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "hide",
+        "string, list, can be used, for prompt traveling"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 277,
+      "type": "Merge Strings [RvTools]",
+      "pos": [
+        -1065,
+        729
+      ],
+      "size": [
+        236,
+        171
+      ],
+      "flags": {},
+      "order": 46,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "string_1",
+          "name": "string_1",
+          "shape": 7,
+          "type": "STRING",
+          "link": 425
+        },
+        {
+          "localized_name": "string_2",
+          "name": "string_2",
+          "shape": 7,
+          "type": "STRING",
+          "link": 426
+        },
+        {
+          "localized_name": "inputcount",
+          "name": "inputcount",
+          "type": "INT",
+          "widget": {
+            "name": "inputcount"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "Delimiter",
+          "name": "Delimiter",
+          "type": "STRING",
+          "widget": {
+            "name": "Delimiter"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "return_as_list",
+          "name": "return_as_list",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "return_as_list"
+          },
+          "link": null
+        },
+        {
+          "name": "string_3",
+          "type": "STRING",
+          "link": 427
+        },
+        {
+          "name": "string_4",
+          "type": "STRING",
+          "link": 428
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "STRING",
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": [
+            429
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        4,
+        ", ",
+        false
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 272,
+      "type": "Join [RvTools]",
+      "pos": [
+        -847,
+        122
+      ],
+      "size": [
+        214,
+        167
+      ],
+      "flags": {},
+      "order": 45,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "input_1",
+          "name": "input_1",
+          "shape": 7,
+          "type": "STRING",
+          "link": 396
+        },
+        {
+          "localized_name": "input_2",
+          "name": "input_2",
+          "shape": 7,
+          "type": "STRING",
+          "link": 397
+        },
+        {
+          "localized_name": "inputcount",
+          "name": "inputcount",
+          "type": "INT",
+          "widget": {
+            "name": "inputcount"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "delimiter",
+          "name": "delimiter",
+          "shape": 7,
+          "type": "STRING",
+          "widget": {
+            "name": "delimiter"
+          },
+          "link": null
+        },
+        {
+          "name": "input_3",
+          "type": "STRING",
+          "link": 398
+        },
+        {
+          "name": "input_4",
+          "type": "STRING",
+          "link": 400
+        },
+        {
+          "name": "input_5",
+          "type": "STRING",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "STRING",
+          "type": "STRING",
+          "links": [
+            386
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Join [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        5,
+        " "
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 278,
+      "type": "Show Any [RvTools]",
+      "pos": [
+        -751,
+        351
+      ],
+      "size": [
+        269,
+        249
+      ],
+      "flags": {},
+      "order": 53,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "anything",
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 386
+        },
+        {
+          "localized_name": "show_images",
+          "name": "show_images",
+          "type": "COMBO",
+          "widget": {
+            "name": "show_images"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "output",
+          "type": "*",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Show Any [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "hide",
+        "string list can be used for prompt traveling"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 288,
+      "type": "Lora Stack [RvTools]",
+      "pos": [
+        -2204,
+        216
+      ],
+      "size": [
+        403,
+        303
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "lora_stack",
+          "name": "lora_stack",
+          "shape": 7,
+          "type": "LORA_STACK",
+          "link": null
+        },
+        {
+          "localized_name": "simple",
+          "name": "simple",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "simple"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "lora_count",
+          "name": "lora_count",
+          "type": "INT",
+          "widget": {
+            "name": "lora_count"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "switch_1",
+          "name": "switch_1",
+          "type": "COMBO",
+          "widget": {
+            "name": "switch_1"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "lora_name_1",
+          "name": "lora_name_1",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_name_1"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "model_weight_1",
+          "name": "model_weight_1",
+          "type": "FLOAT",
+          "widget": {
+            "name": "model_weight_1"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "clip_weight_1",
+          "name": "clip_weight_1",
+          "type": "FLOAT",
+          "widget": {
+            "name": "clip_weight_1"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "switch_2",
+          "name": "switch_2",
+          "type": "COMBO",
+          "widget": {
+            "name": "switch_2"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "lora_name_2",
+          "name": "lora_name_2",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_name_2"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "model_weight_2",
+          "name": "model_weight_2",
+          "type": "FLOAT",
+          "widget": {
+            "name": "model_weight_2"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "clip_weight_2",
+          "name": "clip_weight_2",
+          "type": "FLOAT",
+          "widget": {
+            "name": "clip_weight_2"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "switch_3",
+          "name": "switch_3",
+          "type": "COMBO",
+          "widget": {
+            "name": "switch_3"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "lora_name_3",
+          "name": "lora_name_3",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_name_3"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "model_weight_3",
+          "name": "model_weight_3",
+          "type": "FLOAT",
+          "widget": {
+            "name": "model_weight_3"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "clip_weight_3",
+          "name": "clip_weight_3",
+          "type": "FLOAT",
+          "widget": {
+            "name": "clip_weight_3"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "switch_4",
+          "name": "switch_4",
+          "type": "COMBO",
+          "widget": {
+            "name": "switch_4"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "lora_name_4",
+          "name": "lora_name_4",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_name_4"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "model_weight_4",
+          "name": "model_weight_4",
+          "type": "FLOAT",
+          "widget": {
+            "name": "model_weight_4"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "clip_weight_4",
+          "name": "clip_weight_4",
+          "type": "FLOAT",
+          "widget": {
+            "name": "clip_weight_4"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "switch_5",
+          "name": "switch_5",
+          "type": "COMBO",
+          "widget": {
+            "name": "switch_5"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "lora_name_5",
+          "name": "lora_name_5",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_name_5"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "model_weight_5",
+          "name": "model_weight_5",
+          "type": "FLOAT",
+          "widget": {
+            "name": "model_weight_5"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "clip_weight_5",
+          "name": "clip_weight_5",
+          "type": "FLOAT",
+          "widget": {
+            "name": "clip_weight_5"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "switch_6",
+          "name": "switch_6",
+          "type": "COMBO",
+          "widget": {
+            "name": "switch_6"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "lora_name_6",
+          "name": "lora_name_6",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_name_6"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "model_weight_6",
+          "name": "model_weight_6",
+          "type": "FLOAT",
+          "widget": {
+            "name": "model_weight_6"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "clip_weight_6",
+          "name": "clip_weight_6",
+          "type": "FLOAT",
+          "widget": {
+            "name": "clip_weight_6"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "switch_7",
+          "name": "switch_7",
+          "type": "COMBO",
+          "widget": {
+            "name": "switch_7"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "lora_name_7",
+          "name": "lora_name_7",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_name_7"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "model_weight_7",
+          "name": "model_weight_7",
+          "type": "FLOAT",
+          "widget": {
+            "name": "model_weight_7"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "clip_weight_7",
+          "name": "clip_weight_7",
+          "type": "FLOAT",
+          "widget": {
+            "name": "clip_weight_7"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "switch_8",
+          "name": "switch_8",
+          "type": "COMBO",
+          "widget": {
+            "name": "switch_8"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "lora_name_8",
+          "name": "lora_name_8",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_name_8"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "model_weight_8",
+          "name": "model_weight_8",
+          "type": "FLOAT",
+          "widget": {
+            "name": "model_weight_8"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "clip_weight_8",
+          "name": "clip_weight_8",
+          "type": "FLOAT",
+          "widget": {
+            "name": "clip_weight_8"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "switch_9",
+          "name": "switch_9",
+          "type": "COMBO",
+          "widget": {
+            "name": "switch_9"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "lora_name_9",
+          "name": "lora_name_9",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_name_9"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "model_weight_9",
+          "name": "model_weight_9",
+          "type": "FLOAT",
+          "widget": {
+            "name": "model_weight_9"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "clip_weight_9",
+          "name": "clip_weight_9",
+          "type": "FLOAT",
+          "widget": {
+            "name": "clip_weight_9"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "switch_10",
+          "name": "switch_10",
+          "type": "COMBO",
+          "widget": {
+            "name": "switch_10"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "lora_name_10",
+          "name": "lora_name_10",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_name_10"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "model_weight_10",
+          "name": "model_weight_10",
+          "type": "FLOAT",
+          "widget": {
+            "name": "model_weight_10"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "clip_weight_10",
+          "name": "clip_weight_10",
+          "type": "FLOAT",
+          "widget": {
+            "name": "clip_weight_10"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "LORA_STACK",
+          "name": "LORA_STACK",
+          "type": "LORA_STACK",
+          "links": [
+            430,
+            431
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI_RvTools",
+        "ver": "a206f755375121efdd1f709db82162ea1be71c1a",
+        "Node name for S&R": "Lora Stack [RvTools]"
+      },
+      "widgets_values": [
+        true,
+        3,
+        "On",
+        "SD15\\Standard\\hd_helper_v1.safetensors",
+        1,
+        1,
+        "On",
+        "SDXL\\Style\\SDXL_plaster_Test_Sa_May.safetensors",
+        1,
+        1,
+        "On",
+        "flux\\standard\\aidmaHyperrealism-FLUX-v0.3.safetensors",
+        1,
+        1,
+        "Off",
+        "None",
+        1,
+        1,
+        "Off",
+        "None",
+        1,
+        1,
+        "Off",
+        "None",
+        1,
+        1,
+        "Off",
+        "None",
+        1,
+        1,
+        "Off",
+        "None",
+        1,
+        1,
+        "Off",
+        "None",
+        1,
+        1,
+        "Off",
+        "None",
+        1,
+        1
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 283,
+      "type": "Any Dual-Switch [RvTools]",
+      "pos": [
+        -3995,
+        1186
+      ],
+      "size": [
+        210,
+        102
+      ],
+      "flags": {},
+      "order": 49,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "input1",
+          "name": "input1",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 405
+        },
+        {
+          "localized_name": "input2",
+          "name": "input2",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 404
+        },
+        {
+          "localized_name": "Input",
+          "name": "Input",
+          "type": "INT",
+          "widget": {
+            "name": "Input"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "Purge_VRAM",
+          "name": "Purge_VRAM",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "Purge_VRAM"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "*",
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            432
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "9ba4549fa8749be80846fa13d2aac2857b4ae3f4",
+        "Node name for S&R": "Any Dual-Switch [RvTools]"
+      },
+      "widgets_values": [
+        2,
+        false
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 268,
+      "type": "Show Any [RvTools]",
+      "pos": [
+        -2807,
+        1425
+      ],
+      "size": [
+        216,
+        320
+      ],
+      "flags": {},
+      "order": 66,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "anything",
+          "name": "anything",
+          "shape": 7,
+          "type": "*",
+          "link": 367
+        },
+        {
+          "localized_name": "show_images",
+          "name": "show_images",
+          "type": "COMBO",
+          "widget": {
+            "name": "show_images"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "output",
+          "name": "output",
+          "type": "*",
+          "links": [
+            372
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Show Any [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        "show",
+        "tensor([[[0., 0., 0.,  ..., 0., 0., 0.],\n         [0., 0., 0.,  ..., 0., 0., 0.],\n         [0., 0., 0.,  ..., 0., 0., 0.],\n         ...,\n         [0., 0., 0.,  ..., 0., 0., 0.],\n         [0., 0., 0.,  ..., 0., 0., 0.],\n         [0., 0., 0.,  ..., 0., 0., 0.]],\n\n        [[0., 0., 0.,  ..., 0., 0., 0.],\n         [0., 0., 0.,  ..., 0., 0., 0.],\n         [0., 0., 0.,  ..., 0., 0., 0.],\n         ...,\n         [0., 0., 0.,  ..., 0., 0., 0.],\n         [0., 0., 0.,  ..., 0., 0., 0.],\n         [0., 0., 0.,  ..., 0., 0., 0.]]])"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    }
+  ],
+  "links": [
+    [
+      66,
+      60,
+      0,
+      62,
+      0,
+      "REMBG_SESSION"
+    ],
+    [
+      137,
+      153,
+      0,
+      154,
+      0,
+      "*"
+    ],
+    [
+      197,
+      173,
+      1,
+      189,
+      0,
+      "MASK"
+    ],
+    [
+      198,
+      176,
+      1,
+      190,
+      0,
+      "MASK"
+    ],
+    [
+      270,
+      144,
+      0,
+      211,
+      0,
+      "*"
+    ],
+    [
+      271,
+      137,
+      0,
+      212,
+      0,
+      "*"
+    ],
+    [
+      274,
+      131,
+      0,
+      214,
+      0,
+      "*"
+    ],
+    [
+      276,
+      131,
+      0,
+      215,
+      0,
+      "*"
+    ],
+    [
+      278,
+      131,
+      0,
+      216,
+      0,
+      "*"
+    ],
+    [
+      280,
+      217,
+      0,
+      218,
+      0,
+      "*"
+    ],
+    [
+      281,
+      214,
+      0,
+      219,
+      0,
+      "*"
+    ],
+    [
+      282,
+      216,
+      0,
+      221,
+      0,
+      "*"
+    ],
+    [
+      283,
+      218,
+      0,
+      222,
+      0,
+      "*"
+    ],
+    [
+      284,
+      215,
+      0,
+      220,
+      0,
+      "*"
+    ],
+    [
+      319,
+      240,
+      0,
+      241,
+      0,
+      "IMAGE"
+    ],
+    [
+      339,
+      172,
+      0,
+      250,
+      0,
+      "IMAGE"
+    ],
+    [
+      340,
+      250,
+      0,
+      178,
+      0,
+      "IMAGE"
+    ],
+    [
+      341,
+      173,
+      0,
+      251,
+      0,
+      "IMAGE"
+    ],
+    [
+      342,
+      251,
+      0,
+      180,
+      0,
+      "IMAGE"
+    ],
+    [
+      343,
+      174,
+      0,
+      252,
+      0,
+      "IMAGE"
+    ],
+    [
+      344,
+      252,
+      0,
+      182,
+      0,
+      "IMAGE"
+    ],
+    [
+      345,
+      175,
+      0,
+      253,
+      0,
+      "IMAGE"
+    ],
+    [
+      346,
+      253,
+      0,
+      183,
+      0,
+      "IMAGE"
+    ],
+    [
+      347,
+      176,
+      0,
+      254,
+      0,
+      "IMAGE"
+    ],
+    [
+      348,
+      254,
+      0,
+      186,
+      0,
+      "IMAGE"
+    ],
+    [
+      351,
+      256,
+      2,
+      257,
+      0,
+      "*"
+    ],
+    [
+      359,
+      62,
+      1,
+      263,
+      0,
+      "*"
+    ],
+    [
+      360,
+      263,
+      0,
+      262,
+      0,
+      "*"
+    ],
+    [
+      361,
+      262,
+      0,
+      264,
+      0,
+      "MASK"
+    ],
+    [
+      364,
+      62,
+      1,
+      267,
+      0,
+      "MASK"
+    ],
+    [
+      365,
+      263,
+      0,
+      261,
+      0,
+      "*"
+    ],
+    [
+      367,
+      261,
+      0,
+      268,
+      0,
+      "*"
+    ],
+    [
+      368,
+      62,
+      0,
+      269,
+      0,
+      "IMAGE"
+    ],
+    [
+      372,
+      268,
+      0,
+      265,
+      0,
+      "MASK"
+    ],
+    [
+      386,
+      272,
+      0,
+      278,
+      0,
+      "*"
+    ],
+    [
+      392,
+      258,
+      0,
+      279,
+      0,
+      "*"
+    ],
+    [
+      393,
+      256,
+      0,
+      279,
+      1,
+      "IMAGE"
+    ],
+    [
+      396,
+      275,
+      0,
+      272,
+      0,
+      "*"
+    ],
+    [
+      397,
+      274,
+      0,
+      272,
+      1,
+      "STRING"
+    ],
+    [
+      398,
+      273,
+      0,
+      272,
+      4,
+      "STRING"
+    ],
+    [
+      400,
+      276,
+      0,
+      272,
+      5,
+      "*"
+    ],
+    [
+      402,
+      279,
+      0,
+      223,
+      0,
+      "*"
+    ],
+    [
+      404,
+      279,
+      0,
+      283,
+      1,
+      "*"
+    ],
+    [
+      405,
+      270,
+      0,
+      283,
+      0,
+      "IMAGE"
+    ],
+    [
+      410,
+      279,
+      0,
+      227,
+      0,
+      "*"
+    ],
+    [
+      412,
+      227,
+      0,
+      235,
+      0,
+      "*"
+    ],
+    [
+      415,
+      227,
+      0,
+      237,
+      0,
+      "IMAGE"
+    ],
+    [
+      416,
+      237,
+      0,
+      240,
+      0,
+      "*"
+    ],
+    [
+      417,
+      286,
+      0,
+      210,
+      0,
+      "*"
+    ],
+    [
+      418,
+      286,
+      1,
+      213,
+      0,
+      "*"
+    ],
+    [
+      419,
+      286,
+      1,
+      275,
+      0,
+      "STRING"
+    ],
+    [
+      420,
+      286,
+      1,
+      274,
+      0,
+      "STRING"
+    ],
+    [
+      421,
+      286,
+      1,
+      273,
+      0,
+      "STRING"
+    ],
+    [
+      422,
+      286,
+      1,
+      276,
+      0,
+      "STRING"
+    ],
+    [
+      423,
+      286,
+      1,
+      144,
+      0,
+      "STRING"
+    ],
+    [
+      425,
+      275,
+      0,
+      277,
+      0,
+      "STRING"
+    ],
+    [
+      426,
+      274,
+      0,
+      277,
+      1,
+      "STRING"
+    ],
+    [
+      427,
+      273,
+      0,
+      277,
+      5,
+      "STRING"
+    ],
+    [
+      428,
+      276,
+      0,
+      277,
+      6,
+      "STRING"
+    ],
+    [
+      429,
+      277,
+      0,
+      287,
+      0,
+      "*"
+    ],
+    [
+      430,
+      288,
+      0,
+      137,
+      0,
+      "LORA_STACK"
+    ],
+    [
+      431,
+      288,
+      0,
+      153,
+      0,
+      "*"
+    ],
+    [
+      432,
+      283,
+      0,
+      62,
+      1,
+      "IMAGE"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 2,
+      "title": "Group",
+      "bounding": [
+        -4349,
+        -99,
+        2078,
+        998
+      ],
+      "color": "#4a4a4a",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 3,
+      "title": "Group",
+      "bounding": [
+        -4349,
+        951,
+        2078,
+        808
+      ],
+      "color": "#4a4a4a",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 4,
+      "title": "Group",
+      "bounding": [
+        -2219,
+        -99,
+        1802,
+        1797
+      ],
+      "color": "#4a4a4a",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 5,
+      "title": "Group",
+      "bounding": [
+        -5699,
+        -99,
+        1299,
+        2324.60009765625
+      ],
+      "color": "#4a4a4a",
+      "font_size": 24,
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.6934334949441638,
+      "offset": [
+        3550.339204687422,
+        82.7858798482631
+      ]
+    },
+    "frontendVersion": "1.30.0",
+    "VHS_latentpreview": false,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true
+  },
+  "version": 0.4
+}

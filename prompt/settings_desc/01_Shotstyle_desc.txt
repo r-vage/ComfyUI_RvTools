@@ -1,0 +1,104 @@
+14mm wide angle lens, creates dramatic perspective and wide field of view
+24mm wide-angle lens, captures more of the scene with slight distortion
+70mm telephoto lens, compresses background and focuses on subject
+85mm long lens, ideal for portraits with soft background blur
+aerial shot, view from above for dramatic effect
+aerial view, high vantage point showing landscape or scene
+angle from above, looking down on subject for unique perspective
+angle from below, looking up at subject for imposing effect
+atmospheric perspective, uses haze and distance for depth
+between fingers, subject or object framed by fingers
+between legs, viewpoint framed by legs for dynamic composition
+between thighs, close-up framed by thighs for intimate effect
+Big Close-Up(BCU), extreme close-up focusing on facial details
+birds eye view, top-down perspective for full scene overview
+birds-eye-view shot, overhead shot for dramatic context
+blurry foreground, soft focus in front for depth and mood
+body shot, shows subject from head to toe
+breast awe, focus on chest with sense of admiration
+breast conscious, subject aware of chest, adds emotion
+Chest Shot(MCU), medium close-up focusing on chest and face
+cinematic shot, dramatic lighting and composition for film-like effect
+close-up portrait, tight framing on face for emotional impact
+close-up shot, focuses on details and expressions
+close-up, tight framing for detail and emotion
+Close-Up(CU), close framing for dramatic effect
+cowboy shot, frames subject from mid-thigh up, classic western style
+cut-in, inserts detail shot for emphasis
+depth of field blur, background and foreground out of focus
+depth of field, controls focus and separation of subject
+Detail Shot(ECU), extreme close-up on small details
+dolly zoom, dramatic effect with moving camera and zoom
+dutch angle shot, tilted camera for tension or unease
+dutch angle, slanted horizon for dynamic composition
+establishing shot, wide view to set scene context
+extreme close-up shot, focuses on minute details
+extreme wide shot, shows vast environment around subject
+eye-level shot, neutral perspective at subject's eye level
+face close-up, tight framing on facial features
+Face Shot (VCU), close-up focusing on face for emotion
+far close-up, close framing from a distance for unique effect
+first-person view, perspective as seen by the subject
+fisheye lens, creates curved distortion and wide field
+fisheye, rounded lens effect for creative distortion
+focus sharp, crisp and clear subject details
+from above, viewpoint looking down on subject
+from behind, shows subject from the back for mystery
+from below, upward angle for dramatic effect
+from outside, viewpoint from exterior looking in
+from side, profile or lateral view of subject
+full body shot, shows entire subject from head to toe
+full length frame, captures subject's entire height
+full shot, includes whole subject and surroundings
+gopro view, action camera perspective for dynamic scenes
+ground level shot, camera placed at ground level for unique angle
+half face close-up, focuses on one side of the face
+hatching (texture), crosshatched lines for artistic shading
+high angle shot, camera above subject for dramatic effect
+high defintion, sharp and detailed image quality
+hip level shot, camera at hip height for unique framing
+knee level shot, camera at knee height for creative angle
+long shot, shows subject from a distance with environment
+low angle shot, camera below subject for imposing effect
+macro lens, extreme close-up for tiny details
+medium close-up shot, frames subject from chest up
+medium shot, shows subject from waist up
+medium wide shot, frames subject with some background
+multiple views, shows subject from several angles
+over the shoulder shot, camera behind subject's shoulder
+overhead angle, camera directly above subject
+panorama, wide sweeping view of landscape or scene
+panoramic landscape, wide view of natural scenery
+perspective, creates sense of depth and space
+portrait, vertical framing focused on subject
+pov shot, point-of-view perspective for immersive effect
+pov, point-of-view angle for subjective experience
+professionally shot, high quality and expertly composed
+profile, side view of subject's face or body
+rear angle, shows subject from behind
+reference sheet, multiple views for character design
+rotated, image or subject turned for dynamic effect
+selfie shot angle, camera held by subject for personal view
+selfie, self-portrait taken by subject
+shot from behind, shows subject's back for mystery
+shot from side, lateral view of subject
+shoulder-level shot, camera at shoulder height
+side view shot, profile or lateral angle
+side-profile, side view of face or body
+sideways, subject or camera turned horizontally
+street level shot, camera at street height for urban feel
+studio shot, controlled lighting and background
+telephoto shot, compresses distance and focuses on subject
+three sided view, shows subject from three angles
+top-down view, camera directly above for full scene
+two shot angle, frames two subjects together
+ultra wide angle, captures expansive scene with distortion
+upper body shot, frames subject from waist up
+upside-down, subject or image inverted for creative effect
+vanishing point, lines converge for depth and perspective
+vignette, darkened edges for focus and mood
+Waist Shot(WS), frames subject from waist up
+wide angle portrait, wide lens for dramatic portrait
+wide angle, lens captures broad scene with distortion
+wide shot, shows subject and environment
+zoomed out, camera pulled back for wide view

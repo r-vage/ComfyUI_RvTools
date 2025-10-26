@@ -1,0 +1,33 @@
+armory: A secure indoor space filled with weapons and armor, evoking a sense of preparedness and history.
+bathroom: A clean, tiled room with fixtures, often bright and reflective, suitable for personal care scenes.
+bathtub: A spacious tub in a bathroom, ideal for relaxing or intimate indoor settings.
+bedroom: A cozy, private room with a bed and personal items, perfect for restful or intimate scenes.
+cafeteria: A large, communal dining area with tables and trays, bustling with activity and social interaction.
+classroom: An educational space with desks, a chalkboard, and learning materials, evoking a studious atmosphere.
+closet: A small, enclosed space for storing clothes and personal belongings, often dimly lit and intimate.
+clubroom: A dedicated room for group activities, decorated with posters and supplies, suggesting camaraderie.
+conservatory: A sunlit indoor garden room with glass walls, filled with plants and natural light.
+courtroom: A formal, authoritative space with benches and a judge's stand, evoking seriousness and order.
+cubicle: A compact office workspace with partitions, computers, and paperwork, representing modern work life.
+dining room: A welcoming space with a dining table and chairs, set for meals and gatherings.
+dressing room: A private area with mirrors and wardrobes, ideal for preparation and transformation scenes.
+dungeon: A dark, stone-walled underground room, often mysterious or foreboding, perfect for dramatic scenes.
+fitting room: A small, private space in a store for trying on clothes, often brightly lit and functional.
+gym storeroom: A storage area in a gym, filled with sports equipment and supplies, practical and utilitarian.
+gym: A spacious indoor area with exercise machines and mats, energetic and focused on fitness.
+hotel room: A comfortable, temporary living space with a bed and amenities, suggesting travel and relaxation.
+infirmary: A medical room with beds and equipment, clean and clinical, suitable for care or recovery scenes.
+kitchen: A functional room with appliances and utensils, lively and perfect for cooking or domestic scenes.
+laboratory: A scientific workspace with equipment and experiments, evoking innovation and discovery.
+library: A quiet, book-filled room with shelves and reading areas, ideal for study and contemplation.
+living room: A central, comfortable space with sofas and decor, perfect for social or family scenes.
+messy room: A cluttered indoor space with scattered items, conveying chaos or lived-in authenticity.
+office: A professional indoor environment with desks, computers, and paperwork, focused and organized.
+otaku room: A personalized space filled with anime, manga, and collectibles, vibrant and expressive.
+prison cell: A stark, confined room with minimal furnishings, evoking isolation and tension.
+shower: A tiled area with running water, often steamy and intimate, suitable for cleansing scenes.
+staff room: A break area for employees, with tables and casual seating, relaxed and informal.
+stage: A performance area with lighting and curtains, dramatic and focused on presentation.
+storage room: A utilitarian space filled with boxes and supplies, practical and sometimes cluttered.
+toilet stall: A small, private cubicle in a restroom, functional and enclosed.
+workshop: A creative indoor space with tools and materials, ideal for crafting or building scenes.

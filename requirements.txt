@@ -1,0 +1,11 @@
+torch
+numpy
+Pillow
+opencv-python
+pilgram
+safetensors
+torchvision
+psutil
+requests
+PyYAML
+aiohttp

@@ -1,0 +1,4456 @@
+{
+  "id": "888b624d-e40e-4bde-9a8b-13af9da89f7c",
+  "revision": 0,
+  "last_node_id": 52,
+  "last_link_id": 78,
+  "nodes": [
+    {
+      "id": 4,
+      "type": "CheckpointLoaderSimple",
+      "pos": [
+        26,
+        474
+      ],
+      "size": [
+        315,
+        98
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "ckpt_name",
+          "name": "ckpt_name",
+          "type": "COMBO",
+          "widget": {
+            "name": "ckpt_name"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "MODEL",
+          "name": "MODEL",
+          "type": "MODEL",
+          "slot_index": 0,
+          "links": [
+            1
+          ]
+        },
+        {
+          "localized_name": "CLIP",
+          "name": "CLIP",
+          "type": "CLIP",
+          "slot_index": 1,
+          "links": [
+            3,
+            5
+          ]
+        },
+        {
+          "localized_name": "VAE",
+          "name": "VAE",
+          "type": "VAE",
+          "slot_index": 2,
+          "links": [
+            8
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.56",
+        "Node name for S&R": "CheckpointLoaderSimple"
+      },
+      "widgets_values": [
+        "illustrious\\illustrij_v18.safetensors"
+      ],
+      "shape": 1
+    },
+    {
+      "id": 25,
+      "type": "Preview Image [RvTools]",
+      "pos": [
+        1221,
+        181
+      ],
+      "size": [
+        449,
+        729
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "images",
+          "name": "images",
+          "type": "IMAGE",
+          "link": 27
+        },
+        {
+          "localized_name": "Show_Images",
+          "name": "Show_Images",
+          "type": "INT",
+          "widget": {
+            "name": "Show_Images"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "IMAGE",
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": null
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "cac349590dafec35997fc4aa2a937567a2fa37fe",
+        "Node name for S&R": "Preview Image [RvTools]",
+        "cnr_id": "ComfyUI-RvTools"
+      },
+      "widgets_values": [
+        -1
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 8,
+      "type": "VAEDecode",
+      "pos": [
+        971,
+        951
+      ],
+      "size": [
+        219,
+        49
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "samples",
+          "name": "samples",
+          "type": "LATENT",
+          "link": 7
+        },
+        {
+          "localized_name": "vae",
+          "name": "vae",
+          "type": "VAE",
+          "link": 8
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "IMAGE",
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "slot_index": 0,
+          "links": [
+            27
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.56",
+        "Node name for S&R": "VAEDecode"
+      },
+      "widgets_values": [],
+      "shape": 1
+    },
+    {
+      "id": 3,
+      "type": "KSampler",
+      "pos": [
+        861,
+        181
+      ],
+      "size": [
+        329,
+        729
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "model",
+          "name": "model",
+          "type": "MODEL",
+          "link": 1
+        },
+        {
+          "localized_name": "positive",
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 4
+        },
+        {
+          "localized_name": "negative",
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 6
+        },
+        {
+          "localized_name": "latent_image",
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 2
+        },
+        {
+          "localized_name": "seed",
+          "name": "seed",
+          "type": "INT",
+          "widget": {
+            "name": "seed"
+          },
+          "link": 18
+        },
+        {
+          "localized_name": "steps",
+          "name": "steps",
+          "type": "INT",
+          "widget": {
+            "name": "steps"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "cfg",
+          "name": "cfg",
+          "type": "FLOAT",
+          "widget": {
+            "name": "cfg"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "sampler_name",
+          "name": "sampler_name",
+          "type": "COMBO",
+          "widget": {
+            "name": "sampler_name"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "scheduler",
+          "name": "scheduler",
+          "type": "COMBO",
+          "widget": {
+            "name": "scheduler"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "denoise",
+          "name": "denoise",
+          "type": "FLOAT",
+          "widget": {
+            "name": "denoise"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "LATENT",
+          "name": "LATENT",
+          "type": "LATENT",
+          "slot_index": 0,
+          "links": [
+            7
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.56",
+        "Node name for S&R": "KSampler"
+      },
+      "widgets_values": [
+        699551706692254,
+        "randomize",
+        40,
+        4,
+        "dpmpp_2m",
+        "karras",
+        1
+      ],
+      "shape": 1
+    },
+    {
+      "id": 6,
+      "type": "CLIPTextEncode",
+      "pos": [
+        411,
+        181
+      ],
+      "size": [
+        419,
+        149
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "clip",
+          "name": "clip",
+          "type": "CLIP",
+          "link": 3
+        },
+        {
+          "localized_name": "text",
+          "name": "text",
+          "type": "STRING",
+          "widget": {
+            "name": "text"
+          },
+          "link": 65
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "CONDITIONING",
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "slot_index": 0,
+          "links": [
+            4
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.56",
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        "beautiful scenery nature glass bottle landscape, , purple galaxy bottle,"
+      ],
+      "shape": 1
+    },
+    {
+      "id": 7,
+      "type": "CLIPTextEncode",
+      "pos": [
+        411,
+        391
+      ],
+      "size": [
+        419,
+        169
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "clip",
+          "name": "clip",
+          "type": "CLIP",
+          "link": 5
+        },
+        {
+          "localized_name": "text",
+          "name": "text",
+          "type": "STRING",
+          "widget": {
+            "name": "text"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "CONDITIONING",
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "slot_index": 0,
+          "links": [
+            6
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.56",
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        "text, watermark"
+      ],
+      "shape": 1
+    },
+    {
+      "id": 5,
+      "type": "EmptyLatentImage",
+      "pos": [
+        521,
+        621
+      ],
+      "size": [
+        309,
+        106
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "width",
+          "name": "width",
+          "type": "INT",
+          "widget": {
+            "name": "width"
+          },
+          "link": 57
+        },
+        {
+          "localized_name": "height",
+          "name": "height",
+          "type": "INT",
+          "widget": {
+            "name": "height"
+          },
+          "link": 58
+        },
+        {
+          "localized_name": "batch_size",
+          "name": "batch_size",
+          "type": "INT",
+          "widget": {
+            "name": "batch_size"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "LATENT",
+          "name": "LATENT",
+          "type": "LATENT",
+          "slot_index": 0,
+          "links": [
+            2
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.56",
+        "Node name for S&R": "EmptyLatentImage"
+      },
+      "widgets_values": [
+        832,
+        1216,
+        1
+      ],
+      "shape": 1
+    },
+    {
+      "id": 41,
+      "type": "Image Resolution [RvTools]",
+      "pos": [
+        72,
+        632
+      ],
+      "size": [
+        270,
+        78
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "resolution",
+          "name": "resolution",
+          "type": "COMBO",
+          "widget": {
+            "name": "resolution"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "width",
+          "name": "width",
+          "type": "INT",
+          "links": [
+            57
+          ]
+        },
+        {
+          "localized_name": "height",
+          "name": "height",
+          "type": "INT",
+          "links": [
+            58
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "9ba4549fa8749be80846fa13d2aac2857b4ae3f4",
+        "Node name for S&R": "Image Resolution [RvTools]"
+      },
+      "widgets_values": [
+        "832x1216 (2:3 Flux, SDXL)"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 44,
+      "type": "ShowText|pysssss",
+      "pos": [
+        -729,
+        1121
+      ],
+      "size": [
+        339,
+        199
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "text",
+          "name": "text",
+          "type": "STRING",
+          "link": 73
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "STRING",
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-custom-scripts",
+        "ver": "1.2.5",
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        "atmospheric perspective, Paolo Roversi, cel shading"
+      ]
+    },
+    {
+      "id": 46,
+      "type": "ShowText|pysssss",
+      "pos": [
+        -1099,
+        1121
+      ],
+      "size": [
+        339,
+        199
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "text",
+          "name": "text",
+          "type": "STRING",
+          "link": 71
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "STRING",
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-custom-scripts",
+        "ver": "1.2.5",
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        "akali, standing on one leg, gray hair, black eyes"
+      ]
+    },
+    {
+      "id": 35,
+      "type": "ShowText|pysssss",
+      "pos": [
+        -359,
+        1121
+      ],
+      "size": [
+        339,
+        199
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "text",
+          "name": "text",
+          "type": "STRING",
+          "link": 75
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "STRING",
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-custom-scripts",
+        "ver": "1.2.5",
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        "sunburst background, path, feather"
+      ]
+    },
+    {
+      "id": 48,
+      "type": "ShowText|pysssss",
+      "pos": [
+        21,
+        1121
+      ],
+      "size": [
+        339,
+        199
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "text",
+          "name": "text",
+          "type": "STRING",
+          "link": 66
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "STRING",
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfyui-custom-scripts",
+        "ver": "1.2.5",
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        "akali, standing on one leg, gray hair, black eyes, atmospheric perspective, Paolo Roversi, cel shading, sunburst background, path, feather"
+      ]
+    },
+    {
+      "id": 47,
+      "type": "Merge Strings [RvTools]",
+      "pos": [
+        21,
+        891
+      ],
+      "size": [
+        269,
+        151
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "string_1",
+          "name": "string_1",
+          "shape": 7,
+          "type": "STRING",
+          "link": 76
+        },
+        {
+          "localized_name": "string_2",
+          "name": "string_2",
+          "shape": 7,
+          "type": "STRING",
+          "link": 77
+        },
+        {
+          "localized_name": "inputcount",
+          "name": "inputcount",
+          "type": "INT",
+          "widget": {
+            "name": "inputcount"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "Delimiter",
+          "name": "Delimiter",
+          "type": "STRING",
+          "widget": {
+            "name": "Delimiter"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "return_as_list",
+          "name": "return_as_list",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "return_as_list"
+          },
+          "link": null
+        },
+        {
+          "name": "string_3",
+          "type": "STRING",
+          "link": 78
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "STRING",
+          "name": "STRING",
+          "shape": 6,
+          "type": "STRING",
+          "links": [
+            65,
+            66
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI-RvTools",
+        "ver": "9ba4549fa8749be80846fa13d2aac2857b4ae3f4"
+      },
+      "widgets_values": [
+        3,
+        ", ",
+        false
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 18,
+      "type": "Seed (rgthree)",
+      "pos": [
+        474,
+        820
+      ],
+      "size": [
+        315,
+        130
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "dir": 4,
+          "name": "SEED",
+          "shape": 3,
+          "type": "INT",
+          "links": [
+            18
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "rgthree-comfy",
+        "ver": "110e4ef1dbf2ea20ec39ae5a737bd5e56d4e54c2",
+        "randomMax": 1125899906842624,
+        "randomMin": 0
+      },
+      "widgets_values": [
+        1110013975489051,
+        "",
+        "",
+        ""
+      ],
+      "shape": 1
+    },
+    {
+      "id": 50,
+      "type": "Smart Prompt [RvTools]",
+      "pos": [
+        -1099,
+        461
+      ],
+      "size": [
+        279,
+        490
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "seed_input",
+          "name": "seed_input",
+          "shape": 7,
+          "type": "INT",
+          "link": 70
+        },
+        {
+          "localized_name": "folder",
+          "name": "folder",
+          "type": "COMBO",
+          "widget": {
+            "name": "folder"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment Sky",
+          "name": "environment Sky",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment Sky"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment Indoor",
+          "name": "environment Indoor",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment Indoor"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment Outdoor",
+          "name": "environment Outdoor",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment Outdoor"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment Building",
+          "name": "environment Building",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment Building"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment Flowers",
+          "name": "environment Flowers",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment Flowers"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment Food",
+          "name": "environment Food",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment Food"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment Background",
+          "name": "environment Background",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment Background"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment_desc Sky desc",
+          "name": "environment_desc Sky desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment_desc Sky desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment_desc Indoor desc",
+          "name": "environment_desc Indoor desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment_desc Indoor desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment_desc Outdoor desc",
+          "name": "environment_desc Outdoor desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment_desc Outdoor desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment_desc Building desc",
+          "name": "environment_desc Building desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment_desc Building desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment_desc Flowers desc",
+          "name": "environment_desc Flowers desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment_desc Flowers desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment_desc Food desc",
+          "name": "environment_desc Food desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment_desc Food desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment_desc Background desc",
+          "name": "environment_desc Background desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment_desc Background desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Shotstyle",
+          "name": "settings Shotstyle",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Shotstyle"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Artists",
+          "name": "settings Artists",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Artists"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Arists Special",
+          "name": "settings Arists Special",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Arists Special"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Architects",
+          "name": "settings Architects",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Architects"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Film Directors",
+          "name": "settings Film Directors",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Film Directors"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Lighting",
+          "name": "settings Lighting",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Lighting"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Photography Styles",
+          "name": "settings Photography Styles",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Photography Styles"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Color Theme",
+          "name": "settings Color Theme",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Color Theme"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Theme",
+          "name": "settings Theme",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Theme"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Scene Atmosphere",
+          "name": "settings Scene Atmosphere",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Scene Atmosphere"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Magic Elements",
+          "name": "settings Magic Elements",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Magic Elements"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Effects",
+          "name": "settings Effects",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Effects"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Camera",
+          "name": "settings Camera",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Camera"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Films",
+          "name": "settings Films",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Films"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Image Type",
+          "name": "settings Image Type",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Image Type"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Art Style",
+          "name": "settings Art Style",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Art Style"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Illustration Style",
+          "name": "settings Illustration Style",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Illustration Style"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Composition Method",
+          "name": "settings Composition Method",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Composition Method"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Printing Materials",
+          "name": "settings Printing Materials",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Printing Materials"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Shotstyle desc",
+          "name": "settings_desc Shotstyle desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Shotstyle desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Artists desc",
+          "name": "settings_desc Artists desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Artists desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Arists Special desc",
+          "name": "settings_desc Arists Special desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Arists Special desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Architects desc",
+          "name": "settings_desc Architects desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Architects desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Film Directors desc",
+          "name": "settings_desc Film Directors desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Film Directors desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Lighting desc",
+          "name": "settings_desc Lighting desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Lighting desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Photography Styles desc",
+          "name": "settings_desc Photography Styles desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Photography Styles desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Color Theme desc",
+          "name": "settings_desc Color Theme desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Color Theme desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Theme desc",
+          "name": "settings_desc Theme desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Theme desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Scene Atmosphere desc",
+          "name": "settings_desc Scene Atmosphere desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Scene Atmosphere desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Magic Elements desc",
+          "name": "settings_desc Magic Elements desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Magic Elements desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Effects desc",
+          "name": "settings_desc Effects desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Effects desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Camera desc",
+          "name": "settings_desc Camera desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Camera desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Films desc",
+          "name": "settings_desc Films desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Films desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Image Type desc",
+          "name": "settings_desc Image Type desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Image Type desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Art Style desc",
+          "name": "settings_desc Art Style desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Art Style desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Illustration Style desc",
+          "name": "settings_desc Illustration Style desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Illustration Style desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Composition Method desc",
+          "name": "settings_desc Composition Method desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Composition Method desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Printing Materials desc",
+          "name": "settings_desc Printing Materials desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Printing Materials desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old Shotstyle",
+          "name": "settings_old Shotstyle",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old Shotstyle"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old Angle of View",
+          "name": "settings_old Angle of View",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old Angle of View"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old Locations",
+          "name": "settings_old Locations",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old Locations"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old Artists",
+          "name": "settings_old Artists",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old Artists"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old Artists Special",
+          "name": "settings_old Artists Special",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old Artists Special"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old Cameras",
+          "name": "settings_old Cameras",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old Cameras"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old Lighting",
+          "name": "settings_old Lighting",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old Lighting"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old AdelAi Artists",
+          "name": "settings_old AdelAi Artists",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old AdelAi Artists"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old AdelAi Styles",
+          "name": "settings_old AdelAi Styles",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old AdelAi Styles"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old AdelAi FX",
+          "name": "settings_old AdelAi FX",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old AdelAi FX"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old AdelAi Lighting",
+          "name": "settings_old AdelAi Lighting",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old AdelAi Lighting"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old AdelAi Cameras",
+          "name": "settings_old AdelAi Cameras",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old AdelAi Cameras"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old AdelAi Films",
+          "name": "settings_old AdelAi Films",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old AdelAi Films"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Character",
+          "name": "subjects Character",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Character"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Subject Type",
+          "name": "subjects Subject Type",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Subject Type"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Pose",
+          "name": "subjects Pose",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Pose"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Action",
+          "name": "subjects Action",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Action"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Hair",
+          "name": "subjects Hair",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Hair"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Hair Colors",
+          "name": "subjects Hair Colors",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Hair Colors"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Head Accessories",
+          "name": "subjects Head Accessories",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Head Accessories"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Face",
+          "name": "subjects Face",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Face"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Eyes",
+          "name": "subjects Eyes",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Eyes"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Ears",
+          "name": "subjects Ears",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Ears"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Neck",
+          "name": "subjects Neck",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Neck"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Skin",
+          "name": "subjects Skin",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Skin"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Clothing",
+          "name": "subjects Clothing",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Clothing"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Upper Body Decoration",
+          "name": "subjects Upper Body Decoration",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Upper Body Decoration"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Lower Body Decoration",
+          "name": "subjects Lower Body Decoration",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Lower Body Decoration"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Full Body Decoration",
+          "name": "subjects Full Body Decoration",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Full Body Decoration"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Shoes and Socks",
+          "name": "subjects Shoes and Socks",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Shoes and Socks"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Accessories",
+          "name": "subjects Accessories",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Accessories"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Character desc",
+          "name": "subjects_desc Character desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Character desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Subject Type desc",
+          "name": "subjects_desc Subject Type desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Subject Type desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Pose desc",
+          "name": "subjects_desc Pose desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Pose desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Action desc",
+          "name": "subjects_desc Action desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Action desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Hair desc",
+          "name": "subjects_desc Hair desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Hair desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Hair Colors desc",
+          "name": "subjects_desc Hair Colors desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Hair Colors desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Head Accessories desc",
+          "name": "subjects_desc Head Accessories desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Head Accessories desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Face desc",
+          "name": "subjects_desc Face desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Face desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Eyes desc",
+          "name": "subjects_desc Eyes desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Eyes desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Ears desc",
+          "name": "subjects_desc Ears desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Ears desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Neck desc",
+          "name": "subjects_desc Neck desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Neck desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Skin desc",
+          "name": "subjects_desc Skin desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Skin desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Clothing desc",
+          "name": "subjects_desc Clothing desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Clothing desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Upper Body Decoration desc",
+          "name": "subjects_desc Upper Body Decoration desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Upper Body Decoration desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Lower Body Decoration desc",
+          "name": "subjects_desc Lower Body Decoration desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Lower Body Decoration desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Full Body Decoration desc",
+          "name": "subjects_desc Full Body Decoration desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Full Body Decoration desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Shoes and Socks desc",
+          "name": "subjects_desc Shoes and Socks desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Shoes and Socks desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Accessories desc",
+          "name": "subjects_desc Accessories desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Accessories desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_old Woman",
+          "name": "subjects_old Woman",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_old Woman"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_old Man",
+          "name": "subjects_old Man",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_old Man"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_old Fictional Character",
+          "name": "subjects_old Fictional Character",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_old Fictional Character"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_old Humanoids",
+          "name": "subjects_old Humanoids",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_old Humanoids"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_old Animals",
+          "name": "subjects_old Animals",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_old Animals"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_old Vehicles",
+          "name": "subjects_old Vehicles",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_old Vehicles"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "seed",
+          "name": "seed",
+          "type": "INT",
+          "widget": {
+            "name": "seed"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "prompt",
+          "name": "prompt",
+          "type": "STRING",
+          "links": [
+            71,
+            76
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI_RvTools",
+        "ver": "a206f755375121efdd1f709db82162ea1be71c1a",
+        "Node name for S&R": "Smart Prompt [RvTools]"
+      },
+      "widgets_values": [
+        "subjects",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "Random",
+        "None",
+        "Random",
+        "None",
+        "None",
+        "Random",
+        "None",
+        "None",
+        "Random",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        0,
+        "",
+        "",
+        ""
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 51,
+      "type": "Smart Prompt [RvTools]",
+      "pos": [
+        -729,
+        461
+      ],
+      "size": [
+        279,
+        514
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "seed_input",
+          "name": "seed_input",
+          "shape": 7,
+          "type": "INT",
+          "link": 72
+        },
+        {
+          "localized_name": "folder",
+          "name": "folder",
+          "type": "COMBO",
+          "widget": {
+            "name": "folder"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment Sky",
+          "name": "environment Sky",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment Sky"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment Indoor",
+          "name": "environment Indoor",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment Indoor"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment Outdoor",
+          "name": "environment Outdoor",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment Outdoor"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment Building",
+          "name": "environment Building",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment Building"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment Flowers",
+          "name": "environment Flowers",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment Flowers"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment Food",
+          "name": "environment Food",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment Food"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment Background",
+          "name": "environment Background",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment Background"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment_desc Sky desc",
+          "name": "environment_desc Sky desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment_desc Sky desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment_desc Indoor desc",
+          "name": "environment_desc Indoor desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment_desc Indoor desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment_desc Outdoor desc",
+          "name": "environment_desc Outdoor desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment_desc Outdoor desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment_desc Building desc",
+          "name": "environment_desc Building desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment_desc Building desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment_desc Flowers desc",
+          "name": "environment_desc Flowers desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment_desc Flowers desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment_desc Food desc",
+          "name": "environment_desc Food desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment_desc Food desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment_desc Background desc",
+          "name": "environment_desc Background desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment_desc Background desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Shotstyle",
+          "name": "settings Shotstyle",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Shotstyle"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Artists",
+          "name": "settings Artists",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Artists"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Arists Special",
+          "name": "settings Arists Special",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Arists Special"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Architects",
+          "name": "settings Architects",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Architects"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Film Directors",
+          "name": "settings Film Directors",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Film Directors"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Lighting",
+          "name": "settings Lighting",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Lighting"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Photography Styles",
+          "name": "settings Photography Styles",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Photography Styles"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Color Theme",
+          "name": "settings Color Theme",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Color Theme"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Theme",
+          "name": "settings Theme",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Theme"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Scene Atmosphere",
+          "name": "settings Scene Atmosphere",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Scene Atmosphere"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Magic Elements",
+          "name": "settings Magic Elements",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Magic Elements"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Effects",
+          "name": "settings Effects",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Effects"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Camera",
+          "name": "settings Camera",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Camera"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Films",
+          "name": "settings Films",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Films"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Image Type",
+          "name": "settings Image Type",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Image Type"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Art Style",
+          "name": "settings Art Style",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Art Style"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Illustration Style",
+          "name": "settings Illustration Style",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Illustration Style"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Composition Method",
+          "name": "settings Composition Method",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Composition Method"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Printing Materials",
+          "name": "settings Printing Materials",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Printing Materials"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Shotstyle desc",
+          "name": "settings_desc Shotstyle desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Shotstyle desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Artists desc",
+          "name": "settings_desc Artists desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Artists desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Arists Special desc",
+          "name": "settings_desc Arists Special desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Arists Special desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Architects desc",
+          "name": "settings_desc Architects desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Architects desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Film Directors desc",
+          "name": "settings_desc Film Directors desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Film Directors desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Lighting desc",
+          "name": "settings_desc Lighting desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Lighting desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Photography Styles desc",
+          "name": "settings_desc Photography Styles desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Photography Styles desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Color Theme desc",
+          "name": "settings_desc Color Theme desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Color Theme desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Theme desc",
+          "name": "settings_desc Theme desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Theme desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Scene Atmosphere desc",
+          "name": "settings_desc Scene Atmosphere desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Scene Atmosphere desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Magic Elements desc",
+          "name": "settings_desc Magic Elements desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Magic Elements desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Effects desc",
+          "name": "settings_desc Effects desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Effects desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Camera desc",
+          "name": "settings_desc Camera desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Camera desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Films desc",
+          "name": "settings_desc Films desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Films desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Image Type desc",
+          "name": "settings_desc Image Type desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Image Type desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Art Style desc",
+          "name": "settings_desc Art Style desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Art Style desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Illustration Style desc",
+          "name": "settings_desc Illustration Style desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Illustration Style desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Composition Method desc",
+          "name": "settings_desc Composition Method desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Composition Method desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Printing Materials desc",
+          "name": "settings_desc Printing Materials desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Printing Materials desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old Shotstyle",
+          "name": "settings_old Shotstyle",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old Shotstyle"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old Angle of View",
+          "name": "settings_old Angle of View",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old Angle of View"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old Locations",
+          "name": "settings_old Locations",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old Locations"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old Artists",
+          "name": "settings_old Artists",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old Artists"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old Artists Special",
+          "name": "settings_old Artists Special",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old Artists Special"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old Cameras",
+          "name": "settings_old Cameras",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old Cameras"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old Lighting",
+          "name": "settings_old Lighting",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old Lighting"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old AdelAi Artists",
+          "name": "settings_old AdelAi Artists",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old AdelAi Artists"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old AdelAi Styles",
+          "name": "settings_old AdelAi Styles",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old AdelAi Styles"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old AdelAi FX",
+          "name": "settings_old AdelAi FX",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old AdelAi FX"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old AdelAi Lighting",
+          "name": "settings_old AdelAi Lighting",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old AdelAi Lighting"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old AdelAi Cameras",
+          "name": "settings_old AdelAi Cameras",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old AdelAi Cameras"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old AdelAi Films",
+          "name": "settings_old AdelAi Films",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old AdelAi Films"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Character",
+          "name": "subjects Character",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Character"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Subject Type",
+          "name": "subjects Subject Type",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Subject Type"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Pose",
+          "name": "subjects Pose",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Pose"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Action",
+          "name": "subjects Action",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Action"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Hair",
+          "name": "subjects Hair",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Hair"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Hair Colors",
+          "name": "subjects Hair Colors",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Hair Colors"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Head Accessories",
+          "name": "subjects Head Accessories",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Head Accessories"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Face",
+          "name": "subjects Face",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Face"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Eyes",
+          "name": "subjects Eyes",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Eyes"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Ears",
+          "name": "subjects Ears",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Ears"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Neck",
+          "name": "subjects Neck",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Neck"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Skin",
+          "name": "subjects Skin",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Skin"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Clothing",
+          "name": "subjects Clothing",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Clothing"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Upper Body Decoration",
+          "name": "subjects Upper Body Decoration",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Upper Body Decoration"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Lower Body Decoration",
+          "name": "subjects Lower Body Decoration",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Lower Body Decoration"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Full Body Decoration",
+          "name": "subjects Full Body Decoration",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Full Body Decoration"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Shoes and Socks",
+          "name": "subjects Shoes and Socks",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Shoes and Socks"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Accessories",
+          "name": "subjects Accessories",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Accessories"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Character desc",
+          "name": "subjects_desc Character desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Character desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Subject Type desc",
+          "name": "subjects_desc Subject Type desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Subject Type desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Pose desc",
+          "name": "subjects_desc Pose desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Pose desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Action desc",
+          "name": "subjects_desc Action desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Action desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Hair desc",
+          "name": "subjects_desc Hair desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Hair desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Hair Colors desc",
+          "name": "subjects_desc Hair Colors desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Hair Colors desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Head Accessories desc",
+          "name": "subjects_desc Head Accessories desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Head Accessories desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Face desc",
+          "name": "subjects_desc Face desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Face desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Eyes desc",
+          "name": "subjects_desc Eyes desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Eyes desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Ears desc",
+          "name": "subjects_desc Ears desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Ears desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Neck desc",
+          "name": "subjects_desc Neck desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Neck desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Skin desc",
+          "name": "subjects_desc Skin desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Skin desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Clothing desc",
+          "name": "subjects_desc Clothing desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Clothing desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Upper Body Decoration desc",
+          "name": "subjects_desc Upper Body Decoration desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Upper Body Decoration desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Lower Body Decoration desc",
+          "name": "subjects_desc Lower Body Decoration desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Lower Body Decoration desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Full Body Decoration desc",
+          "name": "subjects_desc Full Body Decoration desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Full Body Decoration desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Shoes and Socks desc",
+          "name": "subjects_desc Shoes and Socks desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Shoes and Socks desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Accessories desc",
+          "name": "subjects_desc Accessories desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Accessories desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_old Woman",
+          "name": "subjects_old Woman",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_old Woman"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_old Man",
+          "name": "subjects_old Man",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_old Man"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_old Fictional Character",
+          "name": "subjects_old Fictional Character",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_old Fictional Character"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_old Humanoids",
+          "name": "subjects_old Humanoids",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_old Humanoids"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_old Animals",
+          "name": "subjects_old Animals",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_old Animals"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_old Vehicles",
+          "name": "subjects_old Vehicles",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_old Vehicles"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "seed",
+          "name": "seed",
+          "type": "INT",
+          "widget": {
+            "name": "seed"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "prompt",
+          "name": "prompt",
+          "type": "STRING",
+          "links": [
+            73,
+            77
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI_RvTools",
+        "ver": "a206f755375121efdd1f709db82162ea1be71c1a",
+        "Node name for S&R": "Smart Prompt [RvTools]"
+      },
+      "widgets_values": [
+        "settings",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "Random",
+        "Random",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "Random",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        0,
+        "",
+        "",
+        ""
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 52,
+      "type": "Smart Prompt [RvTools]",
+      "pos": [
+        -359,
+        461
+      ],
+      "size": [
+        279,
+        322
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "seed_input",
+          "name": "seed_input",
+          "shape": 7,
+          "type": "INT",
+          "link": null
+        },
+        {
+          "localized_name": "folder",
+          "name": "folder",
+          "type": "COMBO",
+          "widget": {
+            "name": "folder"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment Sky",
+          "name": "environment Sky",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment Sky"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment Indoor",
+          "name": "environment Indoor",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment Indoor"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment Outdoor",
+          "name": "environment Outdoor",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment Outdoor"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment Building",
+          "name": "environment Building",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment Building"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment Flowers",
+          "name": "environment Flowers",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment Flowers"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment Food",
+          "name": "environment Food",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment Food"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment Background",
+          "name": "environment Background",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment Background"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment_desc Sky desc",
+          "name": "environment_desc Sky desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment_desc Sky desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment_desc Indoor desc",
+          "name": "environment_desc Indoor desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment_desc Indoor desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment_desc Outdoor desc",
+          "name": "environment_desc Outdoor desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment_desc Outdoor desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment_desc Building desc",
+          "name": "environment_desc Building desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment_desc Building desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment_desc Flowers desc",
+          "name": "environment_desc Flowers desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment_desc Flowers desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment_desc Food desc",
+          "name": "environment_desc Food desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment_desc Food desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "environment_desc Background desc",
+          "name": "environment_desc Background desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "environment_desc Background desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Shotstyle",
+          "name": "settings Shotstyle",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Shotstyle"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Artists",
+          "name": "settings Artists",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Artists"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Arists Special",
+          "name": "settings Arists Special",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Arists Special"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Architects",
+          "name": "settings Architects",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Architects"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Film Directors",
+          "name": "settings Film Directors",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Film Directors"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Lighting",
+          "name": "settings Lighting",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Lighting"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Photography Styles",
+          "name": "settings Photography Styles",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Photography Styles"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Color Theme",
+          "name": "settings Color Theme",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Color Theme"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Theme",
+          "name": "settings Theme",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Theme"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Scene Atmosphere",
+          "name": "settings Scene Atmosphere",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Scene Atmosphere"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Magic Elements",
+          "name": "settings Magic Elements",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Magic Elements"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Effects",
+          "name": "settings Effects",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Effects"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Camera",
+          "name": "settings Camera",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Camera"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Films",
+          "name": "settings Films",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Films"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Image Type",
+          "name": "settings Image Type",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Image Type"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Art Style",
+          "name": "settings Art Style",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Art Style"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Illustration Style",
+          "name": "settings Illustration Style",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Illustration Style"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Composition Method",
+          "name": "settings Composition Method",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Composition Method"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings Printing Materials",
+          "name": "settings Printing Materials",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings Printing Materials"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Shotstyle desc",
+          "name": "settings_desc Shotstyle desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Shotstyle desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Artists desc",
+          "name": "settings_desc Artists desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Artists desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Arists Special desc",
+          "name": "settings_desc Arists Special desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Arists Special desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Architects desc",
+          "name": "settings_desc Architects desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Architects desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Film Directors desc",
+          "name": "settings_desc Film Directors desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Film Directors desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Lighting desc",
+          "name": "settings_desc Lighting desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Lighting desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Photography Styles desc",
+          "name": "settings_desc Photography Styles desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Photography Styles desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Color Theme desc",
+          "name": "settings_desc Color Theme desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Color Theme desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Theme desc",
+          "name": "settings_desc Theme desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Theme desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Scene Atmosphere desc",
+          "name": "settings_desc Scene Atmosphere desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Scene Atmosphere desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Magic Elements desc",
+          "name": "settings_desc Magic Elements desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Magic Elements desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Effects desc",
+          "name": "settings_desc Effects desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Effects desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Camera desc",
+          "name": "settings_desc Camera desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Camera desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Films desc",
+          "name": "settings_desc Films desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Films desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Image Type desc",
+          "name": "settings_desc Image Type desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Image Type desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Art Style desc",
+          "name": "settings_desc Art Style desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Art Style desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Illustration Style desc",
+          "name": "settings_desc Illustration Style desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Illustration Style desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Composition Method desc",
+          "name": "settings_desc Composition Method desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Composition Method desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_desc Printing Materials desc",
+          "name": "settings_desc Printing Materials desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_desc Printing Materials desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old Shotstyle",
+          "name": "settings_old Shotstyle",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old Shotstyle"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old Angle of View",
+          "name": "settings_old Angle of View",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old Angle of View"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old Locations",
+          "name": "settings_old Locations",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old Locations"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old Artists",
+          "name": "settings_old Artists",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old Artists"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old Artists Special",
+          "name": "settings_old Artists Special",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old Artists Special"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old Cameras",
+          "name": "settings_old Cameras",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old Cameras"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old Lighting",
+          "name": "settings_old Lighting",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old Lighting"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old AdelAi Artists",
+          "name": "settings_old AdelAi Artists",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old AdelAi Artists"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old AdelAi Styles",
+          "name": "settings_old AdelAi Styles",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old AdelAi Styles"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old AdelAi FX",
+          "name": "settings_old AdelAi FX",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old AdelAi FX"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old AdelAi Lighting",
+          "name": "settings_old AdelAi Lighting",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old AdelAi Lighting"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old AdelAi Cameras",
+          "name": "settings_old AdelAi Cameras",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old AdelAi Cameras"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "settings_old AdelAi Films",
+          "name": "settings_old AdelAi Films",
+          "type": "COMBO",
+          "widget": {
+            "name": "settings_old AdelAi Films"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Character",
+          "name": "subjects Character",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Character"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Subject Type",
+          "name": "subjects Subject Type",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Subject Type"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Pose",
+          "name": "subjects Pose",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Pose"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Action",
+          "name": "subjects Action",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Action"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Hair",
+          "name": "subjects Hair",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Hair"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Hair Colors",
+          "name": "subjects Hair Colors",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Hair Colors"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Head Accessories",
+          "name": "subjects Head Accessories",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Head Accessories"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Face",
+          "name": "subjects Face",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Face"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Eyes",
+          "name": "subjects Eyes",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Eyes"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Ears",
+          "name": "subjects Ears",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Ears"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Neck",
+          "name": "subjects Neck",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Neck"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Skin",
+          "name": "subjects Skin",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Skin"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Clothing",
+          "name": "subjects Clothing",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Clothing"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Upper Body Decoration",
+          "name": "subjects Upper Body Decoration",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Upper Body Decoration"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Lower Body Decoration",
+          "name": "subjects Lower Body Decoration",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Lower Body Decoration"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Full Body Decoration",
+          "name": "subjects Full Body Decoration",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Full Body Decoration"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Shoes and Socks",
+          "name": "subjects Shoes and Socks",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Shoes and Socks"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects Accessories",
+          "name": "subjects Accessories",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects Accessories"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Character desc",
+          "name": "subjects_desc Character desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Character desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Subject Type desc",
+          "name": "subjects_desc Subject Type desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Subject Type desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Pose desc",
+          "name": "subjects_desc Pose desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Pose desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Action desc",
+          "name": "subjects_desc Action desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Action desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Hair desc",
+          "name": "subjects_desc Hair desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Hair desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Hair Colors desc",
+          "name": "subjects_desc Hair Colors desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Hair Colors desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Head Accessories desc",
+          "name": "subjects_desc Head Accessories desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Head Accessories desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Face desc",
+          "name": "subjects_desc Face desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Face desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Eyes desc",
+          "name": "subjects_desc Eyes desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Eyes desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Ears desc",
+          "name": "subjects_desc Ears desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Ears desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Neck desc",
+          "name": "subjects_desc Neck desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Neck desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Skin desc",
+          "name": "subjects_desc Skin desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Skin desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Clothing desc",
+          "name": "subjects_desc Clothing desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Clothing desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Upper Body Decoration desc",
+          "name": "subjects_desc Upper Body Decoration desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Upper Body Decoration desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Lower Body Decoration desc",
+          "name": "subjects_desc Lower Body Decoration desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Lower Body Decoration desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Full Body Decoration desc",
+          "name": "subjects_desc Full Body Decoration desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Full Body Decoration desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Shoes and Socks desc",
+          "name": "subjects_desc Shoes and Socks desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Shoes and Socks desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_desc Accessories desc",
+          "name": "subjects_desc Accessories desc",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_desc Accessories desc"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_old Woman",
+          "name": "subjects_old Woman",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_old Woman"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_old Man",
+          "name": "subjects_old Man",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_old Man"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_old Fictional Character",
+          "name": "subjects_old Fictional Character",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_old Fictional Character"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_old Humanoids",
+          "name": "subjects_old Humanoids",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_old Humanoids"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_old Animals",
+          "name": "subjects_old Animals",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_old Animals"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "subjects_old Vehicles",
+          "name": "subjects_old Vehicles",
+          "type": "COMBO",
+          "widget": {
+            "name": "subjects_old Vehicles"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "seed",
+          "name": "seed",
+          "type": "INT",
+          "widget": {
+            "name": "seed"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "prompt",
+          "name": "prompt",
+          "type": "STRING",
+          "links": [
+            75,
+            78
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "r-vage/ComfyUI_RvTools",
+        "ver": "a206f755375121efdd1f709db82162ea1be71c1a",
+        "Node name for S&R": "Smart Prompt [RvTools]"
+      },
+      "widgets_values": [
+        "environment",
+        "Random",
+        "None",
+        "Random",
+        "None",
+        "None",
+        "None",
+        "Random",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        "None",
+        292829074232230,
+        "",
+        "",
+        ""
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 49,
+      "type": "Seed (rgthree)",
+      "pos": [
+        -1106,
+        193
+      ],
+      "size": [
+        315,
+        130
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "dir": 4,
+          "name": "SEED",
+          "shape": 3,
+          "type": "INT",
+          "links": [
+            70,
+            72
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "rgthree-comfy",
+        "ver": "1.0.2510052058",
+        "randomMax": 1125899906842624,
+        "randomMin": 0
+      },
+      "widgets_values": [
+        550954375021091,
+        "",
+        "",
+        ""
+      ]
+    }
+  ],
+  "links": [
+    [
+      1,
+      4,
+      0,
+      3,
+      0,
+      "MODEL"
+    ],
+    [
+      2,
+      5,
+      0,
+      3,
+      3,
+      "LATENT"
+    ],
+    [
+      3,
+      4,
+      1,
+      6,
+      0,
+      "CLIP"
+    ],
+    [
+      4,
+      6,
+      0,
+      3,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      5,
+      4,
+      1,
+      7,
+      0,
+      "CLIP"
+    ],
+    [
+      6,
+      7,
+      0,
+      3,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      7,
+      3,
+      0,
+      8,
+      0,
+      "LATENT"
+    ],
+    [
+      8,
+      4,
+      2,
+      8,
+      1,
+      "VAE"
+    ],
+    [
+      18,
+      18,
+      0,
+      3,
+      4,
+      "INT"
+    ],
+    [
+      27,
+      8,
+      0,
+      25,
+      0,
+      "IMAGE"
+    ],
+    [
+      57,
+      41,
+      0,
+      5,
+      0,
+      "INT"
+    ],
+    [
+      58,
+      41,
+      1,
+      5,
+      1,
+      "INT"
+    ],
+    [
+      65,
+      47,
+      0,
+      6,
+      1,
+      "STRING"
+    ],
+    [
+      66,
+      47,
+      0,
+      48,
+      0,
+      "STRING"
+    ],
+    [
+      70,
+      49,
+      0,
+      50,
+      0,
+      "INT"
+    ],
+    [
+      71,
+      50,
+      0,
+      46,
+      0,
+      "STRING"
+    ],
+    [
+      72,
+      49,
+      0,
+      51,
+      0,
+      "INT"
+    ],
+    [
+      73,
+      51,
+      0,
+      44,
+      0,
+      "STRING"
+    ],
+    [
+      75,
+      52,
+      0,
+      35,
+      0,
+      "STRING"
+    ],
+    [
+      76,
+      50,
+      0,
+      47,
+      0,
+      "STRING"
+    ],
+    [
+      77,
+      51,
+      0,
+      47,
+      1,
+      "STRING"
+    ],
+    [
+      78,
+      52,
+      0,
+      47,
+      5,
+      "STRING"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.7513148009015777,
+      "offset": [
+        1430.4189793986532,
+        177.13224739072646
+      ]
+    },
+    "frontendVersion": "1.30.0",
+    "VHS_latentpreview": false,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true
+  },
+  "version": 0.4
+}
