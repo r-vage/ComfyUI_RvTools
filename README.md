@@ -44,7 +44,7 @@ The nodes live under the `py/` directory and are grouped by function. The `core/
 
 ## License
 
-This project is licensed under GPL-3.0 (see `LICENSE`). Check the license before embedding parts of this project in other software.
+This project is licensed under the Apache License 2.0 (see `LICENSE`). Check the license before embedding parts of this project in other software.
 
 ## Beginner-friendly installation
 
