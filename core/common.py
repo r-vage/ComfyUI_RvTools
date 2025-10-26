@@ -128,8 +128,8 @@ def purge_vram() -> None:
     project's cstr warning helper so callers don't need to duplicate
     error handling.
     
-    This function clears allocator caches WITHOUT unloading models,
-    so it won't force the workflow to restart from the beginning.
+    This function unloads all models and clears allocator caches to free
+    maximum VRAM. This will require models to be reloaded on next use.
     Based on comfyui-multigpu's soft_empty_cache_multigpu approach.
     """
     try:
@@ -182,11 +182,12 @@ def purge_vram() -> None:
                 # Ignore device-specific failures
                 pass
 
-        # Step 3: ComfyUI's soft cache clear (does NOT unload models)
+        # Step 3: ComfyUI model unloading and cache clearing
         if comfy_mod is not None:
             try:
-                # Only call soft_empty_cache - this clears caches without unloading models
-                # DO NOT call unload_all_models() as that would restart the workflow
+                # Unload all models first, then clear caches
+                if hasattr(comfy_mod.model_management, 'unload_all_models'):
+                    comfy_mod.model_management.unload_all_models()
                 if hasattr(comfy_mod.model_management, 'soft_empty_cache'):
                     comfy_mod.model_management.soft_empty_cache()
             except Exception:
