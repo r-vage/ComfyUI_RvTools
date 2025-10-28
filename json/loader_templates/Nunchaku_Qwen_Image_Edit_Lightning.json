@@ -3,7 +3,7 @@
   "ckpt_name": "None",
   "unet_name": "None",
   "nunchaku_name": "nunchaku\\svdq-int4_r32-fluxmania-legacy.safetensors",
-  "qwen_name": "nunchaku\\svdq-int4_r32-qwen-image.safetensors",
+  "qwen_name": "nunchaku\\svdq-int4_r32-qwen-image-edit-2509-lightningv2.0-8steps.safetensors",
   "gguf_name": "flux\\amafluxFluxAmateur_10Q4KS.gguf",
   "weight_dtype": "default",
   "data_type": "bfloat16",
@@ -16,6 +16,7 @@
   "gguf_dequant_dtype": "default",
   "gguf_patch_dtype": "default",
   "gguf_patch_on_device": false,
+  "flux_guidance": 3.5,
   "configure_clip": true,
   "configure_vae": true,
   "configure_latent": true,
@@ -37,6 +38,6 @@
   "batch_size": 1,
   "sampler_name": "euler",
   "scheduler": "simple",
-  "steps": 20,
+  "steps": 8,
   "cfg": 1.0
 }
