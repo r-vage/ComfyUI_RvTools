@@ -73,35 +73,90 @@ try:
         print(f"[Nunchaku Wrapper] Path exists: {nunchaku_path.exists()}")
         
         if nunchaku_path.exists():
-            # Import classes (no namespace conflicts)
+            # Import classes using the EXACT same module path that PuLID uses
+            # PuLID's relative imports create entries like 'D:\...\ComfyUI-nunchaku.wrappers.flux' in sys.modules
+            # We need to check sys.modules to find the actual module name and reuse it
             print("[Nunchaku Wrapper] Attempting to import Nunchaku classes...")
             
-            # Temporarily add parent path to import as package
-            nunchaku_parent = str(nunchaku_path.parent)
-            sys.path.insert(0, nunchaku_parent)
+            import importlib
             
-            try:
-                # Import as a proper package to handle relative imports
-                import importlib
+            # Strategy: Check if PuLID has already imported the wrapper, and reuse that module
+            wrapper_module = None
+            for mod_name in sys.modules:
+                if 'ComfyUI-nunchaku' in mod_name and 'wrappers.flux' in mod_name:
+                    wrapper_module = sys.modules[mod_name]
+                    print(f"[Nunchaku Wrapper] Found existing wrapper module: {mod_name}")
+                    break
+            
+            if wrapper_module is not None:
+                # Reuse the already-imported module
+                ComfyFluxWrapper = wrapper_module.ComfyFluxWrapper
                 
-                # Import Flux wrapper
-                flux_wrapper_module = importlib.import_module("ComfyUI-nunchaku.wrappers.flux")
-                ComfyFluxWrapper = flux_wrapper_module.ComfyFluxWrapper
+                # Find and import other modules using similar pattern
+                base_mod_name = mod_name.rsplit('.wrappers.flux', 1)[0]
                 
-                # Import Qwen classes from non-conflicting modules
-                qwen_config_module = importlib.import_module("ComfyUI-nunchaku.model_configs.qwenimage")
-                QwenConfig = qwen_config_module.NunchakuQwenImage
+                qwen_config_module = sys.modules.get(f"{base_mod_name}.model_configs.qwenimage")
+                if qwen_config_module:
+                    QwenConfig = qwen_config_module.NunchakuQwenImage
+                else:
+                    qwen_config_module = importlib.import_module(f"{base_mod_name}.model_configs.qwenimage")
+                    QwenConfig = qwen_config_module.NunchakuQwenImage
                 
-                qwen_base_module = importlib.import_module("ComfyUI-nunchaku.model_base.qwenimage")
-                QwenModelBase = qwen_base_module.NunchakuQwenImage
+                qwen_base_module = sys.modules.get(f"{base_mod_name}.model_base.qwenimage")
+                if qwen_base_module:
+                    QwenModelBase = qwen_base_module.NunchakuQwenImage
+                else:
+                    qwen_base_module = importlib.import_module(f"{base_mod_name}.model_base.qwenimage")
+                    QwenModelBase = qwen_base_module.NunchakuQwenImage
                 
-                patcher_module = importlib.import_module("ComfyUI-nunchaku.model_patcher")
-                NunchakuModelPatcher = patcher_module.NunchakuModelPatcher
+                patcher_module = sys.modules.get(f"{base_mod_name}.model_patcher")
+                if patcher_module:
+                    NunchakuModelPatcher = patcher_module.NunchakuModelPatcher
+                else:
+                    patcher_module = importlib.import_module(f"{base_mod_name}.model_patcher")
+                    NunchakuModelPatcher = patcher_module.NunchakuModelPatcher
                 
-                print(f"[Nunchaku Wrapper] ✓ ComfyFluxWrapper imported successfully")
-                print(f"[Nunchaku Wrapper] ✓ Qwen classes imported successfully")
-            finally:
-                sys.path.remove(nunchaku_parent)
+                print(f"[Nunchaku Wrapper] ✓ Reused existing modules with base: {base_mod_name}")
+            else:
+                # First import - use standard package import (ComfyUI will have set this up)
+                # Try direct import first (ComfyUI __init__ system should have loaded it)
+                try:
+                    import ComfyUI_nunchaku
+                    from ComfyUI_nunchaku.wrappers.flux import ComfyFluxWrapper as _ComfyFluxWrapper
+                    ComfyFluxWrapper = _ComfyFluxWrapper
+                    
+                    from ComfyUI_nunchaku.model_configs.qwenimage import NunchakuQwenImage as _QwenConfig
+                    QwenConfig = _QwenConfig
+                    
+                    from ComfyUI_nunchaku.model_base.qwenimage import NunchakuQwenImage as _QwenModelBase
+                    QwenModelBase = _QwenModelBase
+                    
+                    from ComfyUI_nunchaku.model_patcher import NunchakuModelPatcher as _NunchakuModelPatcher
+                    NunchakuModelPatcher = _NunchakuModelPatcher
+                    
+                    print(f"[Nunchaku Wrapper] ✓ Imported via ComfyUI_nunchaku package")
+                except ImportError:
+                    # Last resort: manual sys.path approach
+                    nunchaku_parent = str(nunchaku_path.parent)
+                    if nunchaku_parent not in sys.path:
+                        sys.path.insert(0, nunchaku_parent)
+                    
+                    flux_wrapper_module = importlib.import_module("ComfyUI-nunchaku.wrappers.flux")
+                    ComfyFluxWrapper = flux_wrapper_module.ComfyFluxWrapper
+                    
+                    qwen_config_module = importlib.import_module("ComfyUI-nunchaku.model_configs.qwenimage")
+                    QwenConfig = qwen_config_module.NunchakuQwenImage
+                    
+                    qwen_base_module = importlib.import_module("ComfyUI-nunchaku.model_base.qwenimage")
+                    QwenModelBase = qwen_base_module.NunchakuQwenImage
+                    
+                    patcher_module = importlib.import_module("ComfyUI-nunchaku.model_patcher")
+                    NunchakuModelPatcher = patcher_module.NunchakuModelPatcher
+                    
+                    print(f"[Nunchaku Wrapper] ✓ Imported via importlib fallback")
+            
+            print(f"[Nunchaku Wrapper] ✓ ComfyFluxWrapper module: {ComfyFluxWrapper.__module__}")
+            print(f"[Nunchaku Wrapper] ✓ All Nunchaku classes imported successfully")
         else:
             raise ImportError("ComfyUI-nunchaku not found")
             
@@ -563,10 +618,17 @@ def load_nunchaku_model(
     model = model_config.get_model({})
     
     # Wrap transformer in ComfyUI-compatible wrapper
-    model.diffusion_model = ComfyFluxWrapper(
+    # After wrapping in ModelPatcher, PuLID will access this as: model_patcher.model.diffusion_model
+    # PuLID-compatible signature: (transformer, config, pulid_pipeline, customized_forward, forward_kwargs)
+    wrapper = ComfyFluxWrapper(
         transformer,
-        config=comfy_config["model_config"]
+        comfy_config["model_config"],
+        None,  # pulid_pipeline - set by PuLID loader later
+        None,  # customized_forward - set by PuLID apply later
+        {}     # forward_kwargs - empty dict
     )
+    
+    model.diffusion_model = wrapper
     
     # Create ModelPatcher for ComfyUI integration
     device_id = device.index if hasattr(device, 'index') else 0
