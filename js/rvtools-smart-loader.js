@@ -16,6 +16,7 @@
 */
 
 import { app } from "../../scripts/app.js";
+import { api } from "../../scripts/api.js";
 
 const NODE_NAME = "Smart Loader [RvTools]";
 
@@ -35,6 +36,8 @@ app.registerExtension({
             // Track previous template_action value to detect changes
             let lastTemplateAction = "None";
             let lastTemplateName = "None";
+            let pendingTemplateSave = null;  // Track pending save template name
+            let pendingTemplateDelete = false;  // Track pending delete operation
             
             // Refresh template list from server
             const refreshTemplateList = async () => {
@@ -70,29 +73,16 @@ app.registerExtension({
                 } else if (templateAction === "Save" && newTemplateName && newTemplateName.trim()) {
                     console.log(`✓ Queueing workflow to save template: ${newTemplateName}`);
                     const savedTemplateName = newTemplateName.trim();
+                    pendingTemplateSave = savedTemplateName;  // Mark as pending
                     // Queue the prompt to execute Python save logic
                     app.queuePrompt(0, 1);
-                    // After save, switch to Load and select the saved template
-                    setTimeout(async () => {
-                        await refreshTemplateList();
-                        setWidgetValue("template_action", "Load");
-                        setWidgetValue("template_name", savedTemplateName);
-                        setWidgetValue("new_template_name", "");
-                        updateVisibility();
-                        console.log(`✓ Switched to Load mode with template: ${savedTemplateName}`);
-                    }, 200);
+                    // Note: The actual refresh happens in execution_interrupted callback after workflow completes
                 } else if (templateAction === "Delete" && templateName && templateName !== "None") {
                     console.log(`✓ Queueing workflow to delete template: ${templateName}`);
+                    pendingTemplateDelete = true;  // Mark as pending
                     // Queue the prompt to execute Python delete logic
                     app.queuePrompt(0, 1);
-                    // Reset to Load with "None" after delete
-                    setTimeout(async () => {
-                        await refreshTemplateList();
-                        setWidgetValue("template_action", "Load");
-                        setWidgetValue("template_name", "None");
-                        updateVisibility();
-                        console.log(`✓ Template deleted, switched to Load mode`);
-                    }, 500);
+                    // Note: The actual refresh happens in execution_interrupted callback after workflow completes
                 }
             };
             
@@ -360,19 +350,90 @@ app.registerExtension({
             
             // Listen for execution events to refresh template list after save/delete
             const onExecuted = node.onExecuted;
-            node.onExecuted = function(message) {
+            node.onExecuted = async function(message) {
                 if (onExecuted) {
                     onExecuted.apply(this, arguments);
                 }
                 
-                const templateAction = getWidgetValue("template_action");
-                if (templateAction === "Save" || templateAction === "Delete") {
-                    // Refresh template list after save/delete
-                    setTimeout(() => {
-                        refreshTemplateList();
-                    }, 100);
+                // Check if we have a pending template save
+                if (pendingTemplateSave) {
+                    const savedTemplateName = pendingTemplateSave;
+                    pendingTemplateSave = null;  // Clear pending state
+                    
+                    console.log(`✓ Save completed, refreshing template list...`);
+                    // Wait a bit for file system to settle
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    await refreshTemplateList();
+                    
+                    // Switch to Load mode and select the saved template
+                    setWidgetValue("template_action", "Load");
+                    setWidgetValue("template_name", savedTemplateName);
+                    setWidgetValue("new_template_name", "");
+                    updateVisibility();
+                    console.log(`✓ Switched to Load mode with template: ${savedTemplateName}`);
+                }
+                
+                // Check if we have a pending template delete
+                if (pendingTemplateDelete) {
+                    pendingTemplateDelete = false;  // Clear pending state
+                    
+                    console.log(`✓ Delete completed, refreshing template list...`);
+                    // Wait a bit for file system to settle
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    await refreshTemplateList();
+                    
+                    // Reset to Load with "None"
+                    setWidgetValue("template_action", "Load");
+                    setWidgetValue("template_name", "None");
+                    updateVisibility();
+                    console.log(`✓ Template deleted, switched to Load mode`);
                 }
             };
+            
+            // Also listen for execution interrupts (since Save/Delete interrupt processing)
+            api.addEventListener("execution_interrupted", async (event) => {
+                console.log('[SmartLoader] execution_interrupted event:', event.detail);
+                
+                // Check if we have any pending operations (regardless of which node interrupted)
+                // Since our Save/Delete operations always interrupt, we can assume it's our node
+                if (pendingTemplateSave || pendingTemplateDelete) {
+                    console.log('[SmartLoader] Processing pending template operation...');
+                    
+                    // Check if we have a pending template save
+                    if (pendingTemplateSave) {
+                        const savedTemplateName = pendingTemplateSave;
+                        pendingTemplateSave = null;  // Clear pending state
+                        
+                        console.log(`✓ Save interrupted (as expected), refreshing template list...`);
+                        // Wait a bit for file system to settle
+                        await new Promise(resolve => setTimeout(resolve, 300));
+                        await refreshTemplateList();
+                        
+                        // Switch to Load mode and select the saved template
+                        setWidgetValue("template_action", "Load");
+                        setWidgetValue("template_name", savedTemplateName);
+                        setWidgetValue("new_template_name", "");
+                        updateVisibility();
+                        console.log(`✓ Switched to Load mode with template: ${savedTemplateName}`);
+                    }
+                    
+                    // Check if we have a pending template delete
+                    if (pendingTemplateDelete) {
+                        pendingTemplateDelete = false;  // Clear pending state
+                        
+                        console.log(`✓ Delete interrupted (as expected), refreshing template list...`);
+                        // Wait a bit for file system to settle
+                        await new Promise(resolve => setTimeout(resolve, 300));
+                        await refreshTemplateList();
+                        
+                        // Reset to Load with "None"
+                        setWidgetValue("template_action", "Load");
+                        setWidgetValue("template_name", "None");
+                        updateVisibility();
+                        console.log(`✓ Template deleted, switched to Load mode`);
+                    }
+                }
+            });
             
             // Initial setup
             setTimeout(() => {
