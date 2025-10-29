@@ -444,10 +444,12 @@ def parse_lora_string(lora_input):
     # - 'name:weight,name2' (comma-separated, optional weights)
     # - 'name name2' (space-separated)
     # Returns: (token_string, {name: weight, ...})
+    # Deduplicates loras, keeping the first occurrence
 
     import re
     tokens = []
     weights = {}
+    seen_loras = set()  # Track seen lora names (normalized)
 
     if lora_input is None:
         return ('', {})
@@ -457,6 +459,11 @@ def parse_lora_string(lora_input):
     if token_matches:
         for name, w in token_matches:
             name = Path(name).stem  # Remove path and extension
+            name_normalized = name.lower()
+            # Skip if we've already seen this lora
+            if name_normalized in seen_loras:
+                continue
+            seen_loras.add(name_normalized)
             weight = float(w) if w not in (None, '') else 1.0
             tokens.append(f"<lora:{name}:{weight}>")
             weights[name] = weight
@@ -475,6 +482,13 @@ def parse_lora_string(lora_input):
         else:
             name = Path(part).stem  # Remove path and extension
             weight = 1.0
+        
+        name_normalized = name.lower()
+        # Skip if we've already seen this lora
+        if name_normalized in seen_loras:
+            continue
+        seen_loras.add(name_normalized)
+        
         tokens.append(f"<lora:{name}:{weight}>")
         weights[name] = weight
 
@@ -825,7 +839,20 @@ class RvImage_SaveImages:
 
             if not model_name in (None, '', 'undefined', 'none'):
                 if model_name is not None:
+                    # Split and deduplicate models while preserving order
                     models = model_name.split(', ')
+                    seen = set()
+                    unique_models = []
+                    for model in models:
+                        model_stripped = model.strip()
+                        # Use normalized name (without extension) for dedup comparison
+                        model_normalized = return_filename_without_extension(model_stripped).lower()
+                        if model_normalized and model_normalized not in seen:
+                            seen.add(model_normalized)
+                            unique_models.append(model_stripped)
+                    
+                    models = unique_models
+                    
                     # Get first model for basemodel
                     if models and models[0]:
                         first_model = models[0].strip()
@@ -881,7 +908,19 @@ class RvImage_SaveImages:
 
             if not vae_name in (None, '', 'undefined', 'none'):
                 if vae_name is not None:
+                    # Split and deduplicate VAE models while preserving order
                     models = vae_name.split(', ')
+                    seen = set()
+                    unique_models = []
+                    for model in models:
+                        model_stripped = model.strip()
+                        model_normalized = return_filename_without_extension(model_stripped).lower()
+                        if model_normalized and model_normalized not in seen:
+                            seen.add(model_normalized)
+                            unique_models.append(model_stripped)
+                    
+                    models = unique_models
+                    
                     for model in models:
                         if not model in (None, '', 'undefined', 'none'):
                             vae_full_path = folder_paths.get_full_path("vae", model)
@@ -895,10 +934,14 @@ class RvImage_SaveImages:
             # Build positive_for_meta and metadata extractor
             if not lora_names in (None, '', 'undefined', 'none'):
                 lora_tokens, lora_weights = parse_lora_string(lora_names)
-                positive_for_meta = positive + str(lora_tokens)
-                metadata_extractor = PromptMetadataExtractor([positive_for_meta, negative])
+                # For metadata extraction, always use positive + lora_tokens to detect loras
+                positive_with_loras = positive + str(lora_tokens)
+                metadata_extractor = PromptMetadataExtractor([positive_with_loras, negative])
+                # Only add loras to the actual prompt text if the option is enabled
                 if add_loras_to_prompt:
-                    positive = positive_for_meta
+                    positive_for_meta = positive_with_loras
+                else:
+                    positive_for_meta = positive
             else:
                 positive_for_meta = positive
                 lora_weights = {}
