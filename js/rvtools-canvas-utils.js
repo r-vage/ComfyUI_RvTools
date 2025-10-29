@@ -15,89 +15,86 @@ import { app } from "../../scripts/app.js";
 
 const canvasUtilsName = "RvTools.canvasUtils";
 
-// New API: Use getCanvasMenuItems hook (ComfyUI v1.0+)
+// Track if the new API has been called
+let newAPIAvailable = false;
+
+// Define menu items in a reusable function
+function getMenuItems() {
+  return [
+    null,
+    // Arrange nodes
+    {
+      content: "Arrange (vertical)",
+      callback: () =>
+        app.graph.arrange(
+          LiteGraph.CANVAS_GRID_SIZE * 4,
+          LiteGraph.VERTICAL_LAYOUT
+        ),
+    },
+    {
+      content: "Arrange (horizontal)",
+      callback: () => app.graph.arrange(LiteGraph.CANVAS_GRID_SIZE * 2),
+    },
+    null,
+    // Pin/Unpin nodes
+    {
+      content: "Pin all Nodes",
+      callback: () => {
+        app.graph._nodes.forEach((node) => {
+          node.flags.pinned = true;
+        });
+      },
+    },
+    {
+      content: "Unpin all Nodes",
+      callback: () => {
+        app.graph._nodes.forEach((node) => {
+          node.flags.pinned = false;
+        });
+      },
+    }
+  ];
+}
+
 app.registerExtension({
   name: canvasUtilsName,
   
+  // New API: getCanvasMenuItems hook (ComfyUI v1.0+)
   getCanvasMenuItems(canvas) {
-    return [
-      null,
-      // Arrange nodes
-      {
-        content: "Arrange (vertical)",
-        callback: () =>
-          app.graph.arrange(
-            LiteGraph.CANVAS_GRID_SIZE * 4,
-            LiteGraph.VERTICAL_LAYOUT
-          ),
-      },
-      {
-        content: "Arrange (horizontal)",
-        callback: () => app.graph.arrange(LiteGraph.CANVAS_GRID_SIZE * 2),
-      },
-      null,
-      // Pin/Unpin nodes
-      {
-        content: "Pin all Nodes",
-        callback: () => {
-          app.graph._nodes.forEach((node) => {
-            node.flags.pinned = true;
-          });
-        },
-      },
-      {
-        content: "Unpin all Nodes",
-        callback: () => {
-          app.graph._nodes.forEach((node) => {
-            node.flags.pinned = false;
-          });
-        },
-      }
-    ];
+    // Mark that the new API is being used
+    newAPIAvailable = true;
+    return getMenuItems();
   },
   
-  // Old API fallback for older ComfyUI versions
+  // Fallback for older ComfyUI versions (pre-v1.0)
   async setup(app) {
-    const getCanvasMenuOptions = LGraphCanvas.prototype.getCanvasMenuOptions;
-    LGraphCanvas.prototype.getCanvasMenuOptions = function () {
-      const menuOptions = getCanvasMenuOptions.apply(this, arguments);
-
-      menuOptions.push(
-        null,
-        // Arrange nodes
-        {
-          content: "Arrange (vertical)",
-          callback: () =>
-            app.graph.arrange(
-              LiteGraph.CANVAS_GRID_SIZE * 4,
-              LiteGraph.VERTICAL_LAYOUT
-            ),
-        },
-        {
-          content: "Arrange (horizontal)",
-          callback: () => app.graph.arrange(LiteGraph.CANVAS_GRID_SIZE * 2),
-        },
-        null,
-        // Pin/Unpin nodes
-        {
-          content: "Pin all Nodes",
-          callback: () => {
-            app.graph._nodes.forEach((node) => {
-              node.flags.pinned = true;
-            });
-          },
-        },
-        {
-          content: "Unpin all Nodes",
-          callback: () => {
-            app.graph._nodes.forEach((node) => {
-              node.flags.pinned = false;
-            });
-          },
-        }
-      );
-
-      return menuOptions;
+    // Wait a bit to see if the new API gets called during initialization
+    // If it doesn't get called by the first user interaction, we need the fallback
+    
+    // Use a one-time event listener to check after first canvas interaction
+    const originalOnContextMenu = LGraphCanvas.prototype.onContextMenu;
+    let fallbackApplied = false;
+    
+    LGraphCanvas.prototype.onContextMenu = function(event, options) {
+      // Restore original immediately to avoid multiple wraps
+      LGraphCanvas.prototype.onContextMenu = originalOnContextMenu;
+      
+      // If new API wasn't called yet, apply fallback
+      if (!newAPIAvailable && !fallbackApplied) {
+        fallbackApplied = true;
+        console.log(`[${canvasUtilsName}] Using legacy API fallback for older ComfyUI version`);
+        
+        // Apply monkey-patch for old API
+        const getCanvasMenuOptions = LGraphCanvas.prototype.getCanvasMenuOptions;
+        LGraphCanvas.prototype.getCanvasMenuOptions = function () {
+          const menuOptions = getCanvasMenuOptions.apply(this, arguments);
+          menuOptions.push(...getMenuItems());
+          return menuOptions;
+        };
+      }
+      
+      // Call original handler
+      return originalOnContextMenu.apply(this, arguments);
     };
   },
 });

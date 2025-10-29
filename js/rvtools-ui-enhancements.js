@@ -377,6 +377,9 @@ app.registerExtension({
 // Adds a "RvTools Node Dimensions" option to node right-click menu which opens
 // a small dialog to set width/height for any node.
 if (!LGraphCanvas.prototype.rvtoolsSetNodeDimension) {
+  // Flag to track if new API is being used for node menu items
+  window.rvtools_newNodeMenuAPIUsed = false;
+  
   // Ensure rvtools dialog CSS exists so dialog is visible even without TinyTerRa
   if (!document.getElementById("rvtools-dialog-style")) {
     const style = document.createElement("style");
@@ -506,50 +509,67 @@ if (!LGraphCanvas.prototype.rvtoolsSetNodeDimension) {
     );
   };
 
-  // Inject menu item into node right-click menu
-  // Use old monkey-patching approach as fallback for older ComfyUI versions
-  const origGetNodeMenuOptions = LGraphCanvas.prototype.getNodeMenuOptions;
-  LGraphCanvas.prototype.getNodeMenuOptions = function (node) {
-    const options = origGetNodeMenuOptions.apply(this, arguments);
-    // Insert our item just before the last separator
-    try {
-      const item = {
-        content: "RvTools: Node Dimensions",
-        callback: () => {
-          LGraphCanvas.prototype.rvtoolsSetNodeDimension(node);
-        },
-      };
-      const reloadItem = {
-        content: "RvTools: Reload Node",
-        callback: () => {
-          try {
-            LGraphCanvas.prototype.rvtoolsReloadNode(node);
-          } catch (e) {
-            console.debug('rvtools: Reload Node failed', e);
+  // Old API: Inject menu item into node right-click menu (non-destructive: keep existing options)
+  // Use delayed detection to avoid triggering deprecation warning on new ComfyUI versions
+  const origOnShowNodeMenu = LGraphCanvas.prototype.showContextMenu;
+  let fallbackApplied = false;
+  
+  LGraphCanvas.prototype.showContextMenu = function(menu_info, options) {
+    // Restore original immediately to avoid wrapping multiple times
+    LGraphCanvas.prototype.showContextMenu = origOnShowNodeMenu;
+    
+    // If new API hasn't been called yet, apply the fallback
+    if (!window.rvtools_newNodeMenuAPIUsed && !fallbackApplied) {
+      fallbackApplied = true;
+      console.log('[RvTools.nodeMenuItems] Using legacy API fallback for older ComfyUI version');
+      
+      const origGetNodeMenuOptions = LGraphCanvas.prototype.getNodeMenuOptions;
+      LGraphCanvas.prototype.getNodeMenuOptions = function (node) {
+        const options = origGetNodeMenuOptions.apply(this, arguments);
+        // Insert our item just before the last separator
+        try {
+          const item = {
+            content: "RvTools: Node Dimensions",
+            callback: () => {
+              LGraphCanvas.prototype.rvtoolsSetNodeDimension(node);
+            },
+          };
+          const reloadItem = {
+            content: "RvTools: Reload Node",
+            callback: () => {
+              try {
+                LGraphCanvas.prototype.rvtoolsReloadNode(node);
+              } catch (e) {
+                console.debug('rvtools: Reload Node failed', e);
+              }
+            },
+          };
+          // Insert both items adjacent with no separator.
+          const hasNodeDimensions = options.some((o) => o && o.content && String(o.content).includes("RvTools: Node Dimensions"));
+          const hasReloadNode = options.some((o) => o && o.content && String(o.content).includes("RvTools: Reload Node"));
+          // If neither exist, insert both together. If one exists, insert the missing one next to it.
+          if (!hasNodeDimensions && !hasReloadNode) {
+            options.splice(options.length - 1, 0, item, reloadItem);
+          } else if (!hasNodeDimensions && hasReloadNode) {
+            options.splice(options.length - 1, 0, item);
+          } else if (hasNodeDimensions && !hasReloadNode) {
+            // find the index of the existing Node Dimensions and insert refresh after it
+            const idx = options.findIndex((o) => o && o.content && String(o.content).includes("Node Dimensions"));
+            if (idx >= 0) {
+              options.splice(idx + 1, 0, reloadItem);
+            } else {
+              options.splice(options.length - 1, 0, reloadItem);
+            }
           }
-        },
-      };
-      // Insert both items adjacent with no separator.
-      const hasNodeDimensions = options.some((o) => o && o.content && String(o.content).includes("RvTools: Node Dimensions"));
-      const hasReloadNode = options.some((o) => o && o.content && String(o.content).includes("RvTools: Reload Node"));
-      // If neither exist, insert both together. If one exists, insert the missing one next to it.
-      if (!hasNodeDimensions && !hasReloadNode) {
-        options.splice(options.length - 1, 0, item, reloadItem);
-      } else if (!hasNodeDimensions && hasReloadNode) {
-        options.splice(options.length - 1, 0, item);
-      } else if (hasNodeDimensions && !hasReloadNode) {
-        // find the index of the existing Node Dimensions and insert refresh after it
-        const idx = options.findIndex((o) => o && o.content && String(o.content).includes("Node Dimensions"));
-        if (idx >= 0) {
-          options.splice(idx + 1, 0, reloadItem);
-        } else {
-          options.splice(options.length - 1, 0, reloadItem);
+        } catch (e) {
+          console.debug('rvtools: failed to inject Node Dimensions menu item', e);
         }
-      }
-    } catch (e) {
-      console.debug('rvtools: failed to inject Node Dimensions menu item', e);
+        return options;
+      };
     }
-    return options;
+    
+    // Call original handler
+    return origOnShowNodeMenu.apply(this, arguments);
   };
 
   // Full rvtoolsReloadNode implementation (adapted from TinyTerra tinyterraReloadNode)
@@ -766,14 +786,14 @@ if (!LGraphCanvas.prototype.rvtoolsSetNodeDimension) {
   };
 }
 
-// Register extension with new API for node menu items (ComfyUI v1.0+)
-// This provides "Node Dimensions" and "Reload Node" menu items using the new hook system
+// New API: Register extension with getNodeMenuItems hook (ComfyUI v1.0+)
 app.registerExtension({
   name: "RvTools.nodeMenuItems",
   
   getNodeMenuItems(node) {
-    // Only return items if new API is supported
-    // The old monkey-patch fallback handles older versions
+    // Mark that new API is in use
+    window.rvtools_newNodeMenuAPIUsed = true;
+    
     return [
       {
         content: "RvTools: Node Dimensions",
