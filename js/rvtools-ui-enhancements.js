@@ -506,7 +506,8 @@ if (!LGraphCanvas.prototype.rvtoolsSetNodeDimension) {
     );
   };
 
-  // Inject menu item into node right-click menu (non-destructive: keep existing options)
+  // Inject menu item into node right-click menu
+  // Use old monkey-patching approach as fallback for older ComfyUI versions
   const origGetNodeMenuOptions = LGraphCanvas.prototype.getNodeMenuOptions;
   LGraphCanvas.prototype.getNodeMenuOptions = function (node) {
     const options = origGetNodeMenuOptions.apply(this, arguments);
@@ -764,6 +765,35 @@ if (!LGraphCanvas.prototype.rvtoolsSetNodeDimension) {
     }
   };
 }
+
+// Register extension with new API for node menu items (ComfyUI v1.0+)
+// This provides "Node Dimensions" and "Reload Node" menu items using the new hook system
+app.registerExtension({
+  name: "RvTools.nodeMenuItems",
+  
+  getNodeMenuItems(node) {
+    // Only return items if new API is supported
+    // The old monkey-patch fallback handles older versions
+    return [
+      {
+        content: "RvTools: Node Dimensions",
+        callback: () => {
+          LGraphCanvas.prototype.rvtoolsSetNodeDimension(node);
+        },
+      },
+      {
+        content: "RvTools: Reload Node",
+        callback: () => {
+          try {
+            LGraphCanvas.prototype.rvtoolsReloadNode(node);
+          } catch (e) {
+            console.debug('rvtools: Reload Node failed', e);
+          }
+        },
+      },
+    ];
+  },
+});
 
 app.registerExtension({
   name: "RvTools.appearance",

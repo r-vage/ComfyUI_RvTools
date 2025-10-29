@@ -15,8 +15,48 @@ import { app } from "../../scripts/app.js";
 
 const canvasUtilsName = "RvTools.canvasUtils";
 
+// New API: Use getCanvasMenuItems hook (ComfyUI v1.0+)
 app.registerExtension({
   name: canvasUtilsName,
+  
+  getCanvasMenuItems(canvas) {
+    return [
+      null,
+      // Arrange nodes
+      {
+        content: "Arrange (vertical)",
+        callback: () =>
+          app.graph.arrange(
+            LiteGraph.CANVAS_GRID_SIZE * 4,
+            LiteGraph.VERTICAL_LAYOUT
+          ),
+      },
+      {
+        content: "Arrange (horizontal)",
+        callback: () => app.graph.arrange(LiteGraph.CANVAS_GRID_SIZE * 2),
+      },
+      null,
+      // Pin/Unpin nodes
+      {
+        content: "Pin all Nodes",
+        callback: () => {
+          app.graph._nodes.forEach((node) => {
+            node.flags.pinned = true;
+          });
+        },
+      },
+      {
+        content: "Unpin all Nodes",
+        callback: () => {
+          app.graph._nodes.forEach((node) => {
+            node.flags.pinned = false;
+          });
+        },
+      }
+    ];
+  },
+  
+  // Old API fallback for older ComfyUI versions
   async setup(app) {
     const getCanvasMenuOptions = LGraphCanvas.prototype.getCanvasMenuOptions;
     LGraphCanvas.prototype.getCanvasMenuOptions = function () {
