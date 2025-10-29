@@ -455,6 +455,12 @@ class RvLoader_SmartLoader_Plus:
                     "step": 0.1,
                     "tooltip": "Flux guidance scale (for non-standard checkpoint models)"
                 }),
+                
+                # === STEP 6: Advanced Options ===
+                "memory_cleanup": ("BOOLEAN", {
+                    "default": True,
+                    "tooltip": "Perform memory cleanup before loading model (recommended for switching between large models)"
+                }),
             },
         }
         
@@ -526,6 +532,7 @@ class RvLoader_SmartLoader_Plus:
         scheduler: Any,
         steps: int,
         cfg: float,
+        memory_cleanup: bool,
     ) -> tuple:
         
         # Handle template actions - Save and Delete interrupt, Load doesn't
@@ -622,7 +629,8 @@ class RvLoader_SmartLoader_Plus:
         # STEP 0: Pre-Load Memory Cleanup
         # ============================================================
         
-        cleanup_memory_before_load()
+        if memory_cleanup:
+            cleanup_memory_before_load()
         
         # ============================================================
         # STEP 1: Load Model (Standard Checkpoint, UNet, Nunchaku Flux, Nunchaku Qwen, or GGUF)

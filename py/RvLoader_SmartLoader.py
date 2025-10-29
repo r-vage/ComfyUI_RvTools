@@ -391,6 +391,12 @@ class RvLoader_SmartLoader:
                     "default": "None",
                     "tooltip": "External VAE file to load"
                 }),
+                
+                # === STEP 5: Advanced Options ===
+                "memory_cleanup": ("BOOLEAN", {
+                    "default": True,
+                    "tooltip": "Perform memory cleanup before loading model (recommended for switching between large models)"
+                }),
             },
         }
         
@@ -451,6 +457,7 @@ class RvLoader_SmartLoader:
         stop_at_clip_layer: int,
         vae_source: str,
         vae_name: str,
+        memory_cleanup: bool,
     ) -> tuple:
         
         # Handle template actions - Save and Delete interrupt, Load doesn't
@@ -536,7 +543,8 @@ class RvLoader_SmartLoader:
         # STEP 0: Pre-Load Memory Cleanup
         # ============================================================
         
-        cleanup_memory_before_load()
+        if memory_cleanup:
+            cleanup_memory_before_load()
         
         # ============================================================
         # STEP 1: Load Model (Standard Checkpoint, UNet, Nunchaku Flux, Nunchaku Qwen, or GGUF)
