@@ -258,37 +258,41 @@ def set_global_values(
 
         # Process each value with strict type checking
         for key, value in values.items():
+            # Skip None values - leave as default empty string
+            if value is None:
+                continue
+                
             # Treat explicit empty strings and 'None' as unset for numeric fields
             if value in ('', 'None'):
                 # leave as default (empty string)
                 continue
-            if value is not None:
-                expected_type = value_types[key]
-                
-                # Validate type
-                if not isinstance(value, expected_type):  # type: ignore[arg-type]
-                    try:
-                        # Try type conversion for numbers
-                        if expected_type in [(int, float), float]:
-                            value = float(value)
-                        elif expected_type == int:
-                            value = int(value)
-                        elif expected_type == str:
-                            value = str(value)
-                    except (ValueError, TypeError) as e:
-                        cstr(f"Ignoring non-numeric/invalid value for {key}: {e}").debug.print()
-                        # leave as default empty to avoid noisy errors
-                        value = ''
+            
+            expected_type = value_types[key]
+            
+            # Validate type
+            if not isinstance(value, expected_type):  # type: ignore[arg-type]
+                try:
+                    # Try type conversion for numbers
+                    if expected_type in [(int, float), float]:
+                        value = float(value)
+                    elif expected_type == int:
+                        value = int(value)
+                    elif expected_type == str:
+                        value = str(value)
+                except (ValueError, TypeError) as e:
+                    cstr(f"Ignoring non-numeric/invalid value for {key}: {e}").debug.print()
+                    # leave as default empty to avoid noisy errors
+                    value = ''
 
-                # Additional validation
-                if isinstance(value, (int, float)):
-                    # Ensure numeric values are reasonable
-                    if key in ['steps', 'cfg', 'denoise']:
-                        if value < 0:
-                            cstr(f"Negative value for {key} adjusted to 0").warning.print()
-                            value = 0
-                
-                global_values[key] = str(value)
+            # Additional validation
+            if isinstance(value, (int, float)):
+                # Ensure numeric values are reasonable
+                if key in ['steps', 'cfg', 'denoise']:
+                    if value < 0:
+                        cstr(f"Negative value for {key} adjusted to 0").warning.print()
+                        value = 0
+            
+            global_values[key] = str(value)
 
     except Exception as e:
         cstr(f"Error in set_global_values: {e}").error.print()
