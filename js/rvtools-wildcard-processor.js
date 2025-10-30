@@ -66,11 +66,62 @@ app.registerExtension({
         // Hook into the graphToPrompt to resolve seeds before sending to server
         const originalGraphToPrompt = app.graphToPrompt;
         app.graphToPrompt = async function() {
-            // Call the original graphToPrompt first
+            // FIRST: Process wildcards for nodes in populate mode BEFORE serialization
+            const nodes = app.graph._nodes;
+            for (const node of nodes) {
+                if (node.type === "Wildcard Processor [RvTools]") {
+                    const wildcardTextWidget = node.widgets?.find(w => w.name === "wildcard_text");
+                    const populatedTextWidget = node.widgets?.find(w => w.name === "populated_text");
+                    const modeWidget = node.widgets?.find(w => w.name === "mode");
+                    
+                    if (!modeWidget || !wildcardTextWidget || !populatedTextWidget) {
+                        continue;
+                    }
+                    
+                    const mode = modeWidget.value;
+                    const wildcardText = wildcardTextWidget.value;
+                    
+                    // In fixed mode: keep populated_text as-is, don't process
+                    if (mode === "fixed") {
+                        continue;
+                    }
+                    
+                    // In populate mode: process the text with resolved seed
+                    if (mode === "populate" && wildcardText) {
+                        // Get seed to use (with fallback if method not available)
+                        const seedWidget = node.widgets?.find(w => w.name === "seed");
+                        const seedToUse = (node.getSeedToUse && typeof node.getSeedToUse === 'function') 
+                            ? node.getSeedToUse() 
+                            : (seedWidget?.value ?? 0);
+                        
+                        try {
+                            const response = await fetch("/rvtools/wildcards/process", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({
+                                    text: wildcardText,
+                                    seed: seedToUse
+                                })
+                            });
+                            
+                            if (response.ok) {
+                                const result = await response.json();
+                                if (result.success) {
+                                    populatedTextWidget.value = result.output;
+                                    // Don't trigger callback - we're about to serialize
+                                }
+                            }
+                        } catch (error) {
+                            console.error("[RvTools Wildcard] graphToPrompt wildcard processing error:", error);
+                        }
+                    }
+                }
+            }
+            
+            // NOW call the original graphToPrompt with updated widget values
             const result = await originalGraphToPrompt.apply(this, arguments);
 
             // Now resolve seeds for Wildcard Processor nodes
-            const nodes = app.graph._nodes;
             for (const node of nodes) {
                 if (node.type === "Wildcard Processor [RvTools]" && node._rvtools_seedWidget) {
                     // Skip if node is muted or bypassed
@@ -163,65 +214,10 @@ app.registerExtension({
         };
         
         // Hook into graph execution to update populated_text before queue runs
+        // NOTE: Wildcard processing now happens in graphToPrompt hook above
         const originalQueuePrompt = app.queuePrompt;
         app.queuePrompt = async function() {
-            // Find all Wildcard Processor nodes
-            for (const nodeId in app.graph._nodes) {
-                const node = app.graph._nodes[nodeId];
-                
-                if (node.type === "Wildcard Processor [RvTools]") {
-                    const wildcardTextWidget = node.widgets?.find(w => w.name === "wildcard_text");
-                    const populatedTextWidget = node.widgets?.find(w => w.name === "populated_text");
-                    const modeWidget = node.widgets?.find(w => w.name === "mode");
-                    
-                    if (!modeWidget || !wildcardTextWidget || !populatedTextWidget) {
-                        continue;
-                    }
-                    
-                    const mode = modeWidget.value;
-                    const wildcardText = wildcardTextWidget.value;
-                    
-                    // In fixed mode: keep populated_text as-is, don't process
-                    if (mode === "fixed") {
-                        continue;
-                    }
-                    
-                    // In populate mode: process the text with resolved seed
-                    if (mode === "populate" && wildcardText) {
-                        // Get seed to use (with fallback if method not available)
-                        const seedWidget = node.widgets?.find(w => w.name === "seed");
-                        const seedToUse = (node.getSeedToUse && typeof node.getSeedToUse === 'function') 
-                            ? node.getSeedToUse() 
-                            : (seedWidget?.value ?? 0);
-                        
-                        try {
-                            const response = await fetch("/rvtools/wildcards/process", {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({
-                                    text: wildcardText,
-                                    seed: seedToUse
-                                })
-                            });
-                            
-                            if (response.ok) {
-                                const result = await response.json();
-                                if (result.success) {
-                                    populatedTextWidget.value = result.output;
-                                    // Trigger callback to ensure widget updates properly
-                                    if (populatedTextWidget.callback) {
-                                        populatedTextWidget.callback(result.output);
-                                    }
-                                }
-                            }
-                        } catch (error) {
-                            console.error("[RvTools Wildcard] queuePrompt error:", error);
-                        }
-                    }
-                }
-            }
-            
-            // Call original queuePrompt
+            // Call original queuePrompt (which will call graphToPrompt internally)
             return originalQueuePrompt.call(this);
         };
     },
@@ -579,8 +575,8 @@ app.registerExtension({
                             return;
                         }
                         
-                        // Update populated_text when wildcard_text changes (in populate mode)
-                        if (modeWidget?.value === "populate" && seedWidget) {
+                        // Update populated_text when wildcard_text changes (ONLY in populate mode)
+                        if (modeWidget?.value === "populate" && value && seedWidget) {
                             const actualSeed = node.getSeedToUse();
                             updatePopulatedText(populatedTextWidget, value, actualSeed);
                         }
@@ -608,11 +604,10 @@ app.registerExtension({
                         if (value === "populate") {
                             // Populate mode: auto-generate and make read-only
                             if (wildcardTextWidget && populatedTextWidget && seedWidget) {
-                                // Only auto-generate if populated_text is empty (don't overwrite loaded content)
-                                if (!populatedTextWidget.value) {
-                                    const actualSeed = node.getSeedToUse();
-                                    updatePopulatedText(populatedTextWidget, wildcardTextWidget.value, actualSeed);
-                                }
+                                // Don't auto-generate during mode switch
+                                // This prevents overwriting loaded values from workflows
+                                // User can manually change the seed to regenerate
+                                
                                 // Make read-only by disabling the widget
                                 populatedTextWidget.disabled = true;
                                 if (populatedTextWidget.element) {
@@ -635,15 +630,9 @@ app.registerExtension({
                                 }
                             }
                             
-                            // Update seed widget to show the actual seed that was used (if it's a special seed)
-                            if (seedWidget) {
-                                const currentSeedValue = seedWidget.value;
-                                // If current seed is a special seed (-1, -2, -3), replace it with the actual last used seed
-                                if (SPECIAL_SEEDS.includes(currentSeedValue)) {
-                                    // Use last seed if available, otherwise fallback to 0
-                                    seedWidget.value = node._rvtools_lastSeed != null ? node._rvtools_lastSeed : 0;
-                                }
-                            }
+                            // Don't modify seed value in fixed mode
+                            // The seed is saved for reproducibility but not used in fixed mode
+                            // Modifying it would trigger callbacks that might re-process wildcards
                             
                             // Update seed button states based on mode and connection
                             node.updateSeedButtonStates();
@@ -736,6 +725,9 @@ app.registerExtension({
                             populatedTextWidget.element.title = "Auto-generated in populate mode. Change seed to generate new output, fix seed to keep same output.";
                         }
                         
+                        // Don't auto-generate during initialization
+                        // Keep the loaded populated_text value intact
+                        
                         // Update seed button states based on mode and connection
                         node.updateSeedButtonStates();
                     }
@@ -769,6 +761,10 @@ app.registerExtension({
             return;
         }
         
+        const modeWidget = node.widgets?.find(w => w.name === "mode");
+        const populatedWidget = node.widgets?.find(w => w.name === "populated_text");
+        const wildcardWidget = node.widgets?.find(w => w.name === "wildcard_text");
+        
         // Force update the combo widget with current wildcard list
         // This ensures widgets created from saved graphs get the updated list
         const wildcardCombo = node.widgets?.find(w => w.name === "wildcards");
@@ -786,14 +782,72 @@ app.registerExtension({
             return;
         }
 
+        const modeWidget = node.widgets?.find(w => w.name === "mode");
+        const populatedWidget = node.widgets?.find(w => w.name === "populated_text");
+
         // Refresh wildcard combo
         const wildcardCombo = node.widgets?.find(w => w.name === "wildcards");
         if (wildcardCombo) {
             updateWildcardCombo(wildcardCombo);
         }
         
-        // DON'T process populated_text here - it happens too early and will overwrite loaded values
-        // The onNodeCreated handler with setTimeout will handle initialization properly
+        // Force clear initialization flag when loading from workflow
+        // The setTimeout in onNodeCreated doesn't fire when loading from saved workflows
+        setTimeout(() => {
+            node._isInitializing = false;
+            
+            // CRITICAL: Force the populated_text widget to refresh its visual display
+            // When loading from workflow, the widget value loads correctly but UI doesn't update
+            if (populatedWidget) {
+                const currentValue = populatedWidget.value;
+                
+                // Trigger the widget's callback to force UI update
+                if (populatedWidget.callback) {
+                    populatedWidget.callback(currentValue);
+                }
+                
+                // Force redraw of the widget element
+                if (populatedWidget.element) {
+                    populatedWidget.element.value = currentValue;
+                } else {
+                    // Widget element might not be created yet - force node to redraw
+                    if (node.onResize) {
+                        node.onResize(node.size);
+                    }
+                }
+                
+                // Mark widget as changed
+                if (populatedWidget.options) {
+                    populatedWidget.options.property = "populated_text";
+                }
+            }
+            
+            // Apply correct UI state based on mode
+            const currentMode = modeWidget?.value;
+            if (currentMode === "fixed" && populatedWidget) {
+                populatedWidget.disabled = false;
+                if (populatedWidget.element) {
+                    populatedWidget.element.style.opacity = "1.0";
+                    populatedWidget.element.style.cursor = "text";
+                }
+            } else if (currentMode === "populate" && populatedWidget) {
+                populatedWidget.disabled = true;
+                if (populatedWidget.element) {
+                    populatedWidget.element.style.opacity = "0.85";
+                    populatedWidget.element.style.cursor = "not-allowed";
+                }
+            }
+            
+            // Update seed button states
+            if (node.updateSeedButtonStates) {
+                node.updateSeedButtonStates();
+            }
+            
+            // Force UI refresh
+            if (node.setDirtyCanvas) {
+                node.setDirtyCanvas(true, true);
+            }
+        }, 100);
     }
 });
 

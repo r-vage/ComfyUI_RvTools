@@ -239,6 +239,9 @@ def onprompt_populate_wildcards(json_data):
         
         inputs = node_data.get('inputs', {})
         mode = inputs.get('mode', 'populate')
+        wildcard_text = inputs.get('wildcard_text', '')
+        populated_text = inputs.get('populated_text', '')
+        seed = inputs.get('seed', 0)
         
         # In fixed mode, normalize the seed to 0 to ensure caching works
         # The seed is not used for wildcard processing in fixed mode
