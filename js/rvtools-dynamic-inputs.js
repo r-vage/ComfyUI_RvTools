@@ -30,6 +30,9 @@ app.registerExtension({
             "RvRouter_Any_MultiSwitch": { type: "*", prefix: "any" },
             "Any Multi-Switch [RvTools]": { type: "*", prefix: "any" },
 
+            "RvRouter_Any_MultiSwitch_purge": { type: "*", prefix: "any" },
+            "Any Multi-Switch Purge [RvTools]": { type: "*", prefix: "any" },
+
             "RvConversion_MergeStrings": { type: "STRING", prefix: "string" },
             "Merge Strings [RvTools]": { type: "STRING", prefix: "string" },
             
