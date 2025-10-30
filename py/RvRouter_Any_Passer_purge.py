@@ -10,17 +10,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from ..core import CATEGORY
+from ..core import CATEGORY, purge_vram
 from ..core import AnyType
 
 any = AnyType("*")
 
-class RvRouter_Any_Passer:
+class RvRouter_Any_Passer_purge:
     @classmethod
     def INPUT_TYPES(cls):
         return {
             "required": {
                 "input": (any, {"tooltip": "Any input to be passed through."}),
+                "Purge_VRAM": ("BOOLEAN", {"default": False, "tooltip": "If enabled, purges VRAM and unloads all models before passing latent."}),
             },
         }
 
@@ -28,14 +29,17 @@ class RvRouter_Any_Passer:
     RETURN_TYPES = (any,)
     FUNCTION = "passthrough"
 
-    def passthrough(self, input: object) -> tuple:
+    def passthrough(self, input: object, Purge_VRAM: bool) -> tuple:
+        if Purge_VRAM:
+            purge_vram()
+
         return (input,)
 
-NODE_NAME = 'Any Passer [RvTools]'
-NODE_DESC = 'Any Passer'
+NODE_NAME = 'Any Passer Purge [RvTools]'
+NODE_DESC = 'Any Passer Purge'
 
 NODE_CLASS_MAPPINGS = {
-    NODE_NAME: RvRouter_Any_Passer
+    NODE_NAME: RvRouter_Any_Passer_purge
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {

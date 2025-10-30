@@ -10,13 +10,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from ..core import CATEGORY
+from ..core import CATEGORY, purge_vram
 from ..core import AnyType
 from typing import Any, Dict, Tuple
 
 any_type = AnyType("*")
 
-class RvRouter_Any_DualSwitch:
+class RvRouter_Any_DualSwitch_purge:
     CATEGORY = CATEGORY.MAIN.value + CATEGORY.ROUTER.value
     RETURN_TYPES = (any_type,)
     RETURN_NAMES = ("*",)
@@ -27,6 +27,7 @@ class RvRouter_Any_DualSwitch:
         return {
             "required": {
                 "Input": ("INT", {"default": 1, "min": 1, "max": 2, "tooltip": "Select which input to output (1 or 2)."}),
+                "Purge_VRAM": ("BOOLEAN", {"default": False, "tooltip": "If True, purges VRAM before switching."}),
             },
             "optional": {
                 "input1": (any_type, {"forceInput": True, "tooltip": "First input (any type)."}),
@@ -34,17 +35,21 @@ class RvRouter_Any_DualSwitch:
             }
         }
 
-    def execute(self, Input: int, input1: Any = None, input2: Any = None) -> Tuple[Any]:
+    def execute(self, Input: int, Purge_VRAM: bool, input1: Any = None, input2: Any = None) -> Tuple[Any]:
+        
+        if Purge_VRAM:
+            purge_vram()
+
         if Input == 1:
             return (input1,)
         else:
             return (input2,)
 
-NODE_NAME = 'Any Dual-Switch [RvTools]'
-NODE_DESC = 'Any Dual-Switch'
+NODE_NAME = 'Any Dual-Switch Purge [RvTools]'
+NODE_DESC = 'Any Dual-Switch Purge'
 
 NODE_CLASS_MAPPINGS = {
-   NODE_NAME: RvRouter_Any_DualSwitch
+   NODE_NAME: RvRouter_Any_DualSwitch_purge
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {

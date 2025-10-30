@@ -52,7 +52,7 @@ class RvSettings_Sampler_Settings_Seed:
     def INPUT_TYPES(cls) -> Dict[str, Any]:
         return {
             "required": {
-                "allow_overwrite": ("BOOLEAN", {"default": True, "tooltip": "When enabled, allows direct inputs to IO nodes to overwrite this node's values."}),
+                "allow_overwrite": ("BOOLEAN", {"default": True, "label_on": "yes", "label_off": "no", "tooltip": "When enabled, allows direct inputs to IO nodes to overwrite this node's values."}),
                 "sampler_name": (SAMPLERS_COMFY, {"tooltip": "Select the sampler algorithm."}),
                 "scheduler": (SCHEDULERS_ANY, {"tooltip": "Select the scheduler algorithm."}),
                 "steps": ("INT", {"default": 20, "min": 1, "step": 1, "tooltip": "Number of sampling steps."}),

@@ -326,25 +326,25 @@ class RvLoader_SmartLoader_Plus:
                     "tooltip": "LoRA patch dtype for GGUF"
                 }),
                 "gguf_patch_on_device": ("BOOLEAN", {
-                    "default": False,
+                    "default": False, "label_on": "yes", "label_off": "no",
                     "tooltip": "Apply LoRA patches on GPU for GGUF (faster but uses more VRAM)"
                 }),
                 
                 # === STEP 3: Component Configuration Toggles ===
                 "configure_clip": ("BOOLEAN", {
-                    "default": True,
+                    "default": True, "label_on": "yes", "label_off": "no",
                     "tooltip": "Enable CLIP configuration options"
                 }),
                 "configure_vae": ("BOOLEAN", {
-                    "default": True,
+                    "default": True, "label_on": "yes", "label_off": "no",
                     "tooltip": "Enable VAE configuration options"
                 }),
                 "configure_latent": ("BOOLEAN", {
-                    "default": True,
+                    "default": True, "label_on": "yes", "label_off": "no",
                     "tooltip": "Enable latent size/batch configuration"
                 }),
                 "configure_sampler": ("BOOLEAN", {
-                    "default": True,
+                    "default": True, "label_on": "yes", "label_off": "no",
                     "tooltip": "Enable sampler configuration options"
                 }),
                 
@@ -379,6 +379,8 @@ class RvLoader_SmartLoader_Plus:
                 }),
                 "enable_clip_layer": ("BOOLEAN", {
                     "default": True,
+                    "label_on": "yes",
+                    "label_off": "no",
                     "tooltip": "Trim CLIP to specific layer (saves memory)"
                 }),
                 "stop_at_clip_layer": ("INT", {
@@ -458,7 +460,7 @@ class RvLoader_SmartLoader_Plus:
                 
                 # === STEP 6: Advanced Options ===
                 "memory_cleanup": ("BOOLEAN", {
-                    "default": True,
+                    "default": True, "label_on": "yes", "label_off": "no",
                     "tooltip": "Perform memory cleanup before loading model (recommended for switching between large models)"
                 }),
             },

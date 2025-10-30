@@ -327,17 +327,17 @@ class RvLoader_SmartLoader:
                     "tooltip": "LoRA patch dtype for GGUF"
                 }),
                 "gguf_patch_on_device": ("BOOLEAN", {
-                    "default": False,
+                    "default": False, "label_on": "yes", "label_off": "no",
                     "tooltip": "Apply LoRA patches on GPU for GGUF (faster but uses more VRAM)"
                 }),
                 
                 # === STEP 3: Component Configuration Toggles ===
                 "configure_clip": ("BOOLEAN", {
-                    "default": True,
+                    "default": True, "label_on": "yes", "label_off": "no",
                     "tooltip": "Enable CLIP configuration options"
                 }),
                 "configure_vae": ("BOOLEAN", {
-                    "default": True,
+                    "default": True, "label_on": "yes", "label_off": "no",
                     "tooltip": "Enable VAE configuration options"
                 }),
                 
@@ -371,7 +371,7 @@ class RvLoader_SmartLoader:
                     "tooltip": "CLIP architecture type (for external CLIP)"
                 }),
                 "enable_clip_layer": ("BOOLEAN", {
-                    "default": True,
+                    "default": True, "label_on": "yes", "label_off": "no",
                     "tooltip": "Trim CLIP to specific layer (saves memory)"
                 }),
                 "stop_at_clip_layer": ("INT", {
@@ -394,7 +394,7 @@ class RvLoader_SmartLoader:
                 
                 # === STEP 5: Advanced Options ===
                 "memory_cleanup": ("BOOLEAN", {
-                    "default": True,
+                    "default": True, "label_on": "yes", "label_off": "no",
                     "tooltip": "Perform memory cleanup before loading model (recommended for switching between large models)"
                 }),
             },

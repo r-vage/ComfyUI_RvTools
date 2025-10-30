@@ -11,17 +11,18 @@
 # limitations under the License.
 
 from __future__ import annotations
-from ..core import CATEGORY
+from ..core import CATEGORY, purge_vram
 from ..core import AnyType
 
 any_type = AnyType("*")
 
-class RvRouter_Any_MultiSwitch:
+class RvRouter_Any_MultiSwitch_purge:
     @classmethod
     def INPUT_TYPES(cls):
         return {
             "required": {
                 "inputcount": ("INT", {"default": 2, "min": 1, "max": 64, "step": 1, "tooltip": "Number of ANY inputs to expose. Inputs update automatically."}),
+                "Purge_VRAM": ("BOOLEAN", {"default": False, "tooltip": "If enabled, purges VRAM before switching."}),
             },
             "optional": {
                 "any_1": (any_type, {"tooltip": "Any input #1 (highest priority). Leave empty to bypass."}),
@@ -35,7 +36,10 @@ class RvRouter_Any_MultiSwitch:
     CATEGORY = CATEGORY.MAIN.value +  CATEGORY.ROUTER.value
     DESCRIPTION = "Multi-switch for ANY inputs. Inputs update automatically when inputcount changes." 
 
-    def select(self, inputcount, **kwargs):
+    def select(self, inputcount, Purge_VRAM=False, **kwargs):
+        if Purge_VRAM:
+            purge_vram()
+
         def _is_empty(v):
             if v is None:
                 return True
@@ -53,13 +57,13 @@ class RvRouter_Any_MultiSwitch:
             if not _is_empty(val):
                 return (val,)
 
-        raise RuntimeError(f"RvRouter_Any_MultiSwitch: no value found among any_1..any_{inputcount}.")
+        raise RuntimeError(f"RvRouter_Any_MultiSwitch_purge: no value found among any_1..any_{inputcount}.")
 
-NODE_NAME = 'Any Multi-Switch [RvTools]'
-NODE_DESC = 'Any Multi-Switch'
+NODE_NAME = 'Any Multi-Switch Purge [RvTools]'
+NODE_DESC = 'Any Multi-Switch Purge'
 
 NODE_CLASS_MAPPINGS = {
-   NODE_NAME: RvRouter_Any_MultiSwitch
+   NODE_NAME: RvRouter_Any_MultiSwitch_purge
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
