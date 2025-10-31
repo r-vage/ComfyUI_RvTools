@@ -28,7 +28,7 @@ from typing import Optional, Any, Callable
 from pathlib import Path
 import torch
 
-print("[GGUF Wrapper] Module loading started...")
+#print("[GGUF Wrapper] Module loading started...")
 
 # Try to import GGUF - graceful fallback if not available
 GGUF_AVAILABLE = False
@@ -36,7 +36,7 @@ GGMLOps: Optional[Any] = None
 gguf_sd_loader: Optional[Callable[[str], dict]] = None
 GGUFModelPatcher: Optional[Any] = None
 
-print("[GGUF Wrapper] Starting GGUF imports...")
+#print("[GGUF Wrapper] Starting GGUF imports...")
 
 try:
     # Check if ComfyUI-GGUF extension exists
@@ -44,8 +44,8 @@ try:
     custom_nodes_path = Path(__file__).parent.parent.parent.parent
     gguf_path = custom_nodes_path / "ComfyUI-GGUF"
     
-    print(f"[GGUF Wrapper] Looking for ComfyUI-GGUF at: {gguf_path}")
-    print(f"[GGUF Wrapper] Path exists: {gguf_path.exists()}")
+    #print(f"[GGUF Wrapper] Looking for ComfyUI-GGUF at: {gguf_path}")
+    #print(f"[GGUF Wrapper] Path exists: {gguf_path.exists()}")
     
     if gguf_path.exists():
         # Import GGUF components using importlib (proper package import)

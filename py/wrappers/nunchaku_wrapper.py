@@ -28,7 +28,7 @@ import json
 from typing import Optional, Any, TYPE_CHECKING
 import torch
 
-print("[Nunchaku Wrapper] Module loading started...")
+#print("[Nunchaku Wrapper] Module loading started...")
 
 # Try to import Nunchaku - graceful fallback if not available
 NUNCHAKU_AVAILABLE = False
@@ -40,7 +40,7 @@ QwenConfig: Optional[Any] = None
 QwenModelBase: Optional[Any] = None
 NunchakuModelPatcher: Optional[Any] = None
 
-print("[Nunchaku Wrapper] Starting Nunchaku imports...")
+#print("[Nunchaku Wrapper] Starting Nunchaku imports...")
 
 try:
     from nunchaku import NunchakuFluxTransformer2dModel as _NunchakuFluxTransformer2dModel
@@ -55,9 +55,9 @@ try:
     try:
         from nunchaku.models.qwenimage import NunchakuQwenImageTransformer2DModel as _NunchakuQwenImageTransformer2DModel
         NunchakuQwenImageTransformer2DModel = _NunchakuQwenImageTransformer2DModel
-        print("[Nunchaku Wrapper] ✓ Qwen model import successful")
+        #print("[Nunchaku Wrapper] ✓ Qwen model import successful")
     except ImportError as e:
-        print(f"[Nunchaku Wrapper] Qwen model not available: {e}")
+        #print(f"[Nunchaku Wrapper] Qwen model not available: {e}")
         NunchakuQwenImageTransformer2DModel = None
     
     # Import ComfyFluxWrapper and Qwen classes from ComfyUI-nunchaku extension
@@ -69,8 +69,8 @@ try:
         custom_nodes_path = Path(__file__).parent.parent.parent.parent
         nunchaku_path = custom_nodes_path / "ComfyUI-nunchaku"
         
-        print(f"[Nunchaku Wrapper] Looking for ComfyUI-nunchaku at: {nunchaku_path}")
-        print(f"[Nunchaku Wrapper] Path exists: {nunchaku_path.exists()}")
+        #print(f"[Nunchaku Wrapper] Looking for ComfyUI-nunchaku at: {nunchaku_path}")
+        #print(f"[Nunchaku Wrapper] Path exists: {nunchaku_path.exists()}")
         
         if nunchaku_path.exists():
             # Import classes using the EXACT same module path that PuLID uses
@@ -85,7 +85,7 @@ try:
             for mod_name in sys.modules:
                 if 'ComfyUI-nunchaku' in mod_name and 'wrappers.flux' in mod_name:
                     wrapper_module = sys.modules[mod_name]
-                    print(f"[Nunchaku Wrapper] Found existing wrapper module: {mod_name}")
+                    #print(f"[Nunchaku Wrapper] Found existing wrapper module: {mod_name}")
                     break
             
             if wrapper_module is not None:
@@ -116,7 +116,7 @@ try:
                     patcher_module = importlib.import_module(f"{base_mod_name}.model_patcher")
                     NunchakuModelPatcher = patcher_module.NunchakuModelPatcher
                 
-                print(f"[Nunchaku Wrapper] ✓ Reused existing modules with base: {base_mod_name}")
+               # print(f"[Nunchaku Wrapper] ✓ Reused existing modules with base: {base_mod_name}")
             else:
                 # First import - use standard package import (ComfyUI will have set this up)
                 # Try direct import first (ComfyUI __init__ system should have loaded it)
@@ -134,7 +134,7 @@ try:
                     from ComfyUI_nunchaku.model_patcher import NunchakuModelPatcher as _NunchakuModelPatcher
                     NunchakuModelPatcher = _NunchakuModelPatcher
                     
-                    print(f"[Nunchaku Wrapper] ✓ Imported via ComfyUI_nunchaku package")
+                  #  print(f"[Nunchaku Wrapper] ✓ Imported via ComfyUI_nunchaku package")
                 except ImportError:
                     # Last resort: manual sys.path approach
                     nunchaku_parent = str(nunchaku_path.parent)
@@ -153,9 +153,9 @@ try:
                     patcher_module = importlib.import_module("ComfyUI-nunchaku.model_patcher")
                     NunchakuModelPatcher = patcher_module.NunchakuModelPatcher
                     
-                    print(f"[Nunchaku Wrapper] ✓ Imported via importlib fallback")
+                  #  print(f"[Nunchaku Wrapper] ✓ Imported via importlib fallback")
             
-            print(f"[Nunchaku Wrapper] ✓ ComfyFluxWrapper module: {ComfyFluxWrapper.__module__}")
+            #print(f"[Nunchaku Wrapper] ✓ ComfyFluxWrapper module: {ComfyFluxWrapper.__module__}")
             print(f"[Nunchaku Wrapper] ✓ All Nunchaku classes imported successfully")
         else:
             raise ImportError("ComfyUI-nunchaku not found")
