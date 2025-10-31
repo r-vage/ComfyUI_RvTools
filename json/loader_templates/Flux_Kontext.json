@@ -1,8 +1,8 @@
 {
   "model_type": "UNet Model",
-  "ckpt_name": "PonyXL\\cyberrealisticPony_v140.safetensors",
-  "unet_name": "flux\\MagicBeautyOfPurismMbop_v1_fp8.safetensors",
-  "nunchaku_name": "nunchaku\\svdq-int4_r32-fluxmania-legacy.safetensors",
+  "ckpt_name": "None",
+  "unet_name": "flux\\Flux1.Dev_Kontext_fp8.safetensors",
+  "nunchaku_name": "nunchaku\\svdq-int4_r32-flux.1-kontext-dev.safetensors",
   "qwen_name": "nunchaku\\svdq-int4_r32-qwen-image.safetensors",
   "gguf_name": "flux\\amafluxFluxAmateur_10Q4KS.gguf",
   "weight_dtype": "fp8_e4m3fn",
@@ -37,7 +37,7 @@
   "height": 1024,
   "batch_size": 1,
   "sampler_name": "euler",
-  "scheduler": "simple",
-  "steps": 25,
+  "scheduler": "beta",
+  "steps": 20,
   "cfg": 1.0
 }
