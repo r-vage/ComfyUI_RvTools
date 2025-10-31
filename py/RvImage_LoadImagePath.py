@@ -453,23 +453,41 @@ class RvImage_LoadImagePath:
 
 	@classmethod
 	def IS_CHANGED(s, image):  # type: ignore
+		# When input is connected to another node, image will be None
+		# Return a constant value to indicate no change tracking for connected inputs
+		if image is None or image == "":
+			return ""
+			
 		image_path = str(image)
 		image_path = image_path.replace('"', "")
 		m = hashlib.sha256()
 		if not image_path.startswith("http"):
-			with open(image_path, 'rb') as f:
-				m.update(f.read())
-			return m.digest().hex()
+			try:
+				with open(image_path, 'rb') as f:
+					m.update(f.read())
+				return m.digest().hex()
+			except:
+				# If file doesn't exist or can't be read, return empty string
+				return ""
 		else:
 			m.update(image.encode("utf-8"))
 			return m.digest().hex()
 
 	@classmethod
 	def VALIDATE_INPUTS(s, image):  # type: ignore
+		# When input is connected to another node, image will be None during validation
+		# In this case, skip validation as the actual value will come from the connected node
+		if image is None or image == "":
+			return True
+			
 		image_path = str(image)
 		image_path = image_path.replace('"', "")
+		
+		# Allow HTTP URLs
 		if image_path.startswith("http"):
 			return True
+			
+		# Check if file exists
 		if not os.path.isfile(image_path):
 			return "No file found: {}".format(image_path)
 
