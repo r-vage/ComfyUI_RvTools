@@ -12,7 +12,7 @@
 from __future__ import annotations
 
 """
-Smart Loader Plus - Advanced Model Loader with Multi-Format Support
+Smart Loader Plus - Advanced Model Loader with Integrated LoRA Support
 
 Comprehensive model loader supporting multiple model formats and quantization methods:
 - Standard Checkpoints (.safetensors, .ckpt)
@@ -23,19 +23,26 @@ Comprehensive model loader supporting multiple model formats and quantization me
 Features:
 - Automatic model type detection
 - Format-specific loading options (cache, attention, offload)
-- Template system for saving/loading configurations
+- Template system for saving/loading configurations with intelligent field filtering
+- Model-only LoRA support with up to 3 slots
 - Graceful fallback when extensions are not installed
 - Comprehensive VRAM management and cleanup
+- Auto-fill template names for easy updates
 """
 
 from typing import Any
 import os
+import sys
+import json
+import time
+import gc
+
+import torch
 import comfy
 import comfy.sd
-import torch
-import folder_paths
 import comfy.utils
-import json
+import folder_paths
+import comfy.model_management as mm
 import nodes
 
 from ..core import CATEGORY, cstr, RESOLUTION_PRESETS, RESOLUTION_MAP
@@ -58,7 +65,6 @@ from .wrappers.gguf_wrapper import (
 
 # Register custom folder path for GGUF files (if GGUF is available)
 if GGUF_AVAILABLE:
-    # Register "diffusion_models_gguf" key that filters for .gguf files
     base = folder_paths.folder_names_and_paths.get("diffusion_models_gguf", ([], {}))
     base = base[0] if isinstance(base[0], (list, set, tuple)) else []
     orig, _ = folder_paths.folder_names_and_paths.get("diffusion_models", ([], {}))
@@ -68,42 +74,22 @@ MAX_RESOLUTION = 32768
 LATENT_CHANNELS = 4
 UNET_DOWNSAMPLE = 8
 
-# Template system - shared with SmartLoader
+# Template system
 TEMPLATE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "json", "loader_templates")
 
 def cleanup_memory_before_load():
-    """
-    Clean up memory before loading a new model.
-    
-    This function performs comprehensive memory cleanup:
-    1. Python garbage collection
-    2. Clear CUDA cache on all GPUs
-    3. Clear CUDA IPC shared memory cache
-    4. ComfyUI's soft empty cache
-    
-    Based on comfyui-multigpu's soft_empty_cache_multigpu function.
-    """
-    import gc
-    import comfy.model_management as mm
-    
+    """Clean up memory before loading a new model."""
     cstr("[Memory Cleanup] Starting pre-load memory cleanup...").msg.print()
-    
-    # Step 1: Python garbage collection
     gc.collect()
     
-    # Step 2: Clear CUDA cache on all devices
     if torch.cuda.is_available():
         device_count = torch.cuda.device_count()
         cstr(f"[Memory Cleanup] Clearing CUDA cache on {device_count} device(s)").msg.print()
-        
         for i in range(device_count):
             with torch.cuda.device(i):
                 torch.cuda.empty_cache()
-                # Clear IPC shared memory cache if available
-                if hasattr(torch.cuda, 'ipc_collect'):
-                    torch.cuda.ipc_collect()
+                torch.cuda.ipc_collect()
     
-    # Step 3: Clear MPS cache (Apple Silicon)
     if hasattr(torch.backends, 'mps') and hasattr(torch.mps, 'empty_cache'):
         try:
             torch.mps.empty_cache()
@@ -111,7 +97,6 @@ def cleanup_memory_before_load():
         except Exception:
             pass
     
-    # Step 4: ComfyUI's soft empty cache
     if hasattr(mm, 'soft_empty_cache'):
         mm.soft_empty_cache()
     
@@ -128,7 +113,7 @@ def get_template_list():
     try:
         for f in os.listdir(TEMPLATE_DIR):
             if f.endswith('.json'):
-                templates.append(f[:-5])  # Remove .json extension
+                templates.append(f[:-5])
     except Exception:
         pass
     return templates
@@ -174,7 +159,7 @@ def delete_template(name: str):
     return False
 
 def _detect_latent_channels_from_vae_obj(vae_obj) -> int:
-    """Infer latent channel count from a VAE-like object. Fall back to default."""
+    """Infer latent channel count from a VAE-like object."""
     try:
         if hasattr(vae_obj, 'channels') and isinstance(getattr(vae_obj, 'channels'), int):
             return getattr(vae_obj, 'channels')
@@ -183,17 +168,168 @@ def _detect_latent_channels_from_vae_obj(vae_obj) -> int:
         for attr in ('encoder', 'conv_in', 'down_blocks'):
             sub = getattr(vae_obj, attr, None)
             if sub is not None and hasattr(sub, 'weight'):
-                w = getattr(sub, 'weight')
-                try:
-                    if hasattr(w, 'ndim') and w.ndim == 4:
-                        return int(w.shape[0])
-                except Exception:
-                    pass
+                return sub.weight.shape[0]
     except Exception:
         pass
     return LATENT_CHANNELS
 
-# Module-level flag to print support messages only once
+def is_nunchaku_model(model: Any) -> bool:
+    """Check if a model is a Nunchaku FLUX model by detecting ComfyFluxWrapper."""
+    try:
+        model_wrapper = model.model.diffusion_model
+        
+        if hasattr(model_wrapper, '_orig_mod'):
+            actual_wrapper = model_wrapper._orig_mod
+            wrapper_class_name = type(actual_wrapper).__name__
+            return wrapper_class_name == 'ComfyFluxWrapper'
+        else:
+            wrapper_class_name = type(model_wrapper).__name__
+            return wrapper_class_name == 'ComfyFluxWrapper'
+    except Exception:
+        return False
+
+def apply_loras_to_model(model: Any, clip: Any, lora_params: list) -> tuple:
+    """
+    Apply LoRAs to model (standard or Nunchaku).
+    
+    Parameters:
+        model: The model to apply LoRAs to
+        clip: The CLIP model (for standard models only)
+        lora_params: List of tuples (lora_name, model_weight)
+    
+    Returns:
+        (modified_model, modified_clip)
+    """
+    if not lora_params:
+        return (model, clip)
+    
+    # Check if this is a Nunchaku model
+    if is_nunchaku_model(model):
+        cstr("[LoRA] Detected Nunchaku model, applying LoRAs via wrapper").msg.print()
+        return _apply_loras_nunchaku(model, clip, lora_params)
+    else:
+        cstr("[LoRA] Applying LoRAs to standard model").msg.print()
+        return _apply_loras_standard(model, clip, lora_params)
+
+def _apply_loras_standard(model: Any, clip: Any, lora_params: list) -> tuple:
+    """Apply LoRAs to standard (non-Nunchaku) models using ComfyUI's loader."""
+    model_lora = model
+    clip_lora = clip
+    
+    for lora_name, model_weight in lora_params:
+        lora_path = folder_paths.get_full_path("loras", lora_name)
+        lora = comfy.utils.load_torch_file(lora_path, safe_load=True)
+        
+        # Use model_weight for both model and clip (model-only mode)
+        model_lora, clip_lora = comfy.sd.load_lora_for_models(
+            model_lora, clip_lora, lora, model_weight, model_weight
+        )
+        cstr(f"[LoRA] Applied {lora_name} with weight {model_weight}").msg.print()
+    
+    return (model_lora, clip_lora)
+
+def _apply_loras_nunchaku(model: Any, clip: Any, lora_params: list) -> tuple:
+    """Apply LoRAs to Nunchaku FLUX models via ComfyFluxWrapper."""
+    try:
+        from nunchaku.lora.flux import to_diffusers
+        from .wrappers.nunchaku_wrapper import ComfyFluxWrapper
+    except ImportError as e:
+        raise RuntimeError(
+            f"Nunchaku not available for LoRA application: {e}\n"
+            "Please install ComfyUI-nunchaku extension."
+        )
+    
+    # Get the model wrapper
+    model_wrapper = model.model.diffusion_model
+    
+    # Handle OptimizedModule case
+    if hasattr(model_wrapper, '_orig_mod'):
+        transformer = model_wrapper._orig_mod.model
+        
+        # Create a new model structure
+        ret_model = model.__class__(
+            model.model, model.load_device, model.offload_device,
+            model.size, model.weight_inplace_update
+        )
+        ret_model.model = model.model
+        
+        # Create a new ComfyFluxWrapper
+        original_wrapper = model_wrapper._orig_mod
+        ret_model_wrapper = ComfyFluxWrapper(
+            transformer,
+            original_wrapper.config,
+            original_wrapper.pulid_pipeline,
+            original_wrapper.customized_forward,
+            original_wrapper.forward_kwargs
+        )
+        
+        # Copy internal state
+        ret_model_wrapper._prev_timestep = original_wrapper._prev_timestep
+        ret_model_wrapper._cache_context = original_wrapper._cache_context
+        if hasattr(original_wrapper, '_original_time_text_embed'):
+            ret_model_wrapper._original_time_text_embed = original_wrapper._original_time_text_embed
+        
+        ret_model.model.diffusion_model = ret_model_wrapper
+    else:
+        # Non-OptimizedModule case
+        transformer = model_wrapper.model
+        
+        ret_model = model.__class__(
+            model.model, model.load_device, model.offload_device,
+            model.size, model.weight_inplace_update
+        )
+        
+        original_wrapper = model_wrapper
+        ret_model_wrapper = ComfyFluxWrapper(
+            transformer,
+            original_wrapper.config,
+            original_wrapper.pulid_pipeline,
+            original_wrapper.customized_forward,
+            original_wrapper.forward_kwargs
+        )
+        
+        # Copy internal state
+        ret_model_wrapper._prev_timestep = original_wrapper._prev_timestep
+        ret_model_wrapper._cache_context = original_wrapper._cache_context
+        if hasattr(original_wrapper, '_original_time_text_embed'):
+            ret_model_wrapper._original_time_text_embed = original_wrapper._original_time_text_embed
+        
+        ret_model.model.diffusion_model = ret_model_wrapper
+    
+    # Restore transformer to original wrapper
+    if hasattr(model_wrapper, '_orig_mod'):
+        model_wrapper._orig_mod.model = transformer
+    else:
+        model_wrapper.model = transformer
+    
+    ret_model_wrapper.model = transformer
+    
+    # Clear existing LoRA list
+    ret_model_wrapper.loras = []
+    
+    # Track max input channels
+    max_in_channels = ret_model.model.model_config.unet_config["in_channels"]
+    
+    # Add all LoRAs
+    for lora_name, model_weight in lora_params:
+        lora_path = folder_paths.get_full_path_or_raise("loras", lora_name)
+        ret_model_wrapper.loras.append((lora_path, model_weight))
+        cstr(f"[LoRA] Applied Nunchaku LoRA {lora_name} with weight {model_weight}").msg.print()
+        
+        # Check input channels
+        sd = to_diffusers(lora_path)
+        if "transformer.x_embedder.lora_A.weight" in sd:
+            new_in_channels = sd["transformer.x_embedder.lora_A.weight"].shape[1]
+            assert new_in_channels % 4 == 0, f"Invalid LoRA input channels: {new_in_channels}"
+            new_in_channels = new_in_channels // 4
+            max_in_channels = max(max_in_channels, new_in_channels)
+    
+    # Update input channels if needed
+    if max_in_channels > ret_model.model.model_config.unet_config["in_channels"]:
+        ret_model.model.model_config.unet_config["in_channels"] = max_in_channels
+    
+    return (ret_model, clip)
+
 _support_messages_printed = False
 
 class RvLoader_SmartLoader_Plus:
@@ -201,36 +337,29 @@ class RvLoader_SmartLoader_Plus:
     resolution_map = RESOLUTION_MAP
     
     def __init__(self):
-        # Print support availability only once per session
         global _support_messages_printed
         if not _support_messages_printed:
             _support_messages_printed = True
             
-            # Print Nunchaku availability
             nunchaku_info = get_nunchaku_info()
             if nunchaku_info['available']:
-                cstr(f"[SmartLoader+] Nunchaku support enabled").msg.print()
+                version = nunchaku_info['version'] if nunchaku_info['version'] else 'installed'
+                cstr(f"✓ Nunchaku support: {version}").msg.print()
             
-            # Print GGUF availability
             if GGUF_AVAILABLE:
-                cstr("[SmartLoader+] GGUF support enabled").msg.print()
+                cstr("✓ GGUF support available").msg.print()
 
     @classmethod
     def INPUT_TYPES(cls):
-        # Get Nunchaku availability for dynamic options
         nunchaku_info = get_nunchaku_info()
-        
-        # Base weight dtype options
         weight_dtype_options = ["default", "fp8_e4m3fn", "fp8_e4m3fn_fast", "fp8_e5m2"]
         
-        # Nunchaku-specific options (only show if available)
-        nunchaku_cache_visible = nunchaku_info['available']
-        nunchaku_attention_visible = nunchaku_info['available']
-        nunchaku_offload_visible = nunchaku_info['available']
+        # Get available LoRAs
+        loras = ["None"] + folder_paths.get_filename_list("loras")
         
         inputs = {
             "required": {
-                # === STEP 0: Template Management ===
+                # Template management
                 "template_action": (["None", "Load", "Save", "Delete"], {
                     "default": "None",
                     "tooltip": "Load/Save/Delete configuration templates"
@@ -244,118 +373,116 @@ class RvLoader_SmartLoader_Plus:
                     "tooltip": "Name for new template (when saving)"
                 }),
                 
-                # === STEP 1: Model Type Selection ===
+                # Model selection
                 "model_type": (["Standard Checkpoint", "UNet Model", "Nunchaku Flux", "Nunchaku Qwen", "GGUF Model"], {
                     "default": "Standard Checkpoint",
-                    "tooltip": "Select model type: Standard (checkpoint), UNet (standalone diffusion model), Nunchaku Flux/Qwen (quantized), or GGUF (quantized)"
+                    "tooltip": "Select model type"
                 }),
-                
-                # === STEP 2: Model Selection ===
                 "ckpt_name": (["None"] + folder_paths.get_filename_list("checkpoints"), {
                     "default": "None",
-                    "tooltip": "Select checkpoint file (for Standard Checkpoint mode)"
+                    "tooltip": "Select checkpoint file"
                 }),
                 "unet_name": (["None"] + folder_paths.get_filename_list("diffusion_models"), {
                     "default": "None",
-                    "tooltip": "Select UNet diffusion model (for UNet Model mode)"
+                    "tooltip": "Select UNet diffusion model"
                 }),
                 "nunchaku_name": (["None"] + folder_paths.get_filename_list("diffusion_models"), {
                     "default": "None",
-                    "tooltip": "Select Nunchaku quantized Flux model (for Nunchaku Flux mode)"
+                    "tooltip": "Select Nunchaku Flux model"
                 }),
                 "qwen_name": (["None"] + folder_paths.get_filename_list("diffusion_models"), {
                     "default": "None",
-                    "tooltip": "Select Nunchaku quantized Qwen model (for Nunchaku Qwen mode)"
+                    "tooltip": "Select Nunchaku Qwen model"
                 }),
                 "gguf_name": (["None"] + folder_paths.get_filename_list("diffusion_models_gguf"), {
                     "default": "None",
-                    "tooltip": "Select GGUF quantized model (.gguf file)"
+                    "tooltip": "Select GGUF model"
                 }),
                 "weight_dtype": (weight_dtype_options, {
                     "default": "default",
-                    "tooltip": "Weight dtype for UNet model (applies fp8 quantization)"
+                    "tooltip": "Weight dtype for UNet model"
                 }),
                 
-                # === STEP 2b: Nunchaku Flux Options ===
+                # Nunchaku settings
                 "data_type": (["bfloat16", "float16"], {
                     "default": "bfloat16",
-                    "tooltip": "Model data type for Nunchaku Flux. Use bfloat16 for 30/40-series GPUs, float16 for 20-series GPUs."
+                    "tooltip": "Model data type for Nunchaku"
                 }),
                 "cache_threshold": ("FLOAT", {
                     "default": 0.0,
                     "min": 0.0,
                     "max": 1.0,
                     "step": 0.001,
-                    "tooltip": "First-block caching for Nunchaku Flux (0=disabled, 0.12=typical). Higher=faster but lower quality."
+                    "tooltip": "Cache threshold for Nunchaku"
                 }),
                 "attention": (["flash-attention2", "nunchaku-fp16"], {
                     "default": "flash-attention2",
-                    "tooltip": "Attention implementation for Nunchaku Flux. Use nunchaku-fp16 for 20-series GPUs."
+                    "tooltip": "Attention implementation"
                 }),
                 "i2f_mode": (["enabled", "always"], {
                     "default": "enabled",
-                    "tooltip": "GEMM implementation for 20-series GPUs (ignored on other GPUs)."
+                    "tooltip": "GEMM implementation"
                 }),
-                
-                # === STEP 2c: Shared Nunchaku Options ===
                 "cpu_offload": (["auto", "enable", "disable"], {
                     "default": "auto",
-                    "tooltip": "CPU offload for Nunchaku models. Auto enables for <14GB VRAM."
+                    "tooltip": "CPU offload"
                 }),
-                
-                # === STEP 2d: Nunchaku Qwen Options ===
                 "num_blocks_on_gpu": ("INT", {
                     "default": 30,
                     "min": 1,
                     "max": 60,
                     "step": 1,
-                    "tooltip": "Number of transformer blocks to keep on GPU (for Nunchaku Qwen)"
+                    "tooltip": "Blocks on GPU (Nunchaku Qwen)"
                 }),
                 "use_pin_memory": (["enable", "disable"], {
                     "default": "enable",
-                    "tooltip": "Use pinned memory for faster CPU-GPU transfers (for Nunchaku Qwen)"
+                    "tooltip": "Use pinned memory"
                 }),
                 
-                # === STEP 2e: GGUF Options ===
+                # GGUF settings
                 "gguf_dequant_dtype": (["default", "target", "float32", "float16", "bfloat16"], {
                     "default": "default",
-                    "tooltip": "Dequantization dtype for GGUF (default=auto, target=match model)"
+                    "tooltip": "Dequantization dtype"
                 }),
                 "gguf_patch_dtype": (["default", "target", "float32", "float16", "bfloat16"], {
                     "default": "default",
-                    "tooltip": "LoRA patch dtype for GGUF"
+                    "tooltip": "LoRA patch dtype"
                 }),
                 "gguf_patch_on_device": ("BOOLEAN", {
                     "default": False, "label_on": "yes", "label_off": "no",
-                    "tooltip": "Apply LoRA patches on GPU for GGUF (faster but uses more VRAM)"
+                    "tooltip": "Apply patches on GPU"
                 }),
                 
-                # === STEP 3: Component Configuration Toggles ===
+                # Configuration toggles
                 "configure_clip": ("BOOLEAN", {
                     "default": True, "label_on": "yes", "label_off": "no",
-                    "tooltip": "Enable CLIP configuration options"
+                    "tooltip": "Enable CLIP configuration"
                 }),
                 "configure_vae": ("BOOLEAN", {
                     "default": True, "label_on": "yes", "label_off": "no",
-                    "tooltip": "Enable VAE configuration options"
+                    "tooltip": "Enable VAE configuration"
                 }),
                 "configure_latent": ("BOOLEAN", {
                     "default": True, "label_on": "yes", "label_off": "no",
-                    "tooltip": "Enable latent size/batch configuration"
+                    "tooltip": "Enable latent configuration"
                 }),
                 "configure_sampler": ("BOOLEAN", {
                     "default": True, "label_on": "yes", "label_off": "no",
-                    "tooltip": "Enable sampler configuration options"
+                    "tooltip": "Enable sampler configuration"
+                }),
+                "configure_model_only_lora": ("BOOLEAN", {
+                    "default": False, "label_on": "yes", "label_off": "no",
+                    "tooltip": "Enable model-only LoRA configuration"
                 }),
                 
-                # === STEP 4a: CLIP Configuration ===
+                # CLIP Configuration Section
                 "clip_source": (["Baked", "External"], {
                     "default": "Baked",
-                    "tooltip": "Baked = use checkpoint's CLIP | External = load separate CLIP files"
+                    "tooltip": "CLIP source"
                 }),
                 "clip_count": (["1", "2", "3", "4"], {
                     "default": "1",
-                    "tooltip": "Number of CLIP models to load (for ensemble)"
+                    "tooltip": "Number of CLIP models"
                 }),
                 "clip_name1": (["None"] + folder_paths.get_filename_list("clip"), {
                     "default": "None",
@@ -363,84 +490,126 @@ class RvLoader_SmartLoader_Plus:
                 }),
                 "clip_name2": (["None"] + folder_paths.get_filename_list("clip"), {
                     "default": "None",
-                    "tooltip": "Secondary CLIP model (optional)"
+                    "tooltip": "Secondary CLIP model"
                 }),
                 "clip_name3": (["None"] + folder_paths.get_filename_list("clip"), {
                     "default": "None",
-                    "tooltip": "Third CLIP model (optional)"
+                    "tooltip": "Third CLIP model"
                 }),
                 "clip_name4": (["None"] + folder_paths.get_filename_list("clip"), {
                     "default": "None",
-                    "tooltip": "Fourth CLIP model (optional)"
+                    "tooltip": "Fourth CLIP model"
                 }),
                 "clip_type": (["flux", "sd3", "sdxl", "stable_cascade", "stable_audio", "hunyuan_dit", "mochi", "ltxv", "hunyuan_video", "pixart", "cosmos", "lumina2", "wan", "hidream", "chroma", "ace", "omnigen2", "qwen_image", "hunyuan_image"], {
                     "default": "flux",
-                    "tooltip": "CLIP architecture type (for external CLIP)"
+                    "tooltip": "CLIP architecture type"
                 }),
                 "enable_clip_layer": ("BOOLEAN", {
                     "default": True,
                     "label_on": "yes",
                     "label_off": "no",
-                    "tooltip": "Trim CLIP to specific layer (saves memory)"
+                    "tooltip": "Trim CLIP to specific layer"
                 }),
                 "stop_at_clip_layer": ("INT", {
                     "default": -2,
                     "min": -24,
                     "max": -1,
                     "step": 1,
-                    "tooltip": "CLIP layer to stop at (negative index, -1 = last layer)"
+                    "tooltip": "CLIP layer to stop at"
                 }),
                 
-                # === STEP 4b: VAE Configuration ===
+                # VAE settings
                 "vae_source": (["Baked", "External"], {
                     "default": "Baked",
-                    "tooltip": "Baked = use checkpoint's VAE | External = load separate VAE file"
+                    "tooltip": "VAE source"
                 }),
                 "vae_name": (["None"] + folder_paths.get_filename_list("vae"), {
                     "default": "None",
-                    "tooltip": "External VAE file to load"
+                    "tooltip": "External VAE file"
                 }),
                 
-                # === STEP 4c: Latent Configuration ===
+                # Latent settings
                 "resolution": (cls.resolution, {
                     "default": "1024x1024 (1:1)",
-                    "tooltip": "Preset resolution or Custom for manual width/height"
+                    "tooltip": "Preset resolution or Custom"
                 }),
                 "width": ("INT", {
                     "default": 1024,
                     "min": 16,
                     "max": MAX_RESOLUTION,
                     "step": 8,
-                    "tooltip": "Custom width (only used when resolution = Custom)"
+                    "tooltip": "Custom width"
                 }),
                 "height": ("INT", {
                     "default": 1024,
                     "min": 16,
                     "max": MAX_RESOLUTION,
                     "step": 8,
-                    "tooltip": "Custom height (only used when resolution = Custom)"
-                }),
-                "batch_size": ("INT", {
-                    "default": 1,
-                    "min": 1,
-                    "max": 4096,
-                    "tooltip": "Number of latent images to generate in batch"
+                    "tooltip": "Custom height"
                 }),
                 
-                # === STEP 4d: Sampler Configuration ===
+                # LoRA configuration
+                "lora_count": (["1", "2", "3"], {
+                    "default": "1",
+                    "tooltip": "Number of LoRA slots to configure"
+                }),
+                
+                # LoRA slot 1
+                "lora_switch_1": ("BOOLEAN", {
+                    "default": False, "label_on": "on", "label_off": "off",
+                    "tooltip": "Enable LoRA 1"
+                }),
+                "lora_name_1": (loras, {
+                    "default": "None",
+                    "tooltip": "LoRA 1 file"
+                }),
+                "lora_weight_1": ("FLOAT", {
+                    "default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01,
+                    "tooltip": "LoRA 1 model weight"
+                }),
+                
+                # LoRA slot 2
+                "lora_switch_2": ("BOOLEAN", {
+                    "default": False, "label_on": "on", "label_off": "off",
+                    "tooltip": "Enable LoRA 2"
+                }),
+                "lora_name_2": (loras, {
+                    "default": "None",
+                    "tooltip": "LoRA 2 file"
+                }),
+                "lora_weight_2": ("FLOAT", {
+                    "default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01,
+                    "tooltip": "LoRA 2 model weight"
+                }),
+                
+                # LoRA slot 3
+                "lora_switch_3": ("BOOLEAN", {
+                    "default": False, "label_on": "on", "label_off": "off",
+                    "tooltip": "Enable LoRA 3"
+                }),
+                "lora_name_3": (loras, {
+                    "default": "None",
+                    "tooltip": "LoRA 3 file"
+                }),
+                "lora_weight_3": ("FLOAT", {
+                    "default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01,
+                    "tooltip": "LoRA 3 model weight"
+                }),
+                
+                # Sampler settings
                 "sampler_name": (comfy.samplers.KSampler.SAMPLERS, {
                     "default": "euler",
                     "tooltip": "Sampling algorithm"
                 }),
                 "scheduler": (comfy.samplers.KSampler.SCHEDULERS, {
                     "default": "normal",
-                    "tooltip": "Scheduler for noise reduction"
+                    "tooltip": "Scheduler"
                 }),
                 "steps": ("INT", {
                     "default": 20,
                     "min": 1,
                     "max": 10000,
-                    "tooltip": "Number of sampling steps"
+                    "tooltip": "Sampling steps"
                 }),
                 "cfg": ("FLOAT", {
                     "default": 8.0,
@@ -448,20 +617,28 @@ class RvLoader_SmartLoader_Plus:
                     "max": 100.0,
                     "step": 0.1,
                     "round": 0.01,
-                    "tooltip": "Classifier-free guidance scale"
+                    "tooltip": "CFG scale"
                 }),
                 "flux_guidance": ("FLOAT", {
                     "default": 3.5,
                     "min": 0.0,
                     "max": 100.0,
                     "step": 0.1,
-                    "tooltip": "Flux guidance scale (for non-standard checkpoint models)"
+                    "tooltip": "Flux guidance scale"
                 }),
                 
-                # === STEP 6: Advanced Options ===
+                # Latent batch size
+                "batch_size": ("INT", {
+                    "default": 1,
+                    "min": 1,
+                    "max": 4096,
+                    "tooltip": "Batch size"
+                }),
+                
+                # Memory management
                 "memory_cleanup": ("BOOLEAN", {
                     "default": True, "label_on": "yes", "label_off": "no",
-                    "tooltip": "Perform memory cleanup before loading model (recommended for switching between large models)"
+                    "tooltip": "Perform memory cleanup before loading"
                 }),
             },
         }
@@ -474,121 +651,186 @@ class RvLoader_SmartLoader_Plus:
     
     @classmethod
     def IS_CHANGED(cls, **kwargs):
-        """Force ComfyUI to refresh INPUT_TYPES to get updated template list"""
-        import time
-        # Return timestamp of template directory to detect changes
         template_dir = TEMPLATE_DIR
         if os.path.exists(template_dir):
-            # Get the latest modification time of any file in the directory
             try:
-                mtime = max(os.path.getmtime(os.path.join(template_dir, f)) 
-                           for f in os.listdir(template_dir) if f.endswith('.json'))
-                return str(mtime)
+                return str(max(os.path.getmtime(os.path.join(template_dir, f)) 
+                          for f in os.listdir(template_dir) if f.endswith('.json')))
             except (ValueError, OSError):
                 pass
         return str(time.time())
 
-    def execute(
-        self,
-        template_action: str,
-        template_name: str,
-        new_template_name: str,
-        model_type: str,
-        ckpt_name: str,
-        unet_name: str,
-        nunchaku_name: str,
-        qwen_name: str,
-        gguf_name: str,
-        weight_dtype: str,
-        data_type: str,
-        cache_threshold: float,
-        attention: str,
-        i2f_mode: str,
-        cpu_offload: str,
-        num_blocks_on_gpu: int,
-        use_pin_memory: str,
-        gguf_dequant_dtype: str,
-        gguf_patch_dtype: str,
-        gguf_patch_on_device: bool,
-        flux_guidance: float,
-        configure_clip: bool,
-        configure_vae: bool,
-        configure_latent: bool,
-        configure_sampler: bool,
-        clip_source: str,
-        clip_count: str,
-        clip_name1: str,
-        clip_name2: str,
-        clip_name3: str,
-        clip_name4: str,
-        clip_type: str,
-        enable_clip_layer: bool,
-        stop_at_clip_layer: int,
-        vae_source: str,
-        vae_name: str,
-        resolution: str,
-        width: int,
-        height: int,
-        batch_size: int,
-        sampler_name: Any,
-        scheduler: Any,
-        steps: int,
-        cfg: float,
-        memory_cleanup: bool,
-    ) -> tuple:
+    def execute(self, **kwargs):
+        # Extract all parameters
+        template_action = kwargs.get('template_action', 'None')
+        template_name = kwargs.get('template_name', 'None')
+        new_template_name = kwargs.get('new_template_name', '')
+        
+        model_type = kwargs.get('model_type', 'Standard Checkpoint')
+        ckpt_name = kwargs.get('ckpt_name', 'None')
+        unet_name = kwargs.get('unet_name', 'None')
+        nunchaku_name = kwargs.get('nunchaku_name', 'None')
+        qwen_name = kwargs.get('qwen_name', 'None')
+        gguf_name = kwargs.get('gguf_name', 'None')
+        weight_dtype = kwargs.get('weight_dtype', 'default')
+        
+        data_type = kwargs.get('data_type', 'bfloat16')
+        cache_threshold = kwargs.get('cache_threshold', 0.0)
+        attention = kwargs.get('attention', 'flash-attention2')
+        i2f_mode = kwargs.get('i2f_mode', 'enabled')
+        cpu_offload = kwargs.get('cpu_offload', 'auto')
+        num_blocks_on_gpu = kwargs.get('num_blocks_on_gpu', 30)
+        use_pin_memory = kwargs.get('use_pin_memory', 'enable')
+        
+        gguf_dequant_dtype = kwargs.get('gguf_dequant_dtype', 'default')
+        gguf_patch_dtype = kwargs.get('gguf_patch_dtype', 'default')
+        gguf_patch_on_device = kwargs.get('gguf_patch_on_device', False)
+        
+        configure_clip = kwargs.get('configure_clip', True)
+        configure_vae = kwargs.get('configure_vae', True)
+        configure_latent = kwargs.get('configure_latent', True)
+        configure_sampler = kwargs.get('configure_sampler', True)
+        configure_model_only_lora = kwargs.get('configure_model_only_lora', False)
+        
+        clip_source = kwargs.get('clip_source', 'Baked')
+        clip_count = kwargs.get('clip_count', '1')
+        clip_name1 = kwargs.get('clip_name1', 'None')
+        clip_name2 = kwargs.get('clip_name2', 'None')
+        clip_name3 = kwargs.get('clip_name3', 'None')
+        clip_name4 = kwargs.get('clip_name4', 'None')
+        clip_type = kwargs.get('clip_type', 'flux')
+        enable_clip_layer = kwargs.get('enable_clip_layer', True)
+        stop_at_clip_layer = kwargs.get('stop_at_clip_layer', -2)
+        
+        vae_source = kwargs.get('vae_source', 'Baked')
+        vae_name = kwargs.get('vae_name', 'None')
+        
+        resolution = kwargs.get('resolution', '1024x1024 (1:1)')
+        width = kwargs.get('width', 1024)
+        height = kwargs.get('height', 1024)
+        batch_size = kwargs.get('batch_size', 1)
+        
+        lora_count = kwargs.get('lora_count', '1')
+        
+        sampler_name = kwargs.get('sampler_name', 'euler')
+        scheduler = kwargs.get('scheduler', 'normal')
+        steps = kwargs.get('steps', 20)
+        cfg = kwargs.get('cfg', 8.0)
+        flux_guidance = kwargs.get('flux_guidance', 3.5)
+        
+        memory_cleanup = kwargs.get('memory_cleanup', True)
         
         # Handle template actions - Save and Delete interrupt, Load doesn't
         if template_action == "Save":
             if new_template_name and new_template_name.strip():
                 config = {
                     "model_type": model_type,
-                    "ckpt_name": ckpt_name,
-                    "unet_name": unet_name,
-                    "nunchaku_name": nunchaku_name,
-                    "qwen_name": qwen_name,
-                    "gguf_name": gguf_name,
-                    "weight_dtype": weight_dtype,
-                    "data_type": data_type,
-                    "cache_threshold": cache_threshold,
-                    "attention": attention,
-                    "i2f_mode": i2f_mode,
-                    "cpu_offload": cpu_offload,
-                    "num_blocks_on_gpu": num_blocks_on_gpu,
-                    "use_pin_memory": use_pin_memory,
-                    "gguf_dequant_dtype": gguf_dequant_dtype,
-                    "gguf_patch_dtype": gguf_patch_dtype,
-                    "gguf_patch_on_device": gguf_patch_on_device,
-                    "flux_guidance": flux_guidance,
                     "configure_clip": configure_clip,
                     "configure_vae": configure_vae,
                     "configure_latent": configure_latent,
                     "configure_sampler": configure_sampler,
-                    "clip_source": clip_source,
-                    "clip_count": clip_count,
-                    "clip_name1": clip_name1,
-                    "clip_name2": clip_name2,
-                    "clip_name3": clip_name3,
-                    "clip_name4": clip_name4,
-                    "clip_type": clip_type,
-                    "enable_clip_layer": enable_clip_layer,
-                    "stop_at_clip_layer": stop_at_clip_layer,
-                    "vae_source": vae_source,
-                    "vae_name": vae_name,
-                    "resolution": resolution,
-                    "width": width,
-                    "height": height,
-                    "batch_size": batch_size,
-                    "sampler_name": sampler_name,
-                    "scheduler": scheduler,
-                    "steps": steps,
-                    "cfg": cfg,
+                    "configure_model_only_lora": configure_model_only_lora,
                 }
+                
+                # Only save the model field that matches the model_type
+                if model_type == "Standard Checkpoint":
+                    if ckpt_name != "None":
+                        config["ckpt_name"] = ckpt_name
+                elif model_type == "UNet Model":
+                    if unet_name != "None":
+                        config["unet_name"] = unet_name
+                    # UNet-specific settings
+                    config["weight_dtype"] = weight_dtype
+                elif model_type == "Nunchaku Flux":
+                    if nunchaku_name != "None":
+                        config["nunchaku_name"] = nunchaku_name
+                    # Nunchaku Flux-specific settings
+                    config["data_type"] = data_type
+                    config["cache_threshold"] = cache_threshold
+                    config["attention"] = attention
+                    config["i2f_mode"] = i2f_mode
+                    config["cpu_offload"] = cpu_offload
+                elif model_type == "Nunchaku Qwen":
+                    if qwen_name != "None":
+                        config["qwen_name"] = qwen_name
+                    # Nunchaku Qwen-specific settings (only offload parameters are used)
+                    config["cpu_offload"] = cpu_offload
+                    config["num_blocks_on_gpu"] = num_blocks_on_gpu
+                    config["use_pin_memory"] = use_pin_memory
+                elif model_type == "GGUF Model":
+                    if gguf_name != "None":
+                        config["gguf_name"] = gguf_name
+                    # GGUF-specific settings
+                    config["gguf_dequant_dtype"] = gguf_dequant_dtype
+                    config["gguf_patch_dtype"] = gguf_patch_dtype
+                    config["gguf_patch_on_device"] = gguf_patch_on_device
+                
+                # Only save CLIP settings if configure_clip is enabled
+                if configure_clip:
+                    config["clip_source"] = clip_source
+                    
+                    # CLIP layer trimming only applies to Standard Checkpoints with baked CLIP
+                    if model_type == "Standard Checkpoint":
+                        config["enable_clip_layer"] = enable_clip_layer
+                        config["stop_at_clip_layer"] = stop_at_clip_layer
+                    
+                    # CLIP configuration for External sources (UNet, Nunchaku, GGUF)
+                    if clip_source == "External":
+                        config["clip_count"] = clip_count
+                        config["clip_type"] = clip_type
+                        
+                        # Only save CLIP names if not "None"
+                        if clip_name1 != "None":
+                            config["clip_name1"] = clip_name1
+                        if clip_name2 != "None":
+                            config["clip_name2"] = clip_name2
+                        if clip_name3 != "None":
+                            config["clip_name3"] = clip_name3
+                        if clip_name4 != "None":
+                            config["clip_name4"] = clip_name4
+                
+                # Only save VAE settings if configure_vae is enabled
+                if configure_vae:
+                    config["vae_source"] = vae_source
+                    # Only save VAE name if using External source
+                    if vae_source == "External" and vae_name != "None":
+                        config["vae_name"] = vae_name
+                
+                # Only save latent settings if configure_latent is enabled
+                if configure_latent:
+                    config["resolution"] = resolution
+                    # batch_size is intentionally not saved - it's a local/workflow value
+                
+                # Only save sampler settings if configure_sampler is enabled
+                if configure_sampler:
+                    config["sampler_name"] = sampler_name
+                    config["scheduler"] = scheduler
+                    config["steps"] = steps
+                    config["cfg"] = cfg
+                    # flux_guidance only relevant for Flux models (check clip_type for external CLIP models)
+                    if model_type == "Nunchaku Flux" or (clip_type == "flux" and model_type in ["UNet Model", "GGUF Model"]):
+                        config["flux_guidance"] = flux_guidance
+                
+                # Only save LoRA settings if configure_model_only_lora is enabled
+                if configure_model_only_lora:
+                    config["lora_count"] = lora_count
+                    # Save all LoRA settings (even if switches are off)
+                    for i in range(1, 4):
+                        config[f"lora_switch_{i}"] = kwargs.get(f'lora_switch_{i}', False)
+                        config[f"lora_name_{i}"] = kwargs.get(f'lora_name_{i}', 'None')
+                        config[f"lora_weight_{i}"] = kwargs.get(f'lora_weight_{i}', 1.0)
+                
+                # Only add width/height if using Custom resolution
+                if configure_latent and resolution == "Custom":
+                    config["width"] = width
+                    config["height"] = height
+                
                 if save_template(new_template_name.strip(), config):
                     cstr(f"✓ Template '{new_template_name}' saved successfully").msg.print()
                 else:
                     cstr(f"✗ Failed to save template '{new_template_name}'").error.print()
             # Stop execution - template saved, no model loading needed
-            empty_pipe = {"model": None, "clip": None, "vae": None, "latent": None, "ckpt_name": ""}
+            empty_pipe = {"model": None, "clip": None, "vae": None, "latent": None}
             nodes.interrupt_processing()
             return (empty_pipe,)
         
@@ -599,7 +841,7 @@ class RvLoader_SmartLoader_Plus:
                 else:
                     cstr(f"✗ Failed to delete template '{template_name}'").error.print()
             # Stop execution - template deleted, no model loading needed
-            empty_pipe = {"model": None, "clip": None, "vae": None, "latent": None, "ckpt_name": ""}
+            empty_pipe = {"model": None, "clip": None, "vae": None, "latent": None}
             nodes.interrupt_processing()
             return (empty_pipe,)
         
@@ -608,8 +850,10 @@ class RvLoader_SmartLoader_Plus:
         configure_vae = bool(configure_vae)
         configure_latent = bool(configure_latent)
         configure_sampler = bool(configure_sampler)
+        configure_model_only_lora = bool(configure_model_only_lora)
         enable_clip_layer = bool(enable_clip_layer)
         clip_count_int = int(clip_count)
+        lora_count_int = int(lora_count)
         
         is_standard = (model_type == "Standard Checkpoint")
         is_unet = (model_type == "UNet Model")
@@ -988,7 +1232,27 @@ class RvLoader_SmartLoader_Plus:
                         cstr(f"Warning: VAE file '{vae_name}' not found").warning.print()
         
         # ============================================================
-        # STEP 4: Create Latent Tensor (if configured)
+        # STEP 4: Apply LoRAs (if configured)
+        # ============================================================
+        
+        if configure_model_only_lora:
+            # Collect enabled LoRAs
+            lora_params = []
+            for i in range(1, lora_count_int + 1):
+                lora_switch = kwargs.get(f'lora_switch_{i}', False)
+                lora_name = kwargs.get(f'lora_name_{i}', 'None')
+                lora_weight = kwargs.get(f'lora_weight_{i}', 1.0)
+                
+                if lora_switch and lora_name not in (None, '', 'None'):
+                    lora_params.append((lora_name, lora_weight))
+            
+            # Apply LoRAs if any enabled
+            if lora_params:
+                cstr(f"[LoRA] Applying {len(lora_params)} LoRA(s)...").msg.print()
+                loaded_model, loaded_clip = apply_loras_to_model(loaded_model, loaded_clip, lora_params)
+        
+        # ============================================================
+        # STEP 5: Create Latent Tensor (if configured)
         # ============================================================
         
         latent_tensor = None
@@ -1014,7 +1278,7 @@ class RvLoader_SmartLoader_Plus:
             ], device="cpu")
         
         # ============================================================
-        # STEP 5: Construct output pipe with sampler settings
+        # STEP 6: Construct output pipe with sampler settings
         # ============================================================
         
         pipe = {
@@ -1028,8 +1292,8 @@ class RvLoader_SmartLoader_Plus:
             "model_name": checkpoint_name,
             "vae_name": vae_name if not use_baked_vae and vae_name not in (None, '', 'None') else '',
             "clip_skip": stop_at_clip_layer if configure_clip and enable_clip_layer else None,
-            "is_nunchaku": is_nunchaku,  # NEW: Track if Nunchaku model
-            "flux_guidance": flux_guidance,  # Flux guidance for sampling (user preference)
+            "is_nunchaku": is_nunchaku,
+            "flux_guidance": flux_guidance,
         }
         
         # Add sampler settings if configured
@@ -1038,7 +1302,6 @@ class RvLoader_SmartLoader_Plus:
             pipe["scheduler"] = scheduler
             pipe["steps"] = steps
             pipe["cfg"] = cfg
-            # SmartLoader sampler settings have low priority (can be overwritten by settings nodes)
             pipe["_allow_overwrite"] = False
         
         return (pipe,)

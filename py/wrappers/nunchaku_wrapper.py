@@ -660,7 +660,18 @@ def get_nunchaku_info() -> dict:
     if NUNCHAKU_AVAILABLE:
         try:
             import nunchaku
-            info['version'] = getattr(nunchaku, '__version__', 'unknown')  # type: ignore
+            # Try to get version from __version__ attribute
+            version = getattr(nunchaku, '__version__', None)
+            
+            # If __version__ not available, try package metadata
+            if not version:
+                try:
+                    from importlib.metadata import version as get_version
+                    version = get_version('nunchaku')
+                except Exception:
+                    pass
+            
+            info['version'] = version
         except Exception:
             pass
     

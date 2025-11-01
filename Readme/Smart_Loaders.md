@@ -171,7 +171,33 @@ Integrated sampler configuration:
 - Enable to use built-in sampler settings
 - Disable to use separate KSampler node
 
-#### 6. Quantization Settings
+#### 6. LoRA Configuration (Model-Only)
+
+Integrated LoRA support with model-only weights:
+
+**LoRA Slots:**
+- Up to 3 LoRA slots available
+- Each slot has: switch (on/off), LoRA selection, model weight
+
+**Model-Only Mode:**
+- Single weight slider per LoRA (applies to model only)
+- No separate CLIP weight configuration
+- Simpler interface for model-focused LoRA usage
+
+**LoRA Count:**
+- Controls how many slots are visible (1-3)
+- Reduces UI clutter when fewer LoRAs needed
+
+**Template Integration:**
+- LoRA configuration saved in templates
+- All 3 slots saved (even if disabled) for easy toggling
+- Switch states, names, and weights preserved
+
+**Toggle:**
+- Enable `configure_model_only_lora` to show LoRA options
+- Disable to hide LoRA section entirely
+
+#### 7. Quantization Settings
 
 Model-specific options for reduced VRAM:
 
@@ -262,17 +288,28 @@ Model-specific options for reduced VRAM:
 
 **Saving a Template:**
 
-1. Configure node completely (model, CLIP, VAE, latent, sampler)
+1. Configure node completely (model, CLIP, VAE, latent, sampler, LoRAs if needed)
 2. Set `template_action` to "Save"
-3. Enter name in `new_template_name` (e.g., "Flux_Dev_Default")
+3. Enter name in `new_template_name` (auto-fills if updating existing template)
 4. Click "Execute Template Action" button
-5. Template saved to `json/loader_templates/Flux_Dev_Default.json`
+5. Template saved to `json/loader_templates/<name>.json`
+6. Node automatically switches back to "Load" mode with saved template selected
+
+**Updating an Existing Template:**
+
+1. Load template you want to update via `template_name`
+2. Make desired changes to settings
+3. Switch `template_action` to "Save"
+4. `new_template_name` auto-fills with loaded template name
+5. Click "Execute Template Action" to overwrite
+6. Or edit the name to save as a new template instead
 
 **Loading a Template:**
 
 1. Set `template_action` to "Load"
 2. Select template from `template_name` dropdown
-3. All settings restored instantly
+3. Template loads automatically - all settings restored instantly
+4. All values reset to defaults first, then template values applied
 
 **Deleting a Template:**
 
@@ -280,12 +317,13 @@ Model-specific options for reduced VRAM:
 2. Select template from `template_name` dropdown
 3. Click "Execute Template Action" button
 4. Template removed from library
+5. Node automatically switches back to "Load" mode
 
 ### Output
 
 The node outputs a comprehensive **pipe** containing:
 
-- `model` - Loaded diffusion model
+- `model` - Loaded diffusion model (with LoRAs applied if enabled)
 - `clip` - CLIP ensemble (single or multi-module)
 - `vae` - VAE encoder/decoder
 - `latent` - Pre-configured empty latent tensor (if enabled)
@@ -301,6 +339,7 @@ The node outputs a comprehensive **pipe** containing:
 - `vae_name` - VAE filename
 - `clip_skip` - CLIP layer setting
 - `is_nunchaku` - Quantization flag
+- `lora_names` - List of active LoRA names (if configure_model_only_lora enabled)
 
 ---
 
@@ -494,45 +533,45 @@ Templates save your complete loader configuration to a JSON file, allowing insta
 
 ### What Gets Saved
 
-**Model Settings:**
-- Model type selection
-- Selected model file (checkpoint, UNet, Nunchaku, GGUF)
-- Weight dtype (for UNet models)
+The template system intelligently saves only relevant configuration for your setup, keeping template files clean and minimal.
 
-**CLIP Configuration:**
+**Always Saved:**
+- Model type selection
+- Configuration toggles (configure_clip, configure_vae, configure_latent, configure_sampler, configure_model_only_lora)
+
+**Model Settings (only the active model type):**
+- Standard Checkpoint: `ckpt_name` only
+- UNet Model: `unet_name` + weight_dtype, data_type, cache_threshold
+- Nunchaku Flux: `nunchaku_name` + attention, i2f_mode, cpu_offload, num_blocks_on_gpu, use_pin_memory
+- Nunchaku Qwen: `qwen_name` + attention, i2f_mode, cpu_offload, num_blocks_on_gpu, use_pin_memory
+- GGUF Model: `gguf_name` + gguf_dequant_dtype, gguf_patch_dtype, gguf_patch_on_device
+
+**CLIP Configuration (only if configure_clip is enabled):**
 - CLIP source (Baked/External)
 - CLIP count (1-4 modules)
 - CLIP type selection
-- Individual CLIP file selections
-- CLIP layer trimming settings
+- CLIP layer trimming settings (enable_clip_layer, stop_at_clip_layer)
+- Individual CLIP file selections (only if clip_source is "External" and not "None")
 
-**VAE Configuration:**
+**VAE Configuration (only if configure_vae is enabled):**
 - VAE source (Baked/External)
-- Selected VAE file
+- Selected VAE file (only if vae_source is "External" and not "None")
 
-**Quantization Settings:**
-- Nunchaku Flux: data_type, cache_threshold, attention, i2f_mode, cpu_offload
-- Nunchaku Qwen: num_blocks_on_gpu, use_pin_memory, cpu_offload
-- GGUF: dequant_dtype, patch_dtype, patch_on_device
-
-**Latent Settings (Smart Loader Plus only):**
-- Resolution preset or custom dimensions
-- Width and height
+**Latent Settings (only if configure_latent is enabled, Smart Loader Plus only):**
+- Resolution preset
 - Batch size
+- Width and height (only if resolution is "Custom")
 
-**Sampler Settings (Smart Loader Plus only):**
+**Sampler Settings (only if configure_sampler is enabled, Smart Loader Plus only):**
 - Sampler name
 - Scheduler
 - Steps
 - CFG scale
 - Flux guidance
 
-**Toggle States:**
-- configure_clip
-- configure_vae
-- configure_latent (Plus only)
-- configure_sampler (Plus only)
-- enable_clip_layer
+**LoRA Settings (only if configure_model_only_lora is enabled, Smart Loader Plus only):**
+- LoRA count (1-3)
+- All 3 LoRA slots: switch state, lora name, model weight (saved even if switch is off for easy toggling)
 
 ### Creating Templates
 
@@ -560,10 +599,28 @@ Templates save your complete loader configuration to a JSON file, allowing insta
 
 1. Set `template_action` to "Load"
 2. Select from `template_name` dropdown
-3. Click "Execute Template Action"
+3. Template loads automatically (no button needed)
 4. All settings restored instantly
 5. Verify settings are correct
 6. Adjust if needed (resolution, steps, etc.)
+
+**Saving:**
+
+1. Configure all desired settings
+2. Set `template_action` to "Save"
+3. Enter name in `new_template_name` (auto-fills with loaded template name if updating)
+4. Click "Execute Template Action" button
+5. Template saves and automatically switches back to "Load" mode
+
+**Auto-Fill Feature:**
+- When switching from "Load" to "Save", the `new_template_name` field automatically fills with the currently loaded template name
+- Makes updating existing templates effortless - just switch to Save and execute
+- Edit the name if you want to save as a new template instead
+
+**Default Reset System:**
+- When loading a template, ALL settings reset to defaults first, then template values are applied
+- Ensures clean state with no leftover values from previous configurations
+- Template files are minimal and only contain non-default values
 
 **Cross-Loader Compatibility:**
 - Templates from Smart Loader Plus work in Smart Loader
