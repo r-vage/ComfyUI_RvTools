@@ -141,7 +141,7 @@ python.exe -m pip install https://github.com/nunchaku-tech/nunchaku/releases/dow
 
 **For PyTorch 2.7:**
 ```powershell
-python.exe -m pip install https://github.com/mit-han-lab/nunchaku/releases/download/v0.3.1dev20250609/nunchaku-0.3.1.dev20250609+torch2.7-cp312-cp312-win_amd64.whl
+python.exe -m pip install https://github.com/nunchaku-tech/nunchaku/releases/download/v0.3.1dev20250609/nunchaku-0.3.1.dev20250609+torch2.7-cp312-cp312-win_amd64.whl
 ```
 
 **For other Python versions (3.10, 3.11, 3.13) or newer PyTorch versions:**
@@ -341,7 +341,7 @@ For more information about model loading and ComfyUI features:
 
 ### External Resources
 
-- **Nunchaku GitHub**: https://github.com/mit-han-lab/nunchaku
+- **Nunchaku GitHub**: https://github.com/nunchaku-tech/nunchaku
 - **Nunchaku Releases**: https://github.com/nunchaku-tech/nunchaku/releases (Find wheels for newer PyTorch versions)
 - **SVDQuant Research**: MIT-HAN Lab's optimization technology
 - **ComfyUI Documentation**: Official ComfyUI guides
@@ -373,7 +373,7 @@ python.exe -m pip install https://github.com/nunchaku-tech/nunchaku/releases/dow
 # python.exe -m pip install https://github.com/nunchaku-tech/nunchaku/releases/download/v1.0.1/nunchaku-1.0.1+torch2.8-cp312-cp312-win_amd64.whl
 
 # For PyTorch 2.7 + Python 3.12:
-# python.exe -m pip install https://github.com/mit-han-lab/nunchaku/releases/download/v0.3.1dev20250609/nunchaku-0.3.1.dev20250609+torch2.7-cp312-cp312-win_amd64.whl
+# python.exe -m pip install https://github.com/nunchaku-tech/nunchaku/releases/download/v0.3.1dev20250609/nunchaku-0.3.1.dev20250609+torch2.7-cp312-cp312-win_amd64.whl
 
 # For other Python versions: Replace cp312 with cp310, cp311, or cp313
 # Check releases: https://github.com/nunchaku-tech/nunchaku/releases
