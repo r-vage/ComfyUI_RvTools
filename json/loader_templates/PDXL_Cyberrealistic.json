@@ -1,0 +1,18 @@
+{
+  "model_type": "Standard Checkpoint",
+  "configure_clip": true,
+  "configure_vae": true,
+  "configure_latent": true,
+  "configure_sampler": true,
+  "configure_model_only_lora": false,
+  "ckpt_name": "PonyXL\\cyberrealisticPony_v140.safetensors",
+  "clip_source": "Baked",
+  "enable_clip_layer": true,
+  "stop_at_clip_layer": -2,
+  "vae_source": "Baked",
+  "resolution": "832x1216 (2:3 Flux, SDXL)",
+  "sampler_name": "dpmpp_2m",
+  "scheduler": "sgm_uniform",
+  "steps": 20,
+  "cfg": 2.5
+}
