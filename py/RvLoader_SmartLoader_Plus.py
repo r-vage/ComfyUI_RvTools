@@ -234,10 +234,13 @@ def _apply_loras_nunchaku(model: Any, clip: Any, lora_params: list) -> tuple:
         from nunchaku.lora.flux import to_diffusers
         from .wrappers.nunchaku_wrapper import ComfyFluxWrapper
     except ImportError as e:
-        raise RuntimeError(
-            f"Nunchaku not available for LoRA application: {e}\n"
-            "Please install ComfyUI-nunchaku extension."
-        )
+        cstr(f"[LoRA] Nunchaku not available for LoRA application: {e}").warning.print()
+        cstr("[LoRA] Returning model unchanged").msg.print()
+        return (model, clip)
+    
+    if ComfyFluxWrapper is None:
+        cstr("[LoRA] ComfyFluxWrapper not available - returning model unchanged").warning.print()
+        return (model, clip)
     
     # Get the model wrapper
     model_wrapper = model.model.diffusion_model
@@ -930,43 +933,34 @@ class RvLoader_SmartLoader_Plus:
                 raise RuntimeError(f"Nunchaku file not readable: {nunchaku_path}")
             
             if not NUNCHAKU_AVAILABLE:
-                raise RuntimeError(
-                    f"Nunchaku Flux type selected but ComfyUI-nunchaku extension not available.\n\n"
-                    f"To use Nunchaku quantized Flux models, install ComfyUI-nunchaku:\n"
-                    f"  1. Navigate to: ComfyUI/custom_nodes/\n"
-                    f"  2. Clone: git clone https://github.com/mit-han-lab/ComfyUI-nunchaku\n"
-                    f"  3. Install: cd ComfyUI-nunchaku && pip install -r requirements.txt\n"
-                    f"  4. Restart ComfyUI\n\n"
-                    f"Or select 'Standard Checkpoint' or 'UNet Model' type instead."
-                )
-            
-            # Load with Nunchaku wrapper
-            try:
-                cstr(f"[Nunchaku Flux] Loading quantized model: {nunchaku_name}").msg.print()
-                
-                loaded_model = load_nunchaku_model(
-                    model_path=nunchaku_path,
-                    device=None,  # Auto-detect
-                    dtype=None,  # Will be determined from data_type
-                    cpu_offload=(cpu_offload == "enable" or cpu_offload == "auto"),
-                    cache_threshold=cache_threshold,
-                    attention=attention,
-                    data_type=data_type,
-                    i2f_mode=i2f_mode,
-                    model_type="flux"
-                )
-                
-                # Set checkpoint name from the model file
-                checkpoint_name = nunchaku_name
-                
-            except Exception as e:
-                raise RuntimeError(
-                    f"Failed to load Nunchaku model '{nunchaku_name}':\n{e}\n\n"
-                    f"This might indicate:\n"
-                    f"  - Corrupted model file\n"
-                    f"  - Incompatible Nunchaku version\n"
-                    f"  - Insufficient VRAM (try enabling CPU offload)\n"
-                )
+                cstr("[Nunchaku Flux] ComfyUI-nunchaku extension not available - skipping model load").warning.print()
+                cstr("[Nunchaku Flux] Install from: https://github.com/nunchaku-tech/ComfyUI-nunchaku").msg.print()
+                loaded_model = None
+                checkpoint_name = ""
+            else:
+                # Load with Nunchaku wrapper
+                try:
+                    cstr(f"[Nunchaku Flux] Loading quantized model: {nunchaku_name}").msg.print()
+                    
+                    loaded_model = load_nunchaku_model(
+                        model_path=nunchaku_path,
+                        device=None,  # Auto-detect
+                        dtype=None,  # Will be determined from data_type
+                        cpu_offload=(cpu_offload == "enable" or cpu_offload == "auto"),
+                        cache_threshold=cache_threshold,
+                        attention=attention,
+                        data_type=data_type,
+                        i2f_mode=i2f_mode,
+                        model_type="flux"
+                    )
+                    
+                    # Set checkpoint name from the model file
+                    checkpoint_name = nunchaku_name
+                    
+                except Exception as e:
+                    cstr(f"[Nunchaku Flux] Failed to load model '{nunchaku_name}': {e}").error.print()
+                    loaded_model = None
+                    checkpoint_name = ""
         
         elif is_qwen:
             # ============================================================
@@ -987,28 +981,30 @@ class RvLoader_SmartLoader_Plus:
             if not os.access(qwen_path, os.R_OK):
                 raise RuntimeError(f"Qwen file not readable: {qwen_path}")
             
-            # Load Nunchaku Qwen model
-            checkpoint_name = qwen_name
-            
-            try:
-                loaded_model = load_nunchaku_model(
-                    model_path=qwen_path,
-                    device=None,  # Auto-detect
-                    dtype=None,  # Auto-detect
-                    cpu_offload=(cpu_offload == "enable" or cpu_offload == "auto"),
-                    num_blocks_on_gpu=num_blocks_on_gpu,
-                    use_pin_memory=(use_pin_memory == "enable"),
-                    model_type="qwen"
-                )
+            if not NUNCHAKU_AVAILABLE:
+                cstr("[Nunchaku Qwen] ComfyUI-nunchaku extension not available - skipping model load").warning.print()
+                cstr("[Nunchaku Qwen] Install from: https://github.com/nunchaku-tech/ComfyUI-nunchaku").msg.print()
+                loaded_model = None
+                checkpoint_name = ""
+            else:
+                # Load Nunchaku Qwen model
+                checkpoint_name = qwen_name
                 
-            except Exception as e:
-                raise RuntimeError(
-                    f"Failed to load Nunchaku Qwen model '{qwen_name}':\n{e}\n\n"
-                    f"This might indicate:\n"
-                    f"  - Corrupted model file\n"
-                    f"  - Incompatible Nunchaku version\n"
-                    f"  - Insufficient VRAM (try adjusting num_blocks_on_gpu)\n"
-                )
+                try:
+                    loaded_model = load_nunchaku_model(
+                        model_path=qwen_path,
+                        device=None,  # Auto-detect
+                        dtype=None,  # Auto-detect
+                        cpu_offload=(cpu_offload == "enable" or cpu_offload == "auto"),
+                        num_blocks_on_gpu=num_blocks_on_gpu,
+                        use_pin_memory=(use_pin_memory == "enable"),
+                        model_type="qwen"
+                    )
+                    
+                except Exception as e:
+                    cstr(f"[Nunchaku Qwen] Failed to load model '{qwen_name}': {e}").error.print()
+                    loaded_model = None
+                    checkpoint_name = ""
         
         elif is_gguf:
             # ============================================================
@@ -1028,26 +1024,27 @@ class RvLoader_SmartLoader_Plus:
             if not os.access(gguf_path, os.R_OK):
                 raise RuntimeError(f"GGUF file not readable: {gguf_path}")
             
-            # Load GGUF model
-            checkpoint_name = gguf_name
-            
-            try:
-                loaded_model = load_gguf_model(
-                    model_path=gguf_path,
-                    dequant_dtype=gguf_dequant_dtype,
-                    patch_dtype=gguf_patch_dtype,
-                    patch_on_device=gguf_patch_on_device
-                )
+            if not GGUF_AVAILABLE:
+                cstr("[GGUF] ComfyUI-GGUF extension not available - skipping model load").warning.print()
+                cstr("[GGUF] Install from: https://github.com/city96/ComfyUI-GGUF").msg.print()
+                loaded_model = None
+                checkpoint_name = ""
+            else:
+                # Load GGUF model
+                checkpoint_name = gguf_name
                 
-            except Exception as e:
-                raise RuntimeError(
-                    f"Failed to load GGUF model '{gguf_name}':\n{e}\n\n"
-                    f"This might indicate:\n"
-                    f"  - Corrupted model file\n"
-                    f"  - Incompatible GGUF version\n"
-                    f"  - ComfyUI-GGUF not installed\n"
-                    f"  - Missing gguf package (pip install --upgrade gguf)\n"
-                )
+                try:
+                    loaded_model = load_gguf_model(
+                        model_path=gguf_path,
+                        dequant_dtype=gguf_dequant_dtype,
+                        patch_dtype=gguf_patch_dtype,
+                        patch_on_device=gguf_patch_on_device
+                    )
+                    
+                except Exception as e:
+                    cstr(f"[GGUF] Failed to load model '{gguf_name}': {e}").error.print()
+                    loaded_model = None
+                    checkpoint_name = ""
             
         elif is_unet:
             # ============================================================

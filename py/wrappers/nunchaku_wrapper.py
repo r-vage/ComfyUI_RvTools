@@ -395,7 +395,7 @@ def load_nunchaku_model(
             "Nunchaku support is not available.\n\n"
             "To load Nunchaku quantized models, please install ComfyUI-nunchaku:\n"
             "  1. Navigate to ComfyUI/custom_nodes/\n"
-            "  2. Clone: git clone https://github.com/mit-han-lab/ComfyUI-nunchaku\n"
+            "  2. Clone: git clone https://github.com/nunchaku-tech/ComfyUI-nunchaku\n"
             "  3. Install: cd ComfyUI-nunchaku && pip install -r requirements.txt\n"
             "  4. Restart ComfyUI\n\n"
             "Alternatively, use a standard (non-quantized) model."
@@ -648,10 +648,10 @@ def get_nunchaku_info() -> dict:
     dict
         Dictionary with keys:
         - 'available': bool - Whether Nunchaku is available
-        - 'version': str - Nunchaku version if available
+        - 'version': str | None - Nunchaku version if available
         - 'wrapper_available': bool - Whether ComfyFluxWrapper is available
     """
-    info = {
+    info: dict[str, bool | str | None] = {
         'available': NUNCHAKU_AVAILABLE,
         'version': None,
         'wrapper_available': ComfyFluxWrapper is not None
@@ -661,7 +661,7 @@ def get_nunchaku_info() -> dict:
         try:
             import nunchaku
             # Try to get version from __version__ attribute
-            version = getattr(nunchaku, '__version__', None)
+            version = getattr(nunchaku, '__version__', None)  # type: str | None
             
             # If __version__ not available, try package metadata
             if not version:
