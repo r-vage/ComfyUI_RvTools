@@ -1288,7 +1288,7 @@ class RvLoader_SmartLoader_Plus:
             "batch_size": batch_size if configure_latent else None,
             "model_name": checkpoint_name,
             "vae_name": vae_name if not use_baked_vae and vae_name not in (None, '', 'None') else '',
-            "clip_skip": stop_at_clip_layer if configure_clip and enable_clip_layer else None,
+            "clip_skip": stop_at_clip_layer if is_standard and use_baked_clip and enable_clip_layer else None,
             "is_nunchaku": is_nunchaku,
             "flux_guidance": flux_guidance,
         }
