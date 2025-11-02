@@ -99,24 +99,10 @@ app.registerExtension({
                             this.outputs[0].type = sourceType;
                             this.outputs[0].name = sourceType;
                             
-                            // Disconnect any output links that don't match the new type
-                            if (this.outputs[0].links && this.outputs[0].links.length > 0) {
-                                const linksToDisconnect = [];
-                                for (let i = 0; i < this.outputs[0].links.length; i++) {
-                                    const linkId = this.outputs[0].links[i];
-                                    const link = app.graph.links[linkId];
-                                    if (link && link.type !== sourceType && link.type !== "*") {
-                                        linksToDisconnect.push({ linkId, targetId: link.target_id, targetSlot: link.target_slot });
-                                    }
-                                }
-                                // Disconnect in separate loop to avoid modifying array while iterating
-                                linksToDisconnect.forEach(({ targetId, targetSlot }) => {
-                                    const targetNode = app.graph.getNodeById(targetId);
-                                    if (targetNode) {
-                                        targetNode.disconnectInput(targetSlot);
-                                    }
-                                });
-                            }
+                            // NOTE: Auto-disconnect logic removed to prevent false disconnections
+                            // when nodes are bypassed. Type validation now handled at execution
+                            // time in Python, which provides better accuracy and prevents
+                            // workflow breakage from temporary type mismatches.
                         }
                         
                     } else if (!connected && type === LiteGraph.INPUT) {
@@ -139,24 +125,7 @@ app.registerExtension({
                                 this.outputs[0].type = activeType;
                                 this.outputs[0].name = activeType;
                                 
-                                // Disconnect any output links that don't match the active type
-                                if (this.outputs[0].links && this.outputs[0].links.length > 0) {
-                                    const linksToDisconnect = [];
-                                    for (let i = 0; i < this.outputs[0].links.length; i++) {
-                                        const linkId = this.outputs[0].links[i];
-                                        const link = app.graph.links[linkId];
-                                        if (link && link.type !== activeType && link.type !== "*") {
-                                            linksToDisconnect.push({ linkId, targetId: link.target_id, targetSlot: link.target_slot });
-                                        }
-                                    }
-                                    // Disconnect in separate loop to avoid modifying array while iterating
-                                    linksToDisconnect.forEach(({ targetId, targetSlot }) => {
-                                        const targetNode = app.graph.getNodeById(targetId);
-                                        if (targetNode) {
-                                            targetNode.disconnectInput(targetSlot);
-                                        }
-                                    });
-                                }
+                                // NOTE: Auto-disconnect logic removed - type validation in Python
                             }
                         } else {
                             // No connections left, reset everything to wildcard

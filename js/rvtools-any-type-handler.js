@@ -53,16 +53,7 @@ export function setupAnyTypeHandling(node, inputIndex = 0, outputIndex = 0) {
                     app.graph.links[link_info.id].color = color;
                 }
                 
-                // Disconnect incompatible output links
-                if (this.outputs[outputIndex].links !== null) {
-                    for (let i = this.outputs[outputIndex].links.length; i > 0; i--) {
-                        const targetLinkId = this.outputs[outputIndex].links[i - 1];
-                        const targetLink = app.graph.links[targetLinkId];
-                        if (this.configured && sourceType !== targetLink.type) {
-                            app.graph.getNodeById(targetLink.target_id).disconnectInput(targetLink.target_slot);
-                        }
-                    }
-                }
+                // NOTE: Auto-disconnect logic removed - ComfyUI handles bypassed nodes correctly NOW
             }
             
             // OUTPUT connection when input is not connected: update to match target type
