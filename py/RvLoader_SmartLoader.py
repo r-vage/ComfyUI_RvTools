@@ -531,7 +531,7 @@ class RvLoader_SmartLoader:
                 
                 # LoRA slot 1
                 "lora_switch_1": ("BOOLEAN", {
-                    "default": False, "label_on": "on", "label_off": "off",
+                    "default": False, "label_on": "ON", "label_off": "OFF",
                     "tooltip": "Enable LoRA 1"
                 }),
                 "lora_name_1": (loras, {
@@ -545,7 +545,7 @@ class RvLoader_SmartLoader:
                 
                 # LoRA slot 2
                 "lora_switch_2": ("BOOLEAN", {
-                    "default": False, "label_on": "on", "label_off": "off",
+                    "default": False, "label_on": "ON", "label_off": "OFF",
                     "tooltip": "Enable LoRA 2"
                 }),
                 "lora_name_2": (loras, {
@@ -559,7 +559,7 @@ class RvLoader_SmartLoader:
                 
                 # LoRA slot 3
                 "lora_switch_3": ("BOOLEAN", {
-                    "default": False, "label_on": "on", "label_off": "off",
+                    "default": False, "label_on": "ON", "label_off": "OFF",
                     "tooltip": "Enable LoRA 3"
                 }),
                 "lora_name_3": (loras, {

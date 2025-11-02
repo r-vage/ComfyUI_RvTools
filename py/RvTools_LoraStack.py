@@ -25,53 +25,53 @@ class RvTools_LoraStack:
         return {"required": {
                     "simple": ("BOOLEAN", {"default": False, "label_on": "yes", "label_off": "no", "tooltip": "When enabled, hides clip_weight widgets and uses model_weight for both"}),
                     "lora_count": ("INT", {"default": 5, "min": 1, "max": 10, "step": 1, "tooltip": "Number of visible LoRA slots"}),
-                    
-                    "switch_1": ("BOOLEAN", {"default": False, "label_on": "on", "label_off": "off"}),
+
+                    "switch_1": ("BOOLEAN", {"default": False, "label_on": "ON", "label_off": "OFF"}),
                     "lora_name_1": (loras,),
                     "model_weight_1": ("FLOAT", {"default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01}),
                     "clip_weight_1": ("FLOAT", {"default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01}),
 
-                    "switch_2": ("BOOLEAN", {"default": False, "label_on": "on", "label_off": "off"}),
+                    "switch_2": ("BOOLEAN", {"default": False, "label_on": "ON", "label_off": "OFF"}),
                     "lora_name_2": (loras,),
                     "model_weight_2": ("FLOAT", {"default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01}),
                     "clip_weight_2": ("FLOAT", {"default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01}),
 
-                    "switch_3": ("BOOLEAN", {"default": False, "label_on": "on", "label_off": "off"}),
+                    "switch_3": ("BOOLEAN", {"default": False, "label_on": "ON", "label_off": "OFF"}),
                     "lora_name_3": (loras,),
                     "model_weight_3": ("FLOAT", {"default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01}),
                     "clip_weight_3": ("FLOAT", {"default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01}),
 
-                    "switch_4": ("BOOLEAN", {"default": False, "label_on": "on", "label_off": "off"}),
+                    "switch_4": ("BOOLEAN", {"default": False, "label_on": "ON", "label_off": "OFF"}),
                     "lora_name_4": (loras,),
                     "model_weight_4": ("FLOAT", {"default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01}),
                     "clip_weight_4": ("FLOAT", {"default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01}),
 
-                    "switch_5": ("BOOLEAN", {"default": False, "label_on": "on", "label_off": "off"}),
+                    "switch_5": ("BOOLEAN", {"default": False, "label_on": "ON", "label_off": "OFF"}),
                     "lora_name_5": (loras,),
                     "model_weight_5": ("FLOAT", {"default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01}),
                     "clip_weight_5": ("FLOAT", {"default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01}),
 
-                    "switch_6": ("BOOLEAN", {"default": False, "label_on": "on", "label_off": "off"}),
+                    "switch_6": ("BOOLEAN", {"default": False, "label_on": "ON", "label_off": "OFF"}),
                     "lora_name_6": (loras,),
                     "model_weight_6": ("FLOAT", {"default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01}),
                     "clip_weight_6": ("FLOAT", {"default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01}),
 
-                    "switch_7": ("BOOLEAN", {"default": False, "label_on": "on", "label_off": "off"}),
+                    "switch_7": ("BOOLEAN", {"default": False, "label_on": "ON", "label_off": "OFF"}),
                     "lora_name_7": (loras,),
                     "model_weight_7": ("FLOAT", {"default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01}),
                     "clip_weight_7": ("FLOAT", {"default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01}),
 
-                    "switch_8": ("BOOLEAN", {"default": False, "label_on": "on", "label_off": "off"}),
+                    "switch_8": ("BOOLEAN", {"default": False, "label_on": "ON", "label_off": "OFF"}),
                     "lora_name_8": (loras,),
                     "model_weight_8": ("FLOAT", {"default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01}),
                     "clip_weight_8": ("FLOAT", {"default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01}),
 
-                    "switch_9": ("BOOLEAN", {"default": False, "label_on": "on", "label_off": "off"}),
+                    "switch_9": ("BOOLEAN", {"default": False, "label_on": "ON", "label_off": "OFF"}),
                     "lora_name_9": (loras,),
                     "model_weight_9": ("FLOAT", {"default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01}),
                     "clip_weight_9": ("FLOAT", {"default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01}),
 
-                    "switch_10": ("BOOLEAN", {"default": False, "label_on": "on", "label_off": "off"}),
+                    "switch_10": ("BOOLEAN", {"default": False, "label_on": "ON", "label_off": "OFF"}),
                     "lora_name_10": (loras,),
                     "model_weight_10": ("FLOAT", {"default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01}),
                     "clip_weight_10": ("FLOAT", {"default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01}),
