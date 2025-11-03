@@ -36,6 +36,7 @@ app.registerExtension({
             let lastTemplateName = "None";
             let pendingTemplateSave = null;
             let pendingTemplateDelete = false;
+            let isApplyingTemplate = false; // Flag to prevent callbacks during template load
             
             // Refresh template list from server
             const refreshTemplateList = async () => {
@@ -99,10 +100,29 @@ app.registerExtension({
             
             const setWidgetValue = (widgetName, value) => {
                 const widget = node.widgets?.find(w => w.name === widgetName);
-                if (widget && widget.value !== value) {
-                    widget.value = value;
-                    if (widget.callback) {
-                        widget.callback(value);
+                if (!widget) return;
+                
+                // For BOOLEAN widgets, ensure proper value setting
+                if (widget.type === "toggle" || widgetName.includes("_switch_") || widgetName.startsWith("configure_") || widgetName.includes("enable_")) {
+                    // Force boolean conversion and update
+                    const boolValue = Boolean(value);
+                    
+                    // When applying template, always set the value to force visual update
+                    if (isApplyingTemplate || widget.value !== boolValue) {
+                        widget.value = boolValue;
+                        // Only trigger callback if not applying template
+                        if (widget.callback && !isApplyingTemplate) {
+                            widget.callback(boolValue);
+                        }
+                    }
+                } else {
+                    // For other widgets, normal assignment
+                    if (widget.value !== value) {
+                        widget.value = value;
+                        // Only trigger callback if not applying template
+                        if (widget.callback && !isApplyingTemplate) {
+                            widget.callback(value);
+                        }
                     }
                 }
             };
@@ -111,7 +131,11 @@ app.registerExtension({
                 if (!templateName || templateName === "None") return null;
                 
                 try {
-                    const response = await fetch(`/rvtools/loader_templates/${templateName}.json`);
+                    // Add cache-busting parameter to force fresh fetch
+                    const cacheBuster = new Date().getTime();
+                    const response = await fetch(`/rvtools/loader_templates/${templateName}.json?t=${cacheBuster}`, {
+                        cache: 'no-store'
+                    });
                     if (response.ok) {
                         return await response.json();
                     }
@@ -125,7 +149,11 @@ app.registerExtension({
                 const config = await loadTemplateConfig(templateName);
                 if (!config) return;
                 
-                // Reset ALL values to their defaults first to avoid leftover values
+                // Set flag to prevent callbacks during template application
+                isApplyingTemplate = true;
+                
+                try {
+                    // Reset ALL values to their defaults first to avoid leftover values
                 
                 // Model selection - reset to defaults
                 setWidgetValue("model_type", "Standard Checkpoint");
@@ -245,7 +273,9 @@ app.registerExtension({
                 // LoRA settings
                 if (config.lora_count !== undefined) setWidgetValue("lora_count", config.lora_count);
                 for (let i = 1; i <= 3; i++) {
-                    if (config[`lora_switch_${i}`] !== undefined) setWidgetValue(`lora_switch_${i}`, config[`lora_switch_${i}`]);
+                    if (config[`lora_switch_${i}`] !== undefined) {
+                        setWidgetValue(`lora_switch_${i}`, config[`lora_switch_${i}`]);
+                    }
                     if (config[`lora_name_${i}`] !== undefined) setWidgetValue(`lora_name_${i}`, config[`lora_name_${i}`]);
                     if (config[`lora_weight_${i}`] !== undefined) setWidgetValue(`lora_weight_${i}`, config[`lora_weight_${i}`]);
                 }
@@ -269,7 +299,15 @@ app.registerExtension({
                 if (config.gguf_name !== undefined) setWidgetValue("gguf_name", config.gguf_name);
                 
                 console.log(`✓ Template '${templateName}' applied`);
-                updateVisibility();
+                
+                } finally {
+                    // Always reset flag and update visibility, even if there's an error
+                    isApplyingTemplate = false;
+                    updateVisibility();
+                    
+                    // Force canvas redraw to ensure widget visuals are updated
+                    node.setDirtyCanvas(true, true);
+                }
             };
             
             const setWidgetVisible = (widgetName, visible) => {
@@ -555,6 +593,28 @@ app.registerExtension({
                 updateVisibility();
                 refreshTemplateList();
             }, 10);
+            
+            // Hook into onConfigure to reload template when workflow is loaded
+            const onConfigure = node.onConfigure;
+            node.onConfigure = function(info) {
+                if (onConfigure) {
+                    onConfigure.apply(this, arguments);
+                }
+                
+                // After workflow is configured, check if a template is selected and reload it
+                // Use longer delay to ensure ComfyUI has finished restoring all widget values
+                setTimeout(() => {
+                    const templateAction = getWidgetValue("template_action");
+                    const templateName = getWidgetValue("template_name");
+                    
+                    if (templateAction === "Load" && templateName && templateName !== "None") {
+                        console.log(`[SmartLoader+] Workflow loaded, reapplying template: ${templateName}`);
+                        applyTemplate(templateName);
+                    } else {
+                        updateVisibility();
+                    }
+                }, 250); // Increased delay to ensure workflow restoration is complete
+            };
             
             return r;
         };
