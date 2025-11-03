@@ -33,7 +33,7 @@
   "unet_name": "qwen_image_fp8_e4m3fn.safetensors",
   "clip_name1": "qwen_2.5_vl_7b_fp8_scaled.safetensors",
   "vae_name": "qwen_image_vae.safetensors",
-  "lora_switch_1": true,
+  "lora_switch_1": false,
   "lora_name_1": "Qwen-Image-Lightning-4steps-V1.0.safetensors",
   "lora_weight_1": 1.0,
   "lora_switch_2": true,

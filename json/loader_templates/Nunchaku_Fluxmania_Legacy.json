@@ -15,7 +15,7 @@
   "clip_count": "2",
   "clip_type": "flux",
   "clip_name1": "ViT-L-14-TEXT-detail-improved-hiT-GmP-TE-only-HF.safetensors",
-  "clip_name2": "t5xxl_fp8_e4m3fn.safetensors",
+  "clip_name2": "t5xxl_fp16.safetensors",
   "vae_source": "External",
   "vae_name": "flux_vae.safetensors",
   "resolution": "832x1216 (2:3 Flux, SDXL)",
