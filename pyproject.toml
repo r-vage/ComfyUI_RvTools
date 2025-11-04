@@ -1,45 +1,33 @@
 [project]
-name = "ComfyUI_RvTools"
+name = "ComfyUI_Eclipse"
 description = "ComfyUI custom nodes and utilities for workflow building, type conversions, checkpoint/pipe loaders and file utilities."
-version = "1.0.28"
+version = "1.0.29"
 license = {file = "LICENSE"} 
 
 authors = [
 	{ name = "r-vage" }
 ]
 
-keywords = ["ComfyUI","custom_nodes","workflow","conversion","combo","checkpoint loader","pipeline","save_generation_data","RvTools"]
+keywords = ["ComfyUI","custom_nodes","workflow","conversion","combo","checkpoint loader","pipeline","save_generation_data","Eclipse"]
 
 readme = "README.md"
 
-# classifiers = [
-#     # For OS-independent nodes (works on all operating systems)
-#     "Operating System :: OS Independent",
-#
-#     # OR for OS-specific nodes, specify the supported systems:
-#     "Operating System :: Microsoft :: Windows",  # Windows specific
-#     "Operating System :: POSIX :: Linux",  # Linux specific
-#     "Operating System :: MacOS",  # macOS specific
-#
-#     # GPU Accelerator support. Pick the ones that are supported by your extension.
-#     "Environment :: GPU :: NVIDIA CUDA",    # NVIDIA CUDA support
-#     "Environment :: GPU :: AMD ROCm",       # AMD ROCm support
-#     "Environment :: GPU :: Intel Arc",      # Intel Arc support
-#     "Environment :: NPU :: Huawei Ascend",  # Huawei Ascend support
-#     "Environment :: GPU :: Apple Metal",    # Apple Metal support
-# ]
+classifiers = [
+  "Operating System :: OS Independent",
+  # "Environment :: GPU :: NVIDIA CUDA",
+]
 
 dependencies = ["torch", "numpy", "Pillow", "opencv-python", "pilgram", "safetensors", "torchvision", "psutil", "requests", "PyYAML", "aiohttp"]
 
 [project.urls]
-Repository = "https://github.com/r-vage/ComfyUI_RvTools"
+Repository = "https://github.com/r-vage/ComfyUI_Eclipse"
 #  Used by Comfy Registry https://registry.comfy.org
-Documentation = "https://github.com/r-vage/ComfyUI_RvTools/wiki"
-"Bug Tracker" = "https://github.com/r-vage/ComfyUI_RvTools/issues"
+Documentation = "https://github.com/r-vage/ComfyUI_Eclipse/wiki"
+"Bug Tracker" = "https://github.com/r-vage/ComfyUI_Eclipse/issues"
 
 [tool.comfy]
 PublisherId = "rvage"
-DisplayName = "ComfyUI_RvTools"
+DisplayName = "ComfyUI_Eclipse"
 Icon = ""
 includes = [] 
 # "requires-comfyui" = ">=1.0.0"  # ComfyUI version compatibility
