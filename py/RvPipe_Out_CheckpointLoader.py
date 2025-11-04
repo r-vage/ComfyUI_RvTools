@@ -149,7 +149,7 @@ class RvPipe_Out_CheckpointLoader:
 
         return (model, clip, vae, output_latent, steps, cfg, sampler, scheduler, clip_skip,width, height, batch_size, model_name, vae_name)
 
-NODE_NAME = 'Pipe Out Checkpoint Loader [RvTools]'
+NODE_NAME = 'Pipe Out Checkpoint Loader [Eclipse]'
 NODE_DESC = 'Pipe Out Checkpoint Loader'
 
 NODE_CLASS_MAPPINGS = {

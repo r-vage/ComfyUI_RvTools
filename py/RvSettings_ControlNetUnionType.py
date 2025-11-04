@@ -52,7 +52,7 @@ class RvSettings_ControlNetUnionType:
             control_net.set_extra_arg("control_type", [])
         return (control_net,)
 
-NODE_NAME = 'ControlNet Set Union Types (Flux) [RvTools]'
+NODE_NAME = 'ControlNet Set Union Types (Flux) [Eclipse]'
 NODE_DESC = 'ControlNet Set Union Types (Flux)'
 
 NODE_CLASS_MAPPINGS = {

@@ -43,7 +43,7 @@ class RvFolder_AddFolder:
         new_path = os.path.join(path, folder_name)
         return (new_path,)
 
-NODE_NAME = 'Add Folder [RvTools]'
+NODE_NAME = 'Add Folder [Eclipse]'
 NODE_DESC = 'Add Folder'
 
 NODE_CLASS_MAPPINGS = {

@@ -36,7 +36,7 @@ class RvSettings_CustomSize:
         # Returns the validated custom width and height for workflow use.
         return (width, height)
 
-NODE_NAME = 'Custom Size [RvTools]'
+NODE_NAME = 'Custom Size [Eclipse]'
 NODE_DESC = 'Custom Size'
 
 NODE_CLASS_MAPPINGS = {

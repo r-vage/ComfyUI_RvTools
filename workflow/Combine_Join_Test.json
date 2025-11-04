@@ -629,7 +629,7 @@
     },
     {
       "id": 31,
-      "type": "Seamless Join Video Clips [RvTools]",
+      "type": "Seamless Join Video Clips [Eclipse]",
       "pos": [
         1501,
         291
@@ -699,9 +699,9 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI-RvTools",
+        "aux_id": "r-vage/ComfyUI_Eclipse",
         "ver": "6969f025f468096d289cbd89afdd995eb083e8ad",
-        "Node name for S&R": "Seamless Join Video Clips [RvTools]"
+        "Node name for S&R": "Seamless Join Video Clips [Eclipse]"
       },
       "widgets_values": [
         81,
@@ -715,7 +715,7 @@
     },
     {
       "id": 34,
-      "type": "Combine Video Clips [RvTools]",
+      "type": "Combine Video Clips [Eclipse]",
       "pos": [
         1501,
         1131
@@ -782,9 +782,9 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI_RvTools",
+        "aux_id": "r-vage/ComfyUI_Eclipse",
         "ver": "80934985ff7d068974d8da434c4bbd529fab4d44",
-        "Node name for S&R": "Combine Video Clips [RvTools]"
+        "Node name for S&R": "Combine Video Clips [Eclipse]"
       },
       "widgets_values": [
         81,
@@ -798,7 +798,7 @@
     },
     {
       "id": 27,
-      "type": "VC-Filename Generator I [RvTools]",
+      "type": "VC-Filename Generator I [Eclipse]",
       "pos": [
         901,
         291
@@ -886,10 +886,10 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI-RvTools",
+        "aux_id": "r-vage/ComfyUI_Eclipse",
         "ver": "994eaf2129f473afc42eb42c160e7e7cec644dd6",
-        "Node name for S&R": "VC-Filename Generator I [RvTools]",
-        "cnr_id": "ComfyUI-RvTools"
+        "Node name for S&R": "VC-Filename Generator I [Eclipse]",
+        "cnr_id": "ComfyUI_Eclipse"
       },
       "widgets_values": [
         "D:\\AI\\ComfyUI_windows_portable\\ComfyUI\\output\\WAN\\2025-08-28\\batch_1\\Video",
@@ -907,7 +907,7 @@
     },
     {
       "id": 7,
-      "type": "VC-Filename Generator II [RvTools]",
+      "type": "VC-Filename Generator II [Eclipse]",
       "pos": [
         901,
         1131
@@ -1005,10 +1005,10 @@
       ],
       "title": "VC-Filename Generator II (Combine)",
       "properties": {
-        "aux_id": "r-vage/ComfyUI-RvTools",
+        "aux_id": "r-vage/ComfyUI_Eclipse",
         "ver": "ba41d8fedbd635e1961821b5c321a19d1fb3b40d",
-        "Node name for S&R": "VC-Filename Generator II [RvTools]",
-        "cnr_id": "ComfyUI-RvTools",
+        "Node name for S&R": "VC-Filename Generator II [Eclipse]",
+        "cnr_id": "ComfyUI_Eclipse",
         "widget_ue_connectable": {}
       },
       "widgets_values": [
@@ -1027,7 +1027,7 @@
     },
     {
       "id": 37,
-      "type": "Pipe Out VC Name Generator [RvTools]",
+      "type": "Pipe Out VC Name Generator [Eclipse]",
       "pos": [
         1211,
         291
@@ -1111,9 +1111,9 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI_RvTools",
+        "aux_id": "r-vage/ComfyUI_Eclipse",
         "ver": "80934985ff7d068974d8da434c4bbd529fab4d44",
-        "Node name for S&R": "Pipe Out VC Name Generator [RvTools]"
+        "Node name for S&R": "Pipe Out VC Name Generator [Eclipse]"
       },
       "widgets_values": [],
       "color": "#4e4e4e",
@@ -1122,7 +1122,7 @@
     },
     {
       "id": 29,
-      "type": "Add Folder [RvTools]",
+      "type": "Add Folder [Eclipse]",
       "pos": [
         1211,
         1341
@@ -1162,10 +1162,10 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI-RvTools",
+        "aux_id": "r-vage/ComfyUI_Eclipse",
         "ver": "994eaf2129f473afc42eb42c160e7e7cec644dd6",
-        "Node name for S&R": "Add Folder [RvTools]",
-        "cnr_id": "ComfyUI-RvTools"
+        "Node name for S&R": "Add Folder [Eclipse]",
+        "cnr_id": "ComfyUI_Eclipse"
       },
       "widgets_values": [
         "combined\\vc_combined"
@@ -1544,7 +1544,7 @@
     },
     {
       "id": 38,
-      "type": "Pipe Out VC Name Generator [RvTools]",
+      "type": "Pipe Out VC Name Generator [Eclipse]",
       "pos": [
         1211,
         1131
@@ -1630,9 +1630,9 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI_RvTools",
+        "aux_id": "r-vage/ComfyUI_Eclipse",
         "ver": "80934985ff7d068974d8da434c4bbd529fab4d44",
-        "Node name for S&R": "Pipe Out VC Name Generator [RvTools]"
+        "Node name for S&R": "Pipe Out VC Name Generator [Eclipse]"
       },
       "widgets_values": [],
       "color": "#4e4e4e",

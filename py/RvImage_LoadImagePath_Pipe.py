@@ -490,7 +490,7 @@ class RvImage_LoadImagePath_Pipe:
 
 		return True
 
-NODE_NAME = 'Load Image from Path (Metadata Pipe) [RvTools]'
+NODE_NAME = 'Load Image from Path (Metadata Pipe) [Eclipse]'
 NODE_DESC = 'Load Image from Path (Metadata Pipe)'
 
 NODE_CLASS_MAPPINGS = {

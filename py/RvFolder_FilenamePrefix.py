@@ -73,7 +73,7 @@ class RvFolder_FilenamePrefix:
             new_path = prefix
         return (new_path,)
 
-NODE_NAME = 'Add Filename Prefix [RvTools]'
+NODE_NAME = 'Add Filename Prefix [Eclipse]'
 NODE_DESC = 'Add Filename Prefix'
 
 NODE_CLASS_MAPPINGS = {

@@ -34,7 +34,7 @@ class RvText_ReplaceString:
         replaced = re.sub(r"[\r\n]+", " ", replaced)
         return (replaced,)
 
-NODE_NAME = 'Replace String [RvTools]'
+NODE_NAME = 'Replace String [Eclipse]'
 NODE_DESC = 'Replace String'
 
 NODE_CLASS_MAPPINGS = {

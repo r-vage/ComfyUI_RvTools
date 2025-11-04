@@ -14,11 +14,11 @@
 */
 
 import { app } from "../../scripts/app.js";
-import { setupAnyTypeHandling } from "./rvtools-any-type-handler.js";
+import { setupAnyTypeHandling } from "./eclipse-any-type-handler.js";
 
 // Type mappings for each conversion node
 const CONVERSION_NODES = {
-    "Convert Primitive [RvTools]": {
+    "Convert Primitive [Eclipse]": {
         widgetName: "convert_to",
         typeMap: {
             "STRING": { type: "STRING", name: "STRING" },
@@ -29,7 +29,7 @@ const CONVERSION_NODES = {
         defaultType: "*",
         useAnyTypeHandling: true
     },
-    "Convert To Batch [RvTools]": {
+    "Convert To Batch [Eclipse]": {
         widgetName: "convert_to",
         typeMap: {
             "IMAGE_LIST_TO_BATCH": { type: "IMAGE", name: "IMAGE" },
@@ -38,7 +38,7 @@ const CONVERSION_NODES = {
         defaultType: "*",
         useAnyTypeHandling: true
     },
-    "Convert to List [RvTools]": {
+    "Convert to List [Eclipse]": {
         widgetName: "convert_to",
         typeMap: {
             "IMAGE_BATCH_TO_LIST": { type: "IMAGE", name: "IMAGE" },
@@ -47,7 +47,7 @@ const CONVERSION_NODES = {
         defaultType: "*",
         useAnyTypeHandling: false
     },
-    "Image Convert [RvTools]": {
+    "Image Convert [Eclipse]": {
         // No widget-based type changes - always IMAGE
         fixedType: { type: "IMAGE", name: "IMAGE" },
         useAnyTypeHandling: false
@@ -116,7 +116,7 @@ function updateOutputTypeFromWidget(node, config) {
 }
 
 app.registerExtension({
-    name: "RvTools.conversionNodes",
+    name: "Eclipse.conversionNodes",
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         const config = CONVERSION_NODES[nodeData.name];
         if (!config) return;

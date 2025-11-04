@@ -39,7 +39,7 @@ class RvLogic_Integer:
             value = 1
         return (int(value),)
 
-NODE_NAME = 'Integer [RvTools]'
+NODE_NAME = 'Integer [Eclipse]'
 NODE_DESC = 'Integer'
 
 NODE_CLASS_MAPPINGS = {

@@ -162,7 +162,7 @@ class RvLoader_Checkpoint_Loader_Small:
             # graph execution halts and surfaces the underlying error.
             raise RuntimeError(f"Checkpoint loading failed: {e}") from e
 
-NODE_NAME = 'Checkpoint Loader Small [RvTools]'
+NODE_NAME = 'Checkpoint Loader Small [Eclipse]'
 NODE_DESC = 'Checkpoint Loader Small'
 
 NODE_CLASS_MAPPINGS = {

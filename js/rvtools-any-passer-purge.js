@@ -14,12 +14,12 @@
 */
 
 import { app } from "../../scripts/app.js";
-import { setupAnyTypeHandling } from "./rvtools-any-type-handler.js";
+import { setupAnyTypeHandling } from "./eclipse-any-type-handler.js";
 
 app.registerExtension({
-    name: "RvTools.RouterAnyPasserPurge",
+    name: "Eclipse.RouterAnyPasserPurge",
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
-        if (nodeData.name === "Any Passer Purge [RvTools]") {
+        if (nodeData.name === "Any Passer Purge [Eclipse]") {
             const onNodeCreated = nodeType.prototype.onNodeCreated;
             nodeType.prototype.onNodeCreated = function () {
                 if (onNodeCreated) {

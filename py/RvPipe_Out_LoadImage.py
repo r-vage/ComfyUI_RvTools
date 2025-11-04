@@ -112,7 +112,7 @@ class RvPipe_Out_LoadImage:
         return (pipe, width, height, text_pos, text_neg, steps, cfg, sampler, scheduler, seed, model_name, path)
 
 
-NODE_NAME = 'Pipe Out Load Image (Metadata Pipe) [RvTools]'
+NODE_NAME = 'Pipe Out Load Image (Metadata Pipe) [Eclipse]'
 NODE_DESC = 'Pipe Out Load Image (Metadata Pipe)'
 
 NODE_CLASS_MAPPINGS = {

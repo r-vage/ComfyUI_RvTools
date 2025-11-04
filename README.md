@@ -1,8 +1,8 @@
-# ComfyUI-RvTools
+# ComfyUI_Eclipse
 
-ComfyUI-RvTools is a collection of custom nodes, helpers and utilities for ComfyUI designed to make workflow building easier and more reliable. It includes convenience nodes for loading checkpoints and pipelines, type conversions, folder and filename helpers, simple image utilities, logic and flow helpers, and small toolkits for working with VAE/CLIP and latents.
+ComfyUI_Eclipse is a collection of custom nodes, helpers and utilities for ComfyUI designed to make workflow building easier and more reliable. It includes convenience nodes for loading checkpoints and pipelines, type conversions, folder and filename helpers, simple image utilities, logic and flow helpers, and small toolkits for working with VAE/CLIP and latents.
 
-Note: Workflows created with RvTools_v2 are NOT compatible with this version. This release contains a substantial cleanup and many improvements.
+Note: Workflows created with Eclipse_v2 are NOT compatible with this version. This release contains a substantial cleanup and many improvements.
 
 ## Documentation
 
@@ -48,16 +48,16 @@ This project is licensed under the Apache License 2.0 (see `LICENSE`). Check the
 
 ## Beginner-friendly installation
 
-The easiest way to install ComfyUI-RvTools is to place it in ComfyUI's `custom_nodes` folder so ComfyUI will discover the nodes automatically.
+The easiest way to install ComfyUI_Eclipse is to place it in ComfyUI's `custom_nodes` folder so ComfyUI will discover the nodes automatically.
 
 1. Locate your ComfyUI installation folder.
 2. Inside ComfyUI, find (or create) the `custom_nodes` folder.
-3. Copy the entire `ComfyUI_RvTools` folder into `custom_nodes` so the tree looks like:
+3. Copy the entire `ComfyUI_Eclipse` folder into `custom_nodes` so the tree looks like:
 
 ```
 ComfyUI/
   custom_nodes/
-    ComfyUI_RvTools/
+    ComfyUI_Eclipse/
       py/
       core/
       README.md
@@ -68,17 +68,17 @@ Or, clone directly into `custom_nodes`:
 
 ```powershell
 # from your ComfyUI directory (PowerShell)
-git clone https://github.com/r-vage/ComfyUI_RvTools custom_nodes/ComfyUI_RvTools
+git clone https://github.com/r-vage/ComfyUI_Eclipse custom_nodes/ComfyUI_Eclipse
 ```
 
 4. Install any optional Python dependencies required by specific nodes. From the repository root (or your ComfyUI root), run:
 
 ```powershell
 # optional - only if your ComfyUI environment is missing packages from requirements.txt
-pip install -r custom_nodes/ComfyUI_RvTools/requirements.txt
+pip install -r custom_nodes/ComfyUI_Eclipse/requirements.txt
 
 # For ComfyUI portable installations:
-python_embeded\python.exe -m pip install -r custom_nodes/ComfyUI_RvTools/requirements.txt
+python_embeded\python.exe -m pip install -r custom_nodes/ComfyUI_Eclipse/requirements.txt
 ```
 
 Common dependencies referenced by nodes include: torch, numpy, Pillow, opencv-python, piexif and others. ComfyUI itself usually provides the main ML stack (torch, torchvision, safetensors), but if you see errors you may need to install missing packages.
@@ -128,7 +128,7 @@ Tips:
 
 The Smart Loader series provides modern, flexible model loading with support for multiple formats and quantization methods.
 
-### Smart Loader Plus [RvTools]
+### Smart Loader Plus [Eclipse]
 The full-featured loader for complex workflows:
 
 - **Multi-Format Support:** Standard Checkpoints, UNet models, Nunchaku quantized Flux/Qwen (SVDQuant INT4/FP4/FP8), and GGUF quantized models.
@@ -145,7 +145,7 @@ The full-featured loader for complex workflows:
   - GGUF: Dequantization dtype, patch dtype, device placement
 - **Outputs:** Single pipe containing model, CLIP, VAE, latent, dimensions, batch size, sampler settings, and metadata.
 
-### Smart Loader [RvTools]
+### Smart Loader [Eclipse]
 Simplified loader for streamlined workflows:
 
 - **Same Format Support:** Standard Checkpoints, UNet, Nunchaku Flux/Qwen, GGUF models.
@@ -206,9 +206,9 @@ If opening issues, include the ComfyUI version, Python version, torch/CUDA detai
 
 ## Node categories overview
 
-This project groups nodes into categories to make them easier to find in ComfyUI. Below is a short summary of the categories provided by ComfyUI-RvTools:
+This project groups nodes into categories to make them easier to find in ComfyUI. Below is a short summary of the categories provided by ComfyUI_Eclipse:
 
-- **RvTools (Main)** — Top-level group for general RvTools nodes and primary entry points. Contains high-level helpers and commonly used nodes.
+- **Eclipse (Main)** — Top-level group for general Eclipse nodes and primary entry points. Contains high-level helpers and commonly used nodes.
 - **Loader** — Smart loaders and checkpoint loaders (model / VAE / CLIP / latent). Advanced loaders with multi-format support including Standard Checkpoints, UNet, Nunchaku quantized models, and GGUF formats.
 - **Conversion** — Type conversion helpers (Any → Float/Integer/String/Combo, lists ↔ batches, image/mask conversions, string merging, pipe concatenation, etc.).
 - **Folder** — Nodes for creating and managing project folders, filename prefixing, and smart folder utilities with placeholder support to organize outputs.
@@ -333,7 +333,7 @@ General utility nodes for LoRA management, debugging, resource management, and w
 - RAM Cleanup - Manual RAM cleanup
 - VRAM Cleanup - Manual VRAM cleanup
 
-## Node Spotlight: Save Images [RvTools]
+## Node Spotlight: Save Images [Eclipse]
 
 The **Save Images** node is a highly advanced and flexible output node designed for robust image saving in ComfyUI workflows, offering extensive customization and metadata support.
 
@@ -373,9 +373,9 @@ When the `save_generation_data` option is enabled:
 - Extracts and includes short SHA-256 hashes for models, Loras, and embeddings in Civitai-compatible format.
 - Supports prompt removal for privacy and Lora token appending for full traceability.
 
-## Node Spotlight: Smart Loader Plus [RvTools]
+## Node Spotlight: Smart Loader Plus [Eclipse]
 
-The **Smart Loader Plus** is the flagship model loader for ComfyUI-RvTools, representing the next generation of checkpoint loading with comprehensive multi-format support, advanced configuration options, and intelligent workflow integration. It's designed for power users who need maximum flexibility and control over their model loading pipeline.
+The **Smart Loader Plus** is the flagship model loader for ComfyUI_Eclipse, representing the next generation of checkpoint loading with comprehensive multi-format support, advanced configuration options, and intelligent workflow integration. It's designed for power users who need maximum flexibility and control over their model loading pipeline.
 
 ### Outstanding Abilities
 
@@ -489,7 +489,7 @@ The JavaScript frontend dynamically shows/hides options based on selections:
 
 #### Workflow Integration
 - **Single-Pipe Architecture:** One connection carries all generation data
-- **Pipe Out Compatibility:** Works with all RvTools Pipe Out nodes for component extraction
+- **Pipe Out Compatibility:** Works with all Eclipse Pipe Out nodes for component extraction
 - **Context Pipe Support:** Directly feeds into Context (Image) and Context (Video) nodes
 - **Metadata Preservation:** Model/VAE names preserved for Save Images and generation tracking
 
@@ -521,7 +521,7 @@ Graceful fallbacks ensure workflows remain portable even without optional extens
 
 The Smart Loader Plus represents the pinnacle of flexible, powerful model loading in ComfyUI, designed to handle everything from simple checkpoint loading to complex multi-model quantized workflows with ease.
 
-## Node Spotlight: Smart Prompt [RvTools]
+## Node Spotlight: Smart Prompt [Eclipse]
 
 The **Smart Prompt** node is an intuitive prompt building system that transforms text file collections into organized dropdown menus, enabling rapid prompt composition and experimentation with reproducible results.
 
@@ -566,7 +566,7 @@ Each dropdown offers three selection modes:
 
 Users can easily create custom prompt libraries:
 
-1. **Navigate to the `prompt/` directory** in the ComfyUI_RvTools installation
+1. **Navigate to the `prompt/` directory** in the ComfyUI_Eclipse installation
 2. **Choose or create a subfolder** (e.g., `subjects/`, `settings/`, or create your own like `styles/`)
 3. **Create a numbered text file** (e.g., `1_my_prompts.txt`, `2_lighting_styles.txt`)
 4. **Add one option per line:**
@@ -613,7 +613,7 @@ Explore effective prompting by browsing pre-configured options and understanding
 
 The Smart Prompt node transforms prompt engineering from manual typing to curated selection, dramatically speeding up workflow iteration and experimentation.
 
-## Node Spotlight: Wildcard Processor [RvTools]
+## Node Spotlight: Wildcard Processor [Eclipse]
 
 The **Wildcard Processor** node is a powerful prompt expansion system that enables dynamic, randomized prompt generation through template-based wildcards, supporting nested expansions, weighted selections, and advanced pattern matching for infinite prompt variations.
 
@@ -765,9 +765,9 @@ Generate varied images in batch workflows while maintaining structural consisten
 
 The Wildcard Processor transforms static prompts into dynamic templates, enabling systematic exploration of prompt space and effortless generation of diverse, reproducible variations.
 
-## The Pipe Ecosystem of [RvTools]
+## The Pipe Ecosystem of [Eclipse]
 
-The pipe ecosystem in ComfyUI-RvTools is a sophisticated data interchange system designed to standardize and simplify the flow of complex data structures through ComfyUI workflows. Pipes act as containers that bundle related parameters, models, and settings into single, manageable objects, eliminating the need for dozens of individual node connections.
+The pipe ecosystem in ComfyUI_Eclipse is a sophisticated data interchange system designed to standardize and simplify the flow of complex data structures through ComfyUI workflows. Pipes act as containers that bundle related parameters, models, and settings into single, manageable objects, eliminating the need for dozens of individual node connections.
 
 ### Core Concept
 
@@ -778,29 +778,29 @@ A pipe is fundamentally a Python dictionary that encapsulates multiple related p
 #### Context Pipes
 Context pipes are the foundation of the ecosystem, holding the core components of a generation pipeline:
 
-- **Context (Image) (`Context (Image) [RvTools]`):** Standard image generation context containing model, CLIP, VAE, conditioning (positive/negative), latent, sampler/scheduler, generation parameters (steps, cfg, seed, dimensions), and text prompts. Ideal for standard image generation workflows.
-- **Context (Video) (`Context (Video) [RvTools]`):** Extended context for video workflows, adding video-specific parameters like frame rate, frame load cap, skip frames, select every nth frame, and audio/image inputs/outputs. Designed for video generation pipelines.
-- **Context (WanVideo) (`Context (WanVideo) [RvTools]`):** Specialized wrapper for WAN Video Workflows, supporting WANVIDEOMODEL and WANTEXTENCODER types with additional video processing parameters for WAN-based video generation.
+- **Context (Image) (`Context (Image) [Eclipse]`):** Standard image generation context containing model, CLIP, VAE, conditioning (positive/negative), latent, sampler/scheduler, generation parameters (steps, cfg, seed, dimensions), and text prompts. Ideal for standard image generation workflows.
+- **Context (Video) (`Context (Video) [Eclipse]`):** Extended context for video workflows, adding video-specific parameters like frame rate, frame load cap, skip frames, select every nth frame, and audio/image inputs/outputs. Designed for video generation pipelines.
+- **Context (WanVideo) (`Context (WanVideo) [Eclipse]`):** Specialized wrapper for WAN Video Workflows, supporting WANVIDEOMODEL and WANTEXTENCODER types with additional video processing parameters for WAN-based video generation.
 
 #### Generation Data Pipes
 These pipes focus on sampler and generation settings:
 
-- **Generation Data (`Generation Data [RvTools]`):** Contains sampler/scheduler names, steps, cfg, seed, dimensions, text prompts, model/VAE names, LoRA names, denoise strength, and CLIP skip settings. Perfect for metadata tracking and parameter preservation.
+- **Generation Data (`Generation Data [Eclipse]`):** Contains sampler/scheduler names, steps, cfg, seed, dimensions, text prompts, model/VAE names, LoRA names, denoise strength, and CLIP skip settings. Perfect for metadata tracking and parameter preservation.
 
 #### Sampler Settings Pipes
 Specialized pipes for different sampling configurations:
 
-- **Sampler Settings (`Sampler Settings [RvTools]`):** Comprehensive sampler configuration with sampler/scheduler, steps, CFG, seed, and denoise parameters.
-- **Sampler Settings (Small) (`Sampler Settings (Small) [RvTools]`):** Minimal sampler configuration with basic sampler/scheduler, steps, and CFG.
-- **Sampler Settings (Small+Seed) (`Sampler Settings (Small+Seed) [RvTools]`):** Minimal configuration with added seed control.
-- **Sampler Settings (Seed) (`Sampler Settings (Seed) [RvTools]`):** Full sampler settings with integrated seed management.
-- **Sampler Settings (NI) (`Sampler Settings (NI) [RvTools]`):** Noise Injection Parameters with generation settings (no seed).
-- **Sampler Settings (NI+Seed) (`Sampler Settings (NI+Seed) [RvTools]`):** Noise Injection Parameters with seed and generation settings.
+- **Sampler Settings (`Sampler Settings [Eclipse]`):** Comprehensive sampler configuration with sampler/scheduler, steps, CFG, seed, and denoise parameters.
+- **Sampler Settings (Small) (`Sampler Settings (Small) [Eclipse]`):** Minimal sampler configuration with basic sampler/scheduler, steps, and CFG.
+- **Sampler Settings (Small+Seed) (`Sampler Settings (Small+Seed) [Eclipse]`):** Minimal configuration with added seed control.
+- **Sampler Settings (Seed) (`Sampler Settings (Seed) [Eclipse]`):** Full sampler settings with integrated seed management.
+- **Sampler Settings (NI) (`Sampler Settings (NI) [Eclipse]`):** Noise Injection Parameters with generation settings (no seed).
+- **Sampler Settings (NI+Seed) (`Sampler Settings (NI+Seed) [Eclipse]`):** Noise Injection Parameters with seed and generation settings.
 
 #### Multi-Channel Pipes
 Flexible any-type data pipes for custom workflows:
 
-- **Pipe 12CH Any (`Pipe 12CH Any [RvTools]`):** 12-channel any-type pipe for complex custom workflows requiring multiple arbitrary data streams.
+- **Pipe 12CH Any (`Pipe 12CH Any [Eclipse]`):** 12-channel any-type pipe for complex custom workflows requiring multiple arbitrary data streams.
 
 ### Key Abilities
 
@@ -829,13 +829,13 @@ Flexible any-type data pipes for custom workflows:
 
 Specialized nodes extract specific data from pipes:
 
-- **Pipe Out Checkpoint Loader (`Pipe Out Checkpoint Loader [RvTools]`):** Extracts model, CLIP, VAE, latent, dimensions, batch size, and model/VAE names from checkpoint loader pipes.
-- **Pipe Out Smart Folder (`Pipe Out Smart Folder [RvTools]`):** Extracts smart folder configuration including paths, dimensions, and placeholder data.
-- **Pipe Out Sampler Settings (`Pipe Out Sampler Settings [RvTools]`):** Extracts all sampler and generation parameters (sampler, scheduler, steps, CFG, seed, denoise, etc.).
-- **Pipe Out Load Directory Settings (`Pipe Out Load Directory Settings [RvTools]`):** Extracts directory settings for output path management.
-- **Pipe Out Load Image (`Pipe Out Load Image [RvTools]`):** Extracts image data and associated metadata from image loading pipes.
-- **Pipe Out VCNameGen (`Pipe Out VCNameGen [RvTools]`):** Extracts video/checkpoint name generator configuration.
-- **Pipe Out WanVideo Setup (`Pipe Out WanVideo Setup [RvTools]`):** Extracts WanVideo workflow setup parameters.
+- **Pipe Out Checkpoint Loader (`Pipe Out Checkpoint Loader [Eclipse]`):** Extracts model, CLIP, VAE, latent, dimensions, batch size, and model/VAE names from checkpoint loader pipes.
+- **Pipe Out Smart Folder (`Pipe Out Smart Folder [Eclipse]`):** Extracts smart folder configuration including paths, dimensions, and placeholder data.
+- **Pipe Out Sampler Settings (`Pipe Out Sampler Settings [Eclipse]`):** Extracts all sampler and generation parameters (sampler, scheduler, steps, CFG, seed, denoise, etc.).
+- **Pipe Out Load Directory Settings (`Pipe Out Load Directory Settings [Eclipse]`):** Extracts directory settings for output path management.
+- **Pipe Out Load Image (`Pipe Out Load Image [Eclipse]`):** Extracts image data and associated metadata from image loading pipes.
+- **Pipe Out VCNameGen (`Pipe Out VCNameGen [Eclipse]`):** Extracts video/checkpoint name generator configuration.
+- **Pipe Out WanVideo Setup (`Pipe Out WanVideo Setup [Eclipse]`):** Extracts WanVideo workflow setup parameters.
 
 ### Practical Applications
 

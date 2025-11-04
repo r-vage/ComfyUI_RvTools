@@ -13,7 +13,7 @@
 
 import { app } from "../../scripts/app.js";
 
-const canvasUtilsName = "RvTools.canvasUtils";
+const canvasUtilsName = "Eclipse.canvasUtils";
 
 // Track if the new API has been called
 let newAPIAvailable = false;

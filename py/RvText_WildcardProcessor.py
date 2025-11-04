@@ -16,7 +16,7 @@
 # - populate: Expands all wildcards and options. Seed controls output - change seed for new output, fix seed for consistent output
 # - fixed: Uses populated_text as-is, ignoring wildcards
 #
-# Special seed values (from rvtools-seed.js extension):
+# Special seed values (from eclipse-seed.js extension):
 #   -1: Randomize each time (generates new random seed)
 #   -2: Increment from last seed
 #   -3: Decrement from last seed
@@ -129,7 +129,7 @@ class RvText_WildcardProcessor:
             }
 
         except Exception as e:
-            logging.error(f"[RvTools Wildcard] Error in execute: {e}")
+            logging.error(f"[Eclipse Wildcard] Error in execute: {e}")
             return {
                 "ui": {"text": [populated_text]},
                 "result": (populated_text,)
@@ -145,7 +145,7 @@ class RvText_WildcardProcessor:
             )
 
         wildcard_load(path)
-        logging.info(f"[RvTools Wildcard] Loaded wildcards from: {path}")
+        logging.info(f"[Eclipse Wildcard] Loaded wildcards from: {path}")
 
 
 # Ensure wildcard engine is initialized on import
@@ -157,7 +157,7 @@ if os.path.exists(_wildcard_path):
     RvText_WildcardProcessor.load_wildcard_path(_wildcard_path)
 
 
-NODE_NAME = 'Wildcard Processor [RvTools]'
+NODE_NAME = 'Wildcard Processor [Eclipse]'
 NODE_DESC = 'Wildcard Processor'
 
 NODE_CLASS_MAPPINGS = {

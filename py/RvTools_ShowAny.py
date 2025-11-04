@@ -30,7 +30,7 @@ except ImportError:
 
 any = AnyType("*")
 
-class RvTools_ShowAny:
+class Eclipse_ShowAny:
     """
     Display any type of data as formatted text output.
     Accepts any input type and converts it to readable text format.
@@ -336,11 +336,11 @@ class RvTools_ShowAny:
             }
 
 
-NODE_NAME = 'Show Any [RvTools]'
+NODE_NAME = 'Show Any [Eclipse]'
 NODE_DESC = 'Show Any'
 
 NODE_CLASS_MAPPINGS = {
-   NODE_NAME: RvTools_ShowAny
+   NODE_NAME: Eclipse_ShowAny
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {

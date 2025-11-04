@@ -71,7 +71,7 @@
     },
     {
       "id": 25,
-      "type": "Preview Image [RvTools]",
+      "type": "Preview Image [Eclipse]",
       "pos": [
         1221,
         181
@@ -109,10 +109,10 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI-RvTools",
+        "aux_id": "r-vage/ComfyUI_Eclipse",
         "ver": "cac349590dafec35997fc4aa2a937567a2fa37fe",
-        "Node name for S&R": "Preview Image [RvTools]",
-        "cnr_id": "ComfyUI-RvTools"
+        "Node name for S&R": "Preview Image [Eclipse]",
+        "cnr_id": "ComfyUI_Eclipse"
       },
       "widgets_values": [
         -1
@@ -463,7 +463,7 @@
     },
     {
       "id": 41,
-      "type": "Image Resolution [RvTools]",
+      "type": "Image Resolution [Eclipse]",
       "pos": [
         72,
         632
@@ -505,9 +505,9 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI-RvTools",
+        "aux_id": "r-vage/ComfyUI_Eclipse",
         "ver": "9ba4549fa8749be80846fa13d2aac2857b4ae3f4",
-        "Node name for S&R": "Image Resolution [RvTools]"
+        "Node name for S&R": "Image Resolution [Eclipse]"
       },
       "widgets_values": [
         "832x1216 (2:3 Flux, SDXL)"
@@ -678,7 +678,7 @@
     },
     {
       "id": 47,
-      "type": "Merge Strings [RvTools]",
+      "type": "Merge Strings [Eclipse]",
       "pos": [
         21,
         891
@@ -751,7 +751,7 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI-RvTools",
+        "aux_id": "r-vage/ComfyUI_Eclipse",
         "ver": "9ba4549fa8749be80846fa13d2aac2857b4ae3f4"
       },
       "widgets_values": [
@@ -805,7 +805,7 @@
     },
     {
       "id": 50,
-      "type": "Smart Prompt [RvTools]",
+      "type": "Smart Prompt [Eclipse]",
       "pos": [
         -1099,
         461
@@ -1819,9 +1819,9 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI_RvTools",
+        "aux_id": "r-vage/ComfyUI_Eclipse",
         "ver": "a206f755375121efdd1f709db82162ea1be71c1a",
-        "Node name for S&R": "Smart Prompt [RvTools]"
+        "Node name for S&R": "Smart Prompt [Eclipse]"
       },
       "widgets_values": [
         "subjects",
@@ -1943,7 +1943,7 @@
     },
     {
       "id": 51,
-      "type": "Smart Prompt [RvTools]",
+      "type": "Smart Prompt [Eclipse]",
       "pos": [
         -729,
         461
@@ -2957,9 +2957,9 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI_RvTools",
+        "aux_id": "r-vage/ComfyUI_Eclipse",
         "ver": "a206f755375121efdd1f709db82162ea1be71c1a",
-        "Node name for S&R": "Smart Prompt [RvTools]"
+        "Node name for S&R": "Smart Prompt [Eclipse]"
       },
       "widgets_values": [
         "settings",
@@ -3081,7 +3081,7 @@
     },
     {
       "id": 52,
-      "type": "Smart Prompt [RvTools]",
+      "type": "Smart Prompt [Eclipse]",
       "pos": [
         -359,
         461
@@ -4095,9 +4095,9 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI_RvTools",
+        "aux_id": "r-vage/ComfyUI_Eclipse",
         "ver": "a206f755375121efdd1f709db82162ea1be71c1a",
-        "Node name for S&R": "Smart Prompt [RvTools]"
+        "Node name for S&R": "Smart Prompt [Eclipse]"
       },
       "widgets_values": [
         "environment",

@@ -31,7 +31,7 @@ class RvRouter_Any_Passer:
     def passthrough(self, input: object) -> tuple:
         return (input,)
 
-NODE_NAME = 'Any Passer [RvTools]'
+NODE_NAME = 'Any Passer [Eclipse]'
 NODE_DESC = 'Any Passer'
 
 NODE_CLASS_MAPPINGS = {

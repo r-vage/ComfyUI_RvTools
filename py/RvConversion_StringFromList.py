@@ -73,7 +73,7 @@ class RvConversion_StringFromList:
                 item_list.append("")
         return (item_list, length, wraps_list)
 
-NODE_NAME = 'String from List [RvTools]'
+NODE_NAME = 'String from List [Eclipse]'
 NODE_DESC = 'String from List'
 
 NODE_CLASS_MAPPINGS = {

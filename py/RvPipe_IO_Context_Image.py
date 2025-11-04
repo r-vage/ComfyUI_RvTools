@@ -145,7 +145,7 @@ class RvPipe_IO_Context_Image:
         # Return the updated pipe and all individual values
         return get_context_return_tuple(ctx)
 
-NODE_NAME = 'Context Image [RvTools]'
+NODE_NAME = 'Context Image [Eclipse]'
 NODE_DESC = 'Context Image'
 
 NODE_CLASS_MAPPINGS = {

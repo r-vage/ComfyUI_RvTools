@@ -139,7 +139,7 @@ class RvPipe_IO_Sampler_Settings:
         ctx = new_context(pipe, **kwargs)
         return get_context_return_tuple(ctx)
 
-NODE_NAME = 'Pipe IO Sampler Settings [RvTools]'
+NODE_NAME = 'Pipe IO Sampler Settings [Eclipse]'
 NODE_DESC = 'Pipe IO Sampler Settings'
 
 NODE_CLASS_MAPPINGS = {

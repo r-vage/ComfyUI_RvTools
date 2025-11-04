@@ -153,7 +153,7 @@ class RvLoader_Checkpoint_Loader_Small_Pipe:
             # rather than returning a dummy pipe which can hide the root cause.
             raise RuntimeError(f"Checkpoint loading failed: {e}") from e
 
-NODE_NAME = 'Checkpoint Loader Small (Pipe) [RvTools]'
+NODE_NAME = 'Checkpoint Loader Small (Pipe) [Eclipse]'
 NODE_DESC = 'Checkpoint Loader Small (Pipe)'
 
 NODE_CLASS_MAPPINGS = {

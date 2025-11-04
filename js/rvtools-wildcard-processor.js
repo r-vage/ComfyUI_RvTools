@@ -1,8 +1,8 @@
 /**
- * RvTools Wildcard Processor - JavaScript Extension
+ * Eclipse Wildcard Processor - JavaScript Extension
  * 
  * Provides UI customization for the RvText_WildcardProcessor node:
- * - Dynamic wildcard combo loading from /rvtools/wildcards/list endpoint
+ * - Dynamic wildcard combo loading from /eclipse/wildcards/list endpoint
  * - Mode-based UI state management (populate/fixed)
  * - Seed controls with special seed handling (-1, -2, -3)
  * - Real-time wildcard selection integration
@@ -41,12 +41,12 @@ async function loadWildcardList() {
     wildcardListLoading = true;
 
     try {
-        const response = await fetch("/rvtools/wildcards/list");
+        const response = await fetch("/eclipse/wildcards/list");
         if (response.ok) {
             wildcardList = await response.json();
         }
     } catch (error) {
-        console.warn("[RvTools Wildcard] Failed to load wildcard list:", error);
+        console.warn("[Eclipse Wildcard] Failed to load wildcard list:", error);
         wildcardList = [];
     } finally {
         wildcardListLoading = false;
@@ -57,7 +57,7 @@ async function loadWildcardList() {
  * Register the extension
  */
 app.registerExtension({
-    name: "RvTools.WildcardProcessor",
+    name: "Eclipse.WildcardProcessor",
     
     async setup() {
         // Load wildcard list on startup
@@ -69,7 +69,7 @@ app.registerExtension({
             // FIRST: Process wildcards for nodes in populate mode BEFORE serialization
             const nodes = app.graph._nodes;
             for (const node of nodes) {
-                if (node.type === "Wildcard Processor [RvTools]") {
+                if (node.type === "Wildcard Processor [Eclipse]") {
                     const wildcardTextWidget = node.widgets?.find(w => w.name === "wildcard_text");
                     const populatedTextWidget = node.widgets?.find(w => w.name === "populated_text");
                     const modeWidget = node.widgets?.find(w => w.name === "mode");
@@ -95,7 +95,7 @@ app.registerExtension({
                             : (seedWidget?.value ?? 0);
                         
                         try {
-                            const response = await fetch("/rvtools/wildcards/process", {
+                            const response = await fetch("/eclipse/wildcards/process", {
                                 method: "POST",
                                 headers: { "Content-Type": "application/json" },
                                 body: JSON.stringify({
@@ -112,7 +112,7 @@ app.registerExtension({
                                 }
                             }
                         } catch (error) {
-                            console.error("[RvTools Wildcard] graphToPrompt wildcard processing error:", error);
+                            console.error("[Eclipse Wildcard] graphToPrompt wildcard processing error:", error);
                         }
                     }
                 }
@@ -123,7 +123,7 @@ app.registerExtension({
 
             // Now resolve seeds for Wildcard Processor nodes
             for (const node of nodes) {
-                if (node.type === "Wildcard Processor [RvTools]" && node._rvtools_seedWidget) {
+                if (node.type === "Wildcard Processor [Eclipse]" && node._Eclipse_seedWidget) {
                     // Skip if node is muted or bypassed
                     if (node.mode === 2 || node.mode === 4) {
                         continue;
@@ -133,7 +133,7 @@ app.registerExtension({
                     const nodeId = String(node.id);
                     if (result.output && result.output[nodeId]) {
                         // Check if seed widget has a connection
-                        const seedWidget = node._rvtools_seedWidget;
+                        const seedWidget = node._Eclipse_seedWidget;
                         const seedInput = node.inputs?.find(input => input.widget?.name === "seed");
                         const seedIsConnected = seedInput && seedInput.link != null;
                         
@@ -148,7 +148,7 @@ app.registerExtension({
                             // Get seed to use (with safety check)
                             seedToUse = (node.getSeedToUse && typeof node.getSeedToUse === 'function')
                                 ? node.getSeedToUse()
-                                : node._rvtools_seedWidget.value;
+                                : node._Eclipse_seedWidget.value;
                             
                             // Update the seed in the prompt output (what gets sent to server)
                             if (result.output[nodeId].inputs && result.output[nodeId].inputs.seed !== undefined) {
@@ -156,23 +156,23 @@ app.registerExtension({
                             }
 
                             // Update last seed tracking
-                            node._rvtools_lastSeed = seedToUse;
+                            node._Eclipse_lastSeed = seedToUse;
                             
                             // Clear the seed cache after use so next call generates fresh random seed
-                            node._rvtools_cachedInputSeed = null;
-                            node._rvtools_cachedResolvedSeed = null;
+                            node._Eclipse_cachedInputSeed = null;
+                            node._Eclipse_cachedResolvedSeed = null;
                             
                             // Update the last seed button
-                            if (node._rvtools_lastSeedButton) {
-                                const currentWidgetValue = node._rvtools_seedWidget.value;
+                            if (node._Eclipse_lastSeedButton) {
+                                const currentWidgetValue = node._Eclipse_seedWidget.value;
                                 if (SPECIAL_SEEDS.includes(currentWidgetValue)) {
                                     // Widget has special seed, show what was actually used
-                                    node._rvtools_lastSeedButton.name = `♻️ ${seedToUse}`;
-                                    node._rvtools_lastSeedButton.disabled = false;
+                                    node._Eclipse_lastSeedButton.name = `♻️ ${seedToUse}`;
+                                    node._Eclipse_lastSeedButton.disabled = false;
                                 } else {
                                     // Widget has regular seed value
-                                    node._rvtools_lastSeedButton.name = LAST_SEED_BUTTON_LABEL;
-                                    node._rvtools_lastSeedButton.disabled = true;
+                                    node._Eclipse_lastSeedButton.name = LAST_SEED_BUTTON_LABEL;
+                                    node._Eclipse_lastSeedButton.disabled = true;
                                 }
                             }
                         }
@@ -224,17 +224,17 @@ app.registerExtension({
 
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         // Only process Wildcard Processor nodes
-        if (nodeData.name !== "Wildcard Processor [RvTools]" && 
-            nodeData.class_type !== "Wildcard Processor [RvTools]") {
+        if (nodeData.name !== "Wildcard Processor [Eclipse]" && 
+            nodeData.class_type !== "Wildcard Processor [Eclipse]") {
             return;
         }
 
         // Add seed helper methods to prototype FIRST (before onNodeCreated)
         // Method to generate random seed
         nodeType.prototype.generateRandomSeed = function() {
-            const step = this._rvtools_seedWidget?.options?.step || 1;
-            const randomMin = this._rvtools_randomMin || 0;
-            const randomMax = this._rvtools_randomMax || 1125899906842624;
+            const step = this._Eclipse_seedWidget?.options?.step || 1;
+            const randomMin = this._Eclipse_randomMin || 0;
+            const randomMax = this._Eclipse_randomMax || 1125899906842624;
             const randomRange = (randomMax - randomMin) / (step / 10);
             let seed = Math.floor(Math.random() * randomRange) * (step / 10) + randomMin;
             
@@ -248,12 +248,12 @@ app.registerExtension({
         // Method to determine seed to use
         nodeType.prototype.getSeedToUse = function() {
             // Normal seed generation logic - seed widget can be connected directly
-            const inputSeed = Number(this._rvtools_seedWidget.value);
+            const inputSeed = Number(this._Eclipse_seedWidget.value);
             
             // Check if we have a cached resolved seed for this input seed
             // This prevents generating different random seeds on multiple calls
-            if (this._rvtools_cachedInputSeed === inputSeed && this._rvtools_cachedResolvedSeed != null) {
-                return this._rvtools_cachedResolvedSeed;
+            if (this._Eclipse_cachedInputSeed === inputSeed && this._Eclipse_cachedResolvedSeed != null) {
+                return this._Eclipse_cachedResolvedSeed;
             }
             
             let seedToUse = null;
@@ -261,11 +261,11 @@ app.registerExtension({
             // If our input seed was a special seed, then handle it
             if (SPECIAL_SEEDS.includes(inputSeed)) {
                 // If the last seed was not a special seed and we have increment/decrement, then do that
-                if (typeof this._rvtools_lastSeed === "number" && !SPECIAL_SEEDS.includes(this._rvtools_lastSeed)) {
+                if (typeof this._Eclipse_lastSeed === "number" && !SPECIAL_SEEDS.includes(this._Eclipse_lastSeed)) {
                     if (inputSeed === SPECIAL_SEED_INCREMENT) {
-                        seedToUse = this._rvtools_lastSeed + 1;
+                        seedToUse = this._Eclipse_lastSeed + 1;
                     } else if (inputSeed === SPECIAL_SEED_DECREMENT) {
-                        seedToUse = this._rvtools_lastSeed - 1;
+                        seedToUse = this._Eclipse_lastSeed - 1;
                     }
                 }
                 
@@ -278,8 +278,8 @@ app.registerExtension({
             const finalSeed = seedToUse != null ? seedToUse : inputSeed;
             
             // Cache the resolved seed for this input seed
-            this._rvtools_cachedInputSeed = inputSeed;
-            this._rvtools_cachedResolvedSeed = finalSeed;
+            this._Eclipse_cachedInputSeed = inputSeed;
+            this._Eclipse_cachedResolvedSeed = finalSeed;
             
             return finalSeed;
         };
@@ -300,7 +300,7 @@ app.registerExtension({
             // Store the seed that was actually used if available
             if (message && message.seed !== undefined) {
                 // Handle both array and single value formats
-                this._rvtools_lastSeed = Array.isArray(message.seed) ? message.seed[0] : message.seed;
+                this._Eclipse_lastSeed = Array.isArray(message.seed) ? message.seed[0] : message.seed;
             }
             
             return result;
@@ -320,26 +320,26 @@ app.registerExtension({
             
             if (currentMode === "populate" && !seedIsConnected) {
                 // Enable buttons only in populate mode AND when seed is not connected
-                if (this._rvtools_randomizeButton) {
-                    this._rvtools_randomizeButton.disabled = false;
+                if (this._Eclipse_randomizeButton) {
+                    this._Eclipse_randomizeButton.disabled = false;
                 }
-                if (this._rvtools_newRandomButton) {
-                    this._rvtools_newRandomButton.disabled = false;
+                if (this._Eclipse_newRandomButton) {
+                    this._Eclipse_newRandomButton.disabled = false;
                 }
-                if (this._rvtools_lastSeedButton && this._rvtools_lastSeed != null) {
-                    const currentWidgetValue = this._rvtools_seedWidget?.value;
-                    this._rvtools_lastSeedButton.disabled = !SPECIAL_SEEDS.includes(currentWidgetValue);
+                if (this._Eclipse_lastSeedButton && this._Eclipse_lastSeed != null) {
+                    const currentWidgetValue = this._Eclipse_seedWidget?.value;
+                    this._Eclipse_lastSeedButton.disabled = !SPECIAL_SEEDS.includes(currentWidgetValue);
                 }
             } else {
                 // Disable buttons in fixed mode OR when seed is connected
-                if (this._rvtools_randomizeButton) {
-                    this._rvtools_randomizeButton.disabled = true;
+                if (this._Eclipse_randomizeButton) {
+                    this._Eclipse_randomizeButton.disabled = true;
                 }
-                if (this._rvtools_newRandomButton) {
-                    this._rvtools_newRandomButton.disabled = true;
+                if (this._Eclipse_newRandomButton) {
+                    this._Eclipse_newRandomButton.disabled = true;
                 }
-                if (this._rvtools_lastSeedButton) {
-                    this._rvtools_lastSeedButton.disabled = true;
+                if (this._Eclipse_lastSeedButton) {
+                    this._Eclipse_lastSeedButton.disabled = true;
                 }
             }
         };
@@ -384,17 +384,17 @@ app.registerExtension({
             }
             
             if (!seedWidget) {
-                console.warn("[RvTools Wildcard] Seed widget not found! Available widgets:", this.widgets.map(w => w.name));
+                console.warn("[Eclipse Wildcard] Seed widget not found! Available widgets:", this.widgets.map(w => w.name));
             }
 
             if (seedWidget) {
                 // Initialize seed tracking properties
-                this._rvtools_seedWidget = seedWidget;
-                this._rvtools_lastSeed = undefined;
-                this._rvtools_randomMin = 0;
-                this._rvtools_randomMax = 1125899906842624;
-                this._rvtools_cachedInputSeed = null;
-                this._rvtools_cachedResolvedSeed = null;
+                this._Eclipse_seedWidget = seedWidget;
+                this._Eclipse_lastSeed = undefined;
+                this._Eclipse_randomMin = 0;
+                this._Eclipse_randomMax = 1125899906842624;
+                this._Eclipse_cachedInputSeed = null;
+                this._Eclipse_cachedResolvedSeed = null;
                 
                 // Ensure seed widget is visible (not hidden)
                 if (seedWidget.type) {
@@ -446,8 +446,8 @@ app.registerExtension({
                     LAST_SEED_BUTTON_LABEL,
                     "",
                     () => {
-                        if (this._rvtools_lastSeed != null) {
-                            seedWidget.value = this._rvtools_lastSeed;
+                        if (this._Eclipse_lastSeed != null) {
+                            seedWidget.value = this._Eclipse_lastSeed;
                             lastSeedButton.name = LAST_SEED_BUTTON_LABEL;
                             lastSeedButton.disabled = true;
                         }
@@ -455,11 +455,11 @@ app.registerExtension({
                     { serialize: false }
                 );
                 lastSeedButton.disabled = true;
-                this._rvtools_lastSeedButton = lastSeedButton;
+                this._Eclipse_lastSeedButton = lastSeedButton;
                 
                 // Store references to seed buttons for mode control
-                this._rvtools_randomizeButton = randomizeButton;
-                this._rvtools_newRandomButton = newRandomButton;
+                this._Eclipse_randomizeButton = randomizeButton;
+                this._Eclipse_newRandomButton = newRandomButton;
                 
                 // Find the wildcards combo and mode widget for positioning
                 const selectCombo = this.widgets?.find(w => w.name === "wildcards");
@@ -533,8 +533,8 @@ app.registerExtension({
                 const originalSeedCallback = seedWidget.callback;
                 seedWidget.callback = (value) => {
                     // Clear the seed cache when the seed value changes
-                    node._rvtools_cachedInputSeed = null;
-                    node._rvtools_cachedResolvedSeed = null;
+                    node._Eclipse_cachedInputSeed = null;
+                    node._Eclipse_cachedResolvedSeed = null;
                     
                     // Call the original callback if it exists
                     if (originalSeedCallback) {
@@ -581,7 +581,7 @@ app.registerExtension({
                             updatePopulatedText(populatedTextWidget, value, actualSeed);
                         }
                     } catch (e) {
-                        console.error("[RvTools Wildcard] Error in wildcard_text callback:", e);
+                        console.error("[Eclipse Wildcard] Error in wildcard_text callback:", e);
                     }
                 };
             }
@@ -640,7 +640,7 @@ app.registerExtension({
                         
                         updateUIForMode(node, value);
                     } catch (e) {
-                        console.error("[RvTools Wildcard] Error in mode callback:", e);
+                        console.error("[Eclipse Wildcard] Error in mode callback:", e);
                     }
                 };
             }
@@ -757,7 +757,7 @@ app.registerExtension({
 
     async nodeCreated(node, app) {
         // Additional node created handling if needed
-        if (node.type !== "Wildcard Processor [RvTools]") {
+        if (node.type !== "Wildcard Processor [Eclipse]") {
             return;
         }
         
@@ -778,7 +778,7 @@ app.registerExtension({
 
     async loadedGraphNode(node, app) {
         // Handle loaded graph nodes
-        if (node.type !== "Wildcard Processor [RvTools]") {
+        if (node.type !== "Wildcard Processor [Eclipse]") {
             return;
         }
 
@@ -925,7 +925,7 @@ async function updatePopulatedText(populatedWidget, wildcardText, seed) {
     }
 
     try {
-        const response = await fetch("/rvtools/wildcards/process", {
+        const response = await fetch("/eclipse/wildcards/process", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -947,13 +947,13 @@ async function updatePopulatedText(populatedWidget, wildcardText, seed) {
                     populatedWidget.callback(cleanedOutput);
                 }
             } else {
-                console.warn("[RvTools Wildcard] Server error - success=false");
+                console.warn("[Eclipse Wildcard] Server error - success=false");
             }
         } else {
-            console.warn("[RvTools Wildcard] Server returned status:", response.status);
+            console.warn("[Eclipse Wildcard] Server returned status:", response.status);
         }
     } catch (error) {
-        console.error("[RvTools Wildcard] Error updating preview:", error);
+        console.error("[Eclipse Wildcard] Error updating preview:", error);
     }
 }/**
  * Update UI state based on selected mode
@@ -993,7 +993,7 @@ function updateUIForMode(node, mode) {
  */
 setInterval(async () => {
     try {
-        const response = await fetch("/rvtools/wildcards/list");
+        const response = await fetch("/eclipse/wildcards/list");
         if (response.ok) {
             const newList = await response.json();
             
@@ -1004,7 +1004,7 @@ setInterval(async () => {
                 // Update all nodes with new list
                 for (const nodeId in app.graph._nodes) {
                     const node = app.graph._nodes[nodeId];
-                    if (node.type === "Wildcard Processor [RvTools]") {
+                    if (node.type === "Wildcard Processor [Eclipse]") {
                         const combo = node.widgets?.find(w => w.name === "wildcards");
                         if (combo) {
                             updateWildcardCombo(combo);

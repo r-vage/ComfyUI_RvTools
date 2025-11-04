@@ -15,7 +15,7 @@ from ..core import CATEGORY, AnyType
 
 any = AnyType("*")
 
-class RvTools_LoraStack:
+class Eclipse_LoraStack:
     # A node to stack multiple LoRAs with weights and options.
     @classmethod
     def INPUT_TYPES(cls):
@@ -144,11 +144,11 @@ class RvTools_LoraStack:
         return (lora_list,)
 
 
-NODE_NAME = 'Lora Stack [RvTools]'
+NODE_NAME = 'Lora Stack [Eclipse]'
 NODE_DESC = 'Lora Stack'
 
 NODE_CLASS_MAPPINGS = {
-   NODE_NAME: RvTools_LoraStack
+   NODE_NAME: Eclipse_LoraStack
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {

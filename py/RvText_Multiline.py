@@ -55,7 +55,7 @@ class RvText_Multiline:
         joined_string = " ".join(string_list)
         return (joined_string, string_list)
 
-NODE_NAME = 'String Multiline [RvTools]'
+NODE_NAME = 'String Multiline [Eclipse]'
 NODE_DESC = 'String Multiline'
 
 NODE_CLASS_MAPPINGS = {

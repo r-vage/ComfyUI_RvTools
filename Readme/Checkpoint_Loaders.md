@@ -1,6 +1,6 @@
 # Checkpoint Loader User Guide
 
-This guide explains how to use the traditional checkpoint loaders in ComfyUI-RvTools. These loaders are simple, reliable options for loading AI models without advanced features.
+This guide explains how to use the traditional checkpoint loaders in ComfyUI_Eclipse. These loaders are simple, reliable options for loading AI models without advanced features.
 
 ## Table of Contents
 - [Overview](#overview)
@@ -14,12 +14,12 @@ This guide explains how to use the traditional checkpoint loaders in ComfyUI-RvT
 
 ## Overview
 
-ComfyUI-RvTools provides two traditional checkpoint loaders:
+ComfyUI_Eclipse provides two traditional checkpoint loaders:
 
 1. **Checkpoint Loader Small** - Outputs individual components (model, CLIP, VAE)
 2. **Checkpoint Loader Small (Pipe)** - Outputs a single pipe containing all components
 
-Both loaders provide the same core functionality but differ in their output format. Use the regular version for standard workflows and the Pipe version when working with RvTools pipe-based workflows.
+Both loaders provide the same core functionality but differ in their output format. Use the regular version for standard workflows and the Pipe version when working with Eclipse pipe-based workflows.
 
 ### When to Use These Loaders
 
@@ -35,7 +35,7 @@ For advanced features like multi-format support, quantization, templates, or aut
 
 ## Checkpoint Loader Small
 
-**Node Name:** `Checkpoint Loader Small [RvTools]`
+**Node Name:** `Checkpoint Loader Small [Eclipse]`
 
 ### What It Does
 
@@ -85,7 +85,7 @@ The node provides 4 separate outputs:
 
 ### How to Use
 
-1. **Add the node** to your workflow from the node menu: `RvTools > Loader > Checkpoint Loader Small`
+1. **Add the node** to your workflow from the node menu: `Eclipse > Loader > Checkpoint Loader Small`
 2. **Select your checkpoint** from the `ckpt_name` dropdown
 3. **Choose VAE setting:**
    - Leave as `Baked VAE` for most models
@@ -112,7 +112,7 @@ Checkpoint Loader Small
 
 ## Checkpoint Loader Small (Pipe)
 
-**Node Name:** `Checkpoint Loader Small (Pipe) [RvTools]`
+**Node Name:** `Checkpoint Loader Small (Pipe) [Eclipse]`
 
 ### What It Does
 
@@ -145,7 +145,7 @@ The node provides 1 pipe output containing all components:
 
 ### How to Use
 
-1. **Add the node** from: `RvTools > Loader > Checkpoint Loader Small (Pipe)`
+1. **Add the node** from: `Eclipse > Loader > Checkpoint Loader Small (Pipe)`
 2. **Configure settings** (same as regular loader)
 3. **Connect the pipe** to downstream nodes:
    - Use **Pipe Out** nodes to extract individual components
@@ -164,7 +164,7 @@ Checkpoint Loader Small (Pipe)
 ### When to Use Pipe Version
 
 **Use Pipe version when:**
-- Working with RvTools pipe ecosystem
+- Working with Eclipse pipe ecosystem
 - Building complex workflows with many connections
 - You want cleaner, more organized node graphs
 - Connecting to Context (Image) or other pipe nodes
@@ -259,7 +259,7 @@ Checkpoint Loader Small (Pipe)
 - Working with non-pipe nodes
 
 **Use Pipe Loader when:**
-- Working with RvTools pipe ecosystem
+- Working with Eclipse pipe ecosystem
 - Building complex multi-stage workflows
 - You want to reduce connection clutter
 - Passing model data through multiple processing stages
@@ -362,7 +362,7 @@ For these formats, use the [Smart Loader series](Smart_Loaders.md).
 ## Related Documentation
 
 - [Smart Loader User Guide](Smart_Loaders.md) - Advanced multi-format loaders with templates and quantization
-- [Pipe Ecosystem Guide](Pipe_System.md) - Understanding RvTools pipe-based workflows
+- [Pipe Ecosystem Guide](Pipe_System.md) - Understanding Eclipse pipe-based workflows
 - [Model Management Guide](Model_Management.md) - Organizing and managing your model collection
 
 ---
@@ -391,4 +391,4 @@ For these formats, use the [Smart Loader series](Smart_Loaders.md).
 
 ---
 
-**Need help?** Check the main [README](../README.md) or open an issue on the [GitHub repository](https://github.com/r-vage/ComfyUI_RvTools).
+**Need help?** Check the main [README](../README.md) or open an issue on the [GitHub repository](https://github.com/r-vage/ComfyUI_Eclipse).

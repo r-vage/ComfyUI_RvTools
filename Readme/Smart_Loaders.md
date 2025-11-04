@@ -16,7 +16,7 @@ This guide explains how to use the Smart Loader series - next-generation model l
 
 ## Overview
 
-The Smart Loader series represents the most advanced model loading system in ComfyUI-RvTools, offering:
+The Smart Loader series represents the most advanced model loading system in ComfyUI_Eclipse, offering:
 
 - **Multi-Format Support:** Standard Checkpoints, UNet, Nunchaku Flux/Qwen (quantized), GGUF (quantized)
 - **Template System:** Save and load complete configurations instantly
@@ -45,7 +45,7 @@ Both loaders share template compatibility and multi-format support.
 
 ## Smart Loader Plus
 
-**Node Name:** `Smart Loader Plus [RvTools]`
+**Node Name:** `Smart Loader Plus [Eclipse]`
 
 ### What It Does
 
@@ -222,7 +222,7 @@ Model-specific options for reduced VRAM:
 
 #### Basic Setup (Standard Checkpoint)
 
-1. **Add Node:** `RvTools > Loader > Smart Loader Plus`
+1. **Add Node:** `Eclipse > Loader > Smart Loader Plus`
 
 2. **Select Model Type:** 
    - Set `model_type` to "Standard Checkpoint"
@@ -345,7 +345,7 @@ The node outputs a comprehensive **pipe** containing:
 
 ## Smart Loader
 
-**Node Name:** `Smart Loader [RvTools]`
+**Node Name:** `Smart Loader [Eclipse]`
 
 ### What It Does
 
@@ -1140,7 +1140,7 @@ steps: 30
 ## Related Documentation
 
 - [Checkpoint Loaders Guide](Checkpoint_Loaders.md) - Traditional checkpoint loaders
-- [Pipe System Guide](Pipe_System.md) - Understanding RvTools pipes
+- [Pipe System Guide](Pipe_System.md) - Understanding Eclipse pipes
 - [Template Management](Templates.md) - Advanced template techniques
 
 ---
@@ -1182,4 +1182,4 @@ steps: 30
 
 ---
 
-**Need help?** Check the main [README](../README.md) or open an issue on the [GitHub repository](https://github.com/r-vage/ComfyUI_RvTools).
+**Need help?** Check the main [README](../README.md) or open an issue on the [GitHub repository](https://github.com/r-vage/ComfyUI_Eclipse).

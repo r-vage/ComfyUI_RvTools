@@ -15,10 +15,10 @@
 import { app } from "../../scripts/app.js";
 import { ComfyWidgets } from "../../scripts/widgets.js";
 
-const NODE_NAME = "Show Any [RvTools]";
+const NODE_NAME = "Show Any [Eclipse]";
 
 app.registerExtension({
-    name: "RvTools.showAny",
+    name: "Eclipse.showAny",
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         if (nodeData.name !== NODE_NAME) {
             return;

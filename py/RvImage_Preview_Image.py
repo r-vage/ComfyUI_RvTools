@@ -99,7 +99,7 @@ class RvImage_Preview_Image():
 
         return {"ui": {"images": results}, "result": (images,)}
 
-NODE_NAME = 'Preview Image [RvTools]'
+NODE_NAME = 'Preview Image [Eclipse]'
 NODE_DESC = 'Preview Image'
 
 NODE_CLASS_MAPPINGS = {

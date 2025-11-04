@@ -13,8 +13,8 @@
 import os
 import logging
 
-# Configuration for RvTools logger. Allow env override RVTOOLSX_LOGLEVEL
+# Configuration for Eclipse logger. Allow env override ECLIPSE_LOGLEVEL
 CONFIG = {
-    "loglevel": int(os.environ.get("RVTOOLSX_LOGLEVEL", logging.INFO)),
-    "indent": int(os.environ.get("RVTOOLSX_INDENT", 2)),
+    "loglevel": int(os.environ.get("ECLIPSE_LOGLEVEL", logging.INFO)),
+    "indent": int(os.environ.get("ECLIPSE_INDENT", 2)),
 }

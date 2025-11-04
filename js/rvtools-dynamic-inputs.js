@@ -12,32 +12,32 @@
 
 import { app } from "../../scripts/app.js";
 
-// Robust dynamic inputs helper for RvTools multi-switch nodes
+// Robust dynamic inputs helper for Eclipse multi-switch nodes
 // - Uses explicit name prefixes that match the Python optional input names (int_, float_, string_, pipe_, any_, basicpipe_)
 // - Ensures widget-only declared prefixed inputs get real sockets created so they are linkable
 // - Adds/removes the highest-numbered prefixed entries when inputcount changes
 // - Avoids duplicating sockets when a node already exposes optional inputs as widgets
 
 app.registerExtension({
-    name: "RvTools.DynamicInputs",
+    name: "Eclipse.DynamicInputs",
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         if (!nodeData?.name) return;
 
         const multiNodes = {
             "RvConversion_ConcatMulti": { type: "PIPE", prefix: "pipe" },
-            "Concat Pipe Multi [RvTools]": { type: "PIPE", prefix: "pipe" },
+            "Concat Pipe Multi [Eclipse]": { type: "PIPE", prefix: "pipe" },
 
             "RvRouter_Any_MultiSwitch": { type: "*", prefix: "any" },
-            "Any Multi-Switch [RvTools]": { type: "*", prefix: "any" },
+            "Any Multi-Switch [Eclipse]": { type: "*", prefix: "any" },
 
             "RvRouter_Any_MultiSwitch_purge": { type: "*", prefix: "any" },
-            "Any Multi-Switch Purge [RvTools]": { type: "*", prefix: "any" },
+            "Any Multi-Switch Purge [Eclipse]": { type: "*", prefix: "any" },
 
             "RvConversion_MergeStrings": { type: "STRING", prefix: "string" },
-            "Merge Strings [RvTools]": { type: "STRING", prefix: "string" },
+            "Merge Strings [Eclipse]": { type: "STRING", prefix: "string" },
             
             "RvConversion_Join": { type: "*", prefix: "input" },
-            "Join [RvTools]": { type: "*", prefix: "input" },
+            "Join [Eclipse]": { type: "*", prefix: "input" },
         };
 
         const baseName = nodeData.name && nodeData.name.includes('/') ? nodeData.name.split('/').pop() : nodeData.name;

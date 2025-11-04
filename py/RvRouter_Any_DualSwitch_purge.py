@@ -45,7 +45,7 @@ class RvRouter_Any_DualSwitch_purge:
         else:
             return (input2,)
 
-NODE_NAME = 'Any Dual-Switch Purge [RvTools]'
+NODE_NAME = 'Any Dual-Switch Purge [Eclipse]'
 NODE_DESC = 'Any Dual-Switch Purge'
 
 NODE_CLASS_MAPPINGS = {

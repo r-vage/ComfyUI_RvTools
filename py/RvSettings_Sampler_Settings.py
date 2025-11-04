@@ -45,7 +45,7 @@ class RvSettings_Sampler_Settings:
         }
         return (pipe,)
 
-NODE_NAME = 'Sampler Settings [RvTools]'
+NODE_NAME = 'Sampler Settings [Eclipse]'
 NODE_DESC = 'Sampler Settings'
 
 NODE_CLASS_MAPPINGS = {

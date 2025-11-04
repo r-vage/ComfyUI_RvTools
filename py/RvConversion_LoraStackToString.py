@@ -49,7 +49,7 @@ class RvConversion_LoraStackToString:
         except Exception:
             return ("",)
 
-NODE_NAME = "Lora Stack to String [RvTools]"
+NODE_NAME = "Lora Stack to String [Eclipse]"
 NODE_DESC = "Lora Stack to String"
 
 NODE_CLASS_MAPPINGS = {

@@ -65,7 +65,7 @@ class RvPipe_Out_WanVideo_Setup:
 
         return (steps, cfg, model_shift, steps_start, steps_stop)
 
-NODE_NAME = 'Pipe Out WanVideo Setup [RvTools]'
+NODE_NAME = 'Pipe Out WanVideo Setup [Eclipse]'
 NODE_DESC = 'Pipe Out WanVideo Setup'
 
 NODE_CLASS_MAPPINGS = {

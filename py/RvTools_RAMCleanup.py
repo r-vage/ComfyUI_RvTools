@@ -11,7 +11,7 @@
 # limitations under the License.
 #
 # Credits to LAOGOU-666: https://github.com/LAOGOU-666/Comfyui-Memory_Cleanup.git
-# improved and adapted for Comfyui_RvTools
+# improved and adapted for Comfyui_Eclipse
 
 import psutil
 import ctypes
@@ -27,7 +27,7 @@ if platform.system() == "Windows":
 
 any = AnyType("*")
 
-class RvTools_RAMCleanup:
+class Eclipse_RAMCleanup:
     @classmethod
     def INPUT_TYPES(cls):
         return {
@@ -287,11 +287,11 @@ class RvTools_RAMCleanup:
         return (anything,)
     
 
-NODE_NAME = 'RAM Cleanup [RvTools]'
+NODE_NAME = 'RAM Cleanup [Eclipse]'
 NODE_DESC = 'RAM Cleanup'
 
 NODE_CLASS_MAPPINGS = {
-   NODE_NAME: RvTools_RAMCleanup
+   NODE_NAME: Eclipse_RAMCleanup
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {

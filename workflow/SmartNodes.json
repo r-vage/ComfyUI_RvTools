@@ -109,7 +109,7 @@
     },
     {
       "id": 17,
-      "type": "Pipe Out Checkpoint Loader [RvTools]",
+      "type": "Pipe Out Checkpoint Loader [Eclipse]",
       "pos": [
         45,
         186
@@ -240,10 +240,10 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI-RvTools",
+        "aux_id": "r-vage/ComfyUI_Eclipse",
         "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
-        "Node name for S&R": "Pipe Out Checkpoint Loader [RvTools]",
-        "cnr_id": "ComfyUI-RvTools"
+        "Node name for S&R": "Pipe Out Checkpoint Loader [Eclipse]",
+        "cnr_id": "ComfyUI_Eclipse"
       },
       "widgets_values": [],
       "color": "#4e4e4e",
@@ -375,7 +375,7 @@
     },
     {
       "id": 25,
-      "type": "Any Passer [RvTools]",
+      "type": "Any Passer [Eclipse]",
       "pos": [
         1209,
         281
@@ -415,10 +415,10 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI-RvTools",
+        "aux_id": "r-vage/ComfyUI_Eclipse",
         "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
-        "Node name for S&R": "Any Passer [RvTools]",
-        "cnr_id": "ComfyUI-RvTools"
+        "Node name for S&R": "Any Passer [Eclipse]",
+        "cnr_id": "ComfyUI_Eclipse"
       },
       "widgets_values": [
         false
@@ -483,7 +483,7 @@
     },
     {
       "id": 18,
-      "type": "Show Any [RvTools]",
+      "type": "Show Any [Eclipse]",
       "pos": [
         904,
         997
@@ -522,10 +522,10 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI-RvTools",
+        "aux_id": "r-vage/ComfyUI_Eclipse",
         "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
-        "Node name for S&R": "Show Any [RvTools]",
-        "cnr_id": "ComfyUI-RvTools"
+        "Node name for S&R": "Show Any [Eclipse]",
+        "cnr_id": "ComfyUI_Eclipse"
       },
       "widgets_values": [
         "hide",
@@ -537,7 +537,7 @@
     },
     {
       "id": 12,
-      "type": "Preview Image [RvTools]",
+      "type": "Preview Image [Eclipse]",
       "pos": [
         1469,
         186
@@ -577,10 +577,10 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI-RvTools",
+        "aux_id": "r-vage/ComfyUI_Eclipse",
         "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
-        "Node name for S&R": "Preview Image [RvTools]",
-        "cnr_id": "ComfyUI-RvTools"
+        "Node name for S&R": "Preview Image [Eclipse]",
+        "cnr_id": "ComfyUI_Eclipse"
       },
       "widgets_values": [
         -1
@@ -591,7 +591,7 @@
     },
     {
       "id": 28,
-      "type": "Concat Pipe Multi [RvTools]",
+      "type": "Concat Pipe Multi [Eclipse]",
       "pos": [
         1373,
         997
@@ -654,7 +654,7 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI-RvTools",
+        "aux_id": "r-vage/ComfyUI_Eclipse",
         "ver": "e5119ec75b58ce68acd0d976755f8c4ad687a6bc"
       },
       "widgets_values": [
@@ -667,7 +667,7 @@
     },
     {
       "id": 31,
-      "type": "Show Any [RvTools]",
+      "type": "Show Any [Eclipse]",
       "pos": [
         1412,
         1250
@@ -706,10 +706,10 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI-RvTools",
+        "aux_id": "r-vage/ComfyUI_Eclipse",
         "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
-        "Node name for S&R": "Show Any [RvTools]",
-        "cnr_id": "ComfyUI-RvTools"
+        "Node name for S&R": "Show Any [Eclipse]",
+        "cnr_id": "ComfyUI_Eclipse"
       },
       "widgets_values": [
         "hide",
@@ -721,7 +721,7 @@
     },
     {
       "id": 27,
-      "type": "Save Images [RvTools]",
+      "type": "Save Images [Eclipse]",
       "pos": [
         1987,
         187
@@ -926,9 +926,9 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI-RvTools",
+        "aux_id": "r-vage/ComfyUI_Eclipse",
         "ver": "e5119ec75b58ce68acd0d976755f8c4ad687a6bc",
-        "Node name for S&R": "Save Images [RvTools]"
+        "Node name for S&R": "Save Images [Eclipse]"
       },
       "widgets_values": [
         "%Y-%M-%D\\%basemodel",
@@ -956,7 +956,7 @@
     },
     {
       "id": 10,
-      "type": "Smart Loader Plus [RvTools]",
+      "type": "Smart Loader Plus [Eclipse]",
       "pos": [
         -322,
         186
@@ -1379,10 +1379,10 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI-RvTools",
+        "aux_id": "r-vage/ComfyUI_Eclipse",
         "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
-        "Node name for S&R": "Smart Loader Plus [RvTools]",
-        "cnr_id": "ComfyUI-RvTools"
+        "Node name for S&R": "Smart Loader Plus [Eclipse]",
+        "cnr_id": "ComfyUI_Eclipse"
       },
       "widgets_values": [
         "Load",
@@ -1436,7 +1436,7 @@
     },
     {
       "id": 23,
-      "type": "Merge Strings [RvTools]",
+      "type": "Merge Strings [Eclipse]",
       "pos": [
         431,
         632
@@ -1509,9 +1509,9 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI-RvTools",
+        "aux_id": "r-vage/ComfyUI_Eclipse",
         "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
-        "cnr_id": "ComfyUI-RvTools"
+        "cnr_id": "ComfyUI_Eclipse"
       },
       "widgets_values": [
         3,
@@ -1524,7 +1524,7 @@
     },
     {
       "id": 22,
-      "type": "String Multiline [RvTools]",
+      "type": "String Multiline [Eclipse]",
       "pos": [
         -326,
         997
@@ -1565,10 +1565,10 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI-RvTools",
+        "aux_id": "r-vage/ComfyUI_Eclipse",
         "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
-        "Node name for S&R": "String Multiline [RvTools]",
-        "cnr_id": "ComfyUI-RvTools"
+        "Node name for S&R": "String Multiline [Eclipse]",
+        "cnr_id": "ComfyUI_Eclipse"
       },
       "widgets_values": [
         ""
@@ -1579,7 +1579,7 @@
     },
     {
       "id": 21,
-      "type": "Pipe Out Smart Folder [RvTools]",
+      "type": "Pipe Out Smart Folder [Eclipse]",
       "pos": [
         -569,
         670
@@ -1678,10 +1678,10 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI-RvTools",
+        "aux_id": "r-vage/ComfyUI_Eclipse",
         "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
-        "Node name for S&R": "Pipe Out Smart Folder [RvTools]",
-        "cnr_id": "ComfyUI-RvTools"
+        "Node name for S&R": "Pipe Out Smart Folder [Eclipse]",
+        "cnr_id": "ComfyUI_Eclipse"
       },
       "widgets_values": [],
       "color": "#4e4e4e",
@@ -1690,7 +1690,7 @@
     },
     {
       "id": 29,
-      "type": "Context Image [RvTools]",
+      "type": "Context Image [Eclipse]",
       "pos": [
         1936,
         997
@@ -2089,9 +2089,9 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI-RvTools",
+        "aux_id": "r-vage/ComfyUI_Eclipse",
         "ver": "e5119ec75b58ce68acd0d976755f8c4ad687a6bc",
-        "Node name for S&R": "Context Image [RvTools]"
+        "Node name for S&R": "Context Image [Eclipse]"
       },
       "widgets_values": [],
       "color": "#4e4e4e",
@@ -2100,7 +2100,7 @@
     },
     {
       "id": 38,
-      "type": "Show Any [RvTools]",
+      "type": "Show Any [Eclipse]",
       "pos": [
         2229,
         997
@@ -2139,10 +2139,10 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI-RvTools",
+        "aux_id": "r-vage/ComfyUI_Eclipse",
         "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
-        "Node name for S&R": "Show Any [RvTools]",
-        "cnr_id": "ComfyUI-RvTools"
+        "Node name for S&R": "Show Any [Eclipse]",
+        "cnr_id": "ComfyUI_Eclipse"
       },
       "widgets_values": [
         "show",
@@ -2154,7 +2154,7 @@
     },
     {
       "id": 20,
-      "type": "Smart Folder [RvTools]",
+      "type": "Smart Folder [Eclipse]",
       "pos": [
         -679,
         186
@@ -2423,10 +2423,10 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI-RvTools",
+        "aux_id": "r-vage/ComfyUI_Eclipse",
         "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
-        "Node name for S&R": "Smart Folder [RvTools]",
-        "cnr_id": "ComfyUI-RvTools"
+        "Node name for S&R": "Smart Folder [Eclipse]",
+        "cnr_id": "ComfyUI_Eclipse"
       },
       "widgets_values": [
         "Image Mode",
@@ -2466,7 +2466,7 @@
     },
     {
       "id": 13,
-      "type": "Show Any [RvTools]",
+      "type": "Show Any [Eclipse]",
       "pos": [
         36,
         638
@@ -2505,10 +2505,10 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI-RvTools",
+        "aux_id": "r-vage/ComfyUI_Eclipse",
         "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
-        "Node name for S&R": "Show Any [RvTools]",
-        "cnr_id": "ComfyUI-RvTools"
+        "Node name for S&R": "Show Any [Eclipse]",
+        "cnr_id": "ComfyUI_Eclipse"
       },
       "widgets_values": [
         "hide",
@@ -2603,7 +2603,7 @@
     },
     {
       "id": 36,
-      "type": "Smart Prompt [RvTools]",
+      "type": "Smart Prompt [Eclipse]",
       "pos": [
         112,
         997
@@ -3616,9 +3616,9 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI_RvTools",
+        "aux_id": "r-vage/ComfyUI_Eclipse",
         "ver": "a206f755375121efdd1f709db82162ea1be71c1a",
-        "Node name for S&R": "Smart Prompt [RvTools]"
+        "Node name for S&R": "Smart Prompt [Eclipse]"
       },
       "widgets_values": [
         "settings",
@@ -3740,7 +3740,7 @@
     },
     {
       "id": 44,
-      "type": "Wildcard Processor [RvTools]",
+      "type": "Wildcard Processor [Eclipse]",
       "pos": [
         447,
         963
@@ -3812,9 +3812,9 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI_RvTools",
+        "aux_id": "r-vage/ComfyUI_Eclipse",
         "ver": "c1669863e799ffd81292b745254e7a0f36b12715",
-        "Node name for S&R": "Wildcard Processor [RvTools]"
+        "Node name for S&R": "Wildcard Processor [Eclipse]"
       },
       "widgets_values": [
         "a beautiful woman with {pale|fair|white} skin, and long, {straight|messy|wavy} {blonde|white|red|black} hair. She has {blue|green|grey|brown} eyes and {subtle tasteful|dark|colorful} makeup that accentuates her features, she wears a {red|white|black|pink} {dress, skin tight dress|suit|lace babydoll, skin tight}, skin press, she has medium breasts, a sultry, knowing smile playing on her lips, seductivly, __smartprompt/environment_desc/03_outdoor_desc__",

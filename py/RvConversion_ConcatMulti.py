@@ -152,7 +152,7 @@ class RvConversion_ConcatMulti:
 
         return (result,)
 
-NODE_NAME = 'Concat Pipe Multi [RvTools]'
+NODE_NAME = 'Concat Pipe Multi [Eclipse]'
 NODE_DESC = 'Concat Pipe Multi'
 
 NODE_CLASS_MAPPINGS = {

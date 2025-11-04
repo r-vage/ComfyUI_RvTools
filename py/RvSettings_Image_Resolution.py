@@ -39,7 +39,7 @@ class RvSettings_Image_Resolution:
         width, height = RESOLUTION_MAP.get(resolution, (512, 512))
         return width, height
 
-NODE_NAME = 'Image Resolution [RvTools]'
+NODE_NAME = 'Image Resolution [Eclipse]'
 NODE_DESC = 'Image Resolution'
 
 NODE_CLASS_MAPPINGS = {

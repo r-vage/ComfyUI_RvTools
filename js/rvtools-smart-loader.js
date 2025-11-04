@@ -17,10 +17,10 @@
 import { app } from "../../scripts/app.js";
 import { api } from "../../scripts/api.js";
 
-const NODE_NAME = "Smart Loader [RvTools]";
+const NODE_NAME = "Smart Loader [Eclipse]";
 
 app.registerExtension({
-    name: "RvTools.SmartLoader",
+    name: "Eclipse.SmartLoader",
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         if (nodeData.name !== NODE_NAME) {
             return;
@@ -41,7 +41,7 @@ app.registerExtension({
             // Refresh template list from server
             const refreshTemplateList = async () => {
                 try {
-                    const response = await fetch('/rvtools/loader_templates_list');
+                    const response = await fetch('/eclipse/loader_templates_list');
                     if (response.ok) {
                         const templates = await response.json();
                         const templateWidget = node.widgets?.find(w => w.name === "template_name");
@@ -133,7 +133,7 @@ app.registerExtension({
                 try {
                     // Add cache-busting parameter to force fresh fetch
                     const cacheBuster = new Date().getTime();
-                    const response = await fetch(`/rvtools/loader_templates/${templateName}.json?t=${cacheBuster}`, {
+                    const response = await fetch(`/eclipse/loader_templates/${templateName}.json?t=${cacheBuster}`, {
                         cache: 'no-store'
                     });
                     if (response.ok) {

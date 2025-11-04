@@ -81,7 +81,7 @@ class RvPipe_Out_VCNameGen:
 
         return (path, rel_path, frame_load_cap, mask_first_frames, mask_last_frames, simple_combine, files, files_join)
 
-NODE_NAME = 'Pipe Out VC Name Generator [RvTools]'
+NODE_NAME = 'Pipe Out VC Name Generator [Eclipse]'
 NODE_DESC = 'Pipe Out VC Name Generator'
 
 NODE_CLASS_MAPPINGS = {

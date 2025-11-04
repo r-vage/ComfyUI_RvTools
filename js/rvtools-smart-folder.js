@@ -16,10 +16,10 @@
 
 import { app } from "../../scripts/app.js";
 
-const NODE_NAME = "Smart Folder [RvTools]";
+const NODE_NAME = "Smart Folder [Eclipse]";
 
 app.registerExtension({
-    name: "RvTools.SmartFolder",
+    name: "Eclipse.SmartFolder",
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         if (nodeData.name !== NODE_NAME) {
             return;
@@ -32,8 +32,8 @@ app.registerExtension({
             const node = this;
 
             // Initialize storage for last values
-            node._rvtools_lastBatchNumber = null;
-            node._rvtools_lastSkipFirstFramesCalc = null;
+            node._Eclipse_lastBatchNumber = null;
+            node._Eclipse_lastSkipFirstFramesCalc = null;
 
             // Helper function to hide/show a widget (using ComfyUI's proper method)
             const setWidgetVisible = (widgetName, visible) => {
@@ -124,7 +124,7 @@ app.registerExtension({
                 // Common widgets (always visible)
                 // generation_mode, project_root_name, create_date_time_folder,
                 // create_batch_folder
-                // Seed widgets are always visible (handled by rvtools-seed.js extension)
+                // Seed widgets are always visible (handled by eclipse-seed.js extension)
                 
                 // Smart resize - only resize height if needed, preserve width
                 // Use setTimeout to ensure hidden widgets' computeSize is applied first
@@ -223,8 +223,8 @@ app.registerExtension({
                         if (batchNumberWidget && batchNumberControl && inputs) {
                             if (batchNumberControl.value === "increment") {
                                 // If we have a last value, increment it
-                                if (node._rvtools_lastBatchNumber != null) {
-                                    const newValue = node._rvtools_lastBatchNumber + 1;
+                                if (node._Eclipse_lastBatchNumber != null) {
+                                    const newValue = node._Eclipse_lastBatchNumber + 1;
                                     // Only change inputs/workflow/UI if the new value differs
                                     try {
                                         const existing = inputs.batch_number;
@@ -234,7 +234,7 @@ app.registerExtension({
                                     } catch (e) {
                                         inputs.batch_number = newValue;
                                     }
-                                    node._rvtools_lastBatchNumber = newValue;
+                                    node._Eclipse_lastBatchNumber = newValue;
                                     // Update the widget value displayed in the UI only if different
                                     try {
                                         if (Number(batchNumberWidget.value) !== newValue) {
@@ -260,11 +260,11 @@ app.registerExtension({
                                     }
                                 } else {
                                     // First run, store the current value
-                                    node._rvtools_lastBatchNumber = batchNumberWidget.value;
+                                    node._Eclipse_lastBatchNumber = batchNumberWidget.value;
                                 }
                             } else {
                                 // Fixed mode, just store the current value
-                                node._rvtools_lastBatchNumber = batchNumberWidget.value;
+                                node._Eclipse_lastBatchNumber = batchNumberWidget.value;
                             }
                         }
                         
@@ -275,8 +275,8 @@ app.registerExtension({
                         if (skipCalcWidget && skipCalcControl && inputs) {
                             if (skipCalcControl.value === "increment") {
                                 // If we have a last value, increment it
-                                if (node._rvtools_lastSkipFirstFramesCalc != null) {
-                                    const newValue = node._rvtools_lastSkipFirstFramesCalc + 1;
+                                if (node._Eclipse_lastSkipFirstFramesCalc != null) {
+                                    const newValue = node._Eclipse_lastSkipFirstFramesCalc + 1;
                                     // Only change inputs/workflow/UI if the new value differs
                                     try {
                                         const existing = inputs.skip_calculation;
@@ -286,7 +286,7 @@ app.registerExtension({
                                     } catch (e) {
                                         inputs.skip_calculation = newValue;
                                     }
-                                    node._rvtools_lastSkipFirstFramesCalc = newValue;
+                                    node._Eclipse_lastSkipFirstFramesCalc = newValue;
 
                                     // Update the widget value displayed in the UI only if different
                                     if (Number(skipCalcWidget.value) !== newValue) {
@@ -310,11 +310,11 @@ app.registerExtension({
                                     }
                                 } else {
                                     // First run, store the current value
-                                    node._rvtools_lastSkipFirstFramesCalc = skipCalcWidget.value;
+                                    node._Eclipse_lastSkipFirstFramesCalc = skipCalcWidget.value;
                                 }
                             } else {
                                 // Fixed mode, just store the current value
-                                node._rvtools_lastSkipFirstFramesCalc = skipCalcWidget.value;
+                                node._Eclipse_lastSkipFirstFramesCalc = skipCalcWidget.value;
                             }
                         }
                     }

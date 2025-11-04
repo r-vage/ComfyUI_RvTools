@@ -115,7 +115,7 @@ class RvPipe_Generation_Data:
         return get_context_return_tuple(ctx)
 
 
-NODE_NAME = "Generation Data [RvTools]"
+NODE_NAME = "Generation Data [Eclipse]"
 NODE_DESC = "Generation Data"
 
 NODE_CLASS_MAPPINGS = {NODE_NAME: RvPipe_Generation_Data}

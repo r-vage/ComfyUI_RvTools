@@ -436,7 +436,7 @@ def full_lora_path_for(lora: str):
                 matching_lora = candidate
                 break
     if not matching_lora:
-        cstr(f'RvTools: could not find full path to lora "{original}"').error.print()
+        cstr(f'Eclipse: could not find full path to lora "{original}"').error.print()
         return None
     return folder_paths.get_full_path("loras", matching_lora)
 
@@ -1258,7 +1258,7 @@ class RvImage_SaveImages:
         subfolder_path = os.sep.join(subfolder_parts[:-1])
         return subfolder_path
 
-NODE_NAME = 'Save Images [RvTools]'
+NODE_NAME = 'Save Images [Eclipse]'
 NODE_DESC = 'Save Images'
 
 NODE_CLASS_MAPPINGS = {

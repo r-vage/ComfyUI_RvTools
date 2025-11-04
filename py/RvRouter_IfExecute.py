@@ -42,7 +42,7 @@ class RvSwitch_IfExecute:
         else:
             return (on_false,)
 
-NODE_NAME = 'IF A Else B [RvTools]'
+NODE_NAME = 'IF A Else B [Eclipse]'
 NODE_DESC = 'IF A Else B'
 
 NODE_CLASS_MAPPINGS = {

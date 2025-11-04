@@ -91,7 +91,7 @@ Wildcard files are plain `.txt` files with one option per line.
 ### Step 1: Add the Node
 
 1. Right-click in ComfyUI workflow
-2. Navigate to: `RvTools > Text > Wildcard Processor`
+2. Navigate to: `Eclipse > Text > Wildcard Processor`
 3. Node appears with:
    - `wildcard_text` - Your template
    - `populated_text` - Processed output
@@ -1428,9 +1428,9 @@ processed_text (output)
 ## Related Documentation
 
 - [Smart Prompt Guide](Smart_Prompt.md) - Dropdown-based prompt building
-- [Main README](../README.md#node-spotlight-wildcard-processor-rvtools) - Wildcard Processor spotlight
+- [Main README](../README.md#node-spotlight-wildcard-processor-eclipse) - Wildcard Processor spotlight
 - [Wildcard Syntax Examples](../readme_wildcardprocessor.md) - Additional syntax examples
 
 ---
 
-**Need help?** Check the main [README](../README.md) or open an issue on the [GitHub repository](https://github.com/r-vage/ComfyUI_RvTools).
+**Need help?** Check the main [README](../README.md) or open an issue on the [GitHub repository](https://github.com/r-vage/ComfyUI_Eclipse).

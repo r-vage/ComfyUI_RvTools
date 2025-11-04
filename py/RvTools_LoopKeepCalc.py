@@ -13,7 +13,7 @@
 from typing import Tuple
 from ..core import CATEGORY, cstr
 
-class RvTools_LoopKeepCalc:
+class Eclipse_LoopKeepCalc:
 #     Calculates frames to keep based on context length and total frames
     def __init__(self):
         pass
@@ -55,11 +55,11 @@ class RvTools_LoopKeepCalc:
             cstr(f"Frame calculation failed: {str(e)}").error.print()
             return (0,)
 
-NODE_NAME = 'Keep Calculator [RvTools]'
+NODE_NAME = 'Keep Calculator [Eclipse]'
 NODE_DESC = 'Keep Calculator'
 
 NODE_CLASS_MAPPINGS = {
-    NODE_NAME: RvTools_LoopKeepCalc
+    NODE_NAME: Eclipse_LoopKeepCalc
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {

@@ -14,9 +14,9 @@
 */
 
 import { app } from "../../scripts/app.js";
-import { setupAnyTypeHandling } from "./rvtools-any-type-handler.js";
+import { setupAnyTypeHandling } from "./eclipse-any-type-handler.js";
 
-class RvTools_Stop
+class Eclipse_Stop
 {
     constructor(node)
     {
@@ -81,15 +81,15 @@ class RvTools_Stop
 
 app.registerExtension(
 {
-    name: "Stop [RvTools]",
+    name: "Stop [Eclipse]",
     async beforeRegisterNodeDef(nodeType, nodeData, _app)
     {
-        if (nodeData.name === "Stop [RvTools]")
+        if (nodeData.name === "Stop [Eclipse]")
         {
             const onNodeCreated = nodeType.prototype.onNodeCreated;
             nodeType.prototype.onNodeCreated = function () {
                 if (onNodeCreated) onNodeCreated.apply(this, []);
-                this.Stop = new RvTools_Stop(this);
+                this.Stop = new Eclipse_Stop(this);
             }
         }
     }

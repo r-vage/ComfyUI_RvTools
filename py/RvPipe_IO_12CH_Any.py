@@ -115,7 +115,7 @@ class RvPipe_12CH_Any:
         ctx = new_context(pipe, **kwargs)
         return get_context_return_tuple(ctx)
 
-NODE_NAME = 'Pipe 12CH Any [RvTools]'
+NODE_NAME = 'Pipe 12CH Any [Eclipse]'
 NODE_DESC = 'Pipe 12CH Any'
 
 NODE_CLASS_MAPPINGS = {

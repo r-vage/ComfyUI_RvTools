@@ -42,7 +42,7 @@ class RvSettings_LoadDirectorySettings:
         }
         return (pipe,)
 
-NODE_NAME = 'Load Directory Settings [RvTools]'
+NODE_NAME = 'Load Directory Settings [Eclipse]'
 NODE_DESC = 'Load Directory Settings'
 
 NODE_CLASS_MAPPINGS = {

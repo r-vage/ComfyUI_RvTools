@@ -11,7 +11,7 @@
 # limitations under the License.
 #
 # Credits to LAOGOU-666: https://github.com/LAOGOU-666/Comfyui-Memory_Cleanup.git
-# improved and adapted for Comfyui_RvTools
+# improved and adapted for Comfyui_Eclipse
 
 import time
 import gc
@@ -22,7 +22,7 @@ from ..core import AnyType
 
 any = AnyType("*")
 
-class RvTools_VRAMCleanup:
+class Eclipse_VRAMCleanup:
     @classmethod
     def INPUT_TYPES(cls):
         return {
@@ -174,11 +174,11 @@ class RvTools_VRAMCleanup:
         return (anything,)
 
 
-NODE_NAME = 'VRAM Cleanup [RvTools]'
+NODE_NAME = 'VRAM Cleanup [Eclipse]'
 NODE_DESC = 'VRAM Cleanup'
 
 NODE_CLASS_MAPPINGS = {
-   NODE_NAME: RvTools_VRAMCleanup
+   NODE_NAME: Eclipse_VRAMCleanup
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {

@@ -35,7 +35,7 @@ class RvRouter_Any_Passer_purge:
 
         return (input,)
 
-NODE_NAME = 'Any Passer Purge [RvTools]'
+NODE_NAME = 'Any Passer Purge [Eclipse]'
 NODE_DESC = 'Any Passer Purge'
 
 NODE_CLASS_MAPPINGS = {

@@ -393,7 +393,7 @@
     },
     {
       "id": 115,
-      "type": "Lora Stack apply [RvTools]",
+      "type": "Lora Stack apply [Eclipse]",
       "pos": [
         -148,
         331
@@ -451,9 +451,9 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI_RvTools_X",
+        "aux_id": "r-vage/ComfyUI_Eclipse_X",
         "ver": "799ba12d15c38ce9079fdfc10d302d9de1775f4a",
-        "Node name for S&R": "Lora Stack apply [RvTools]"
+        "Node name for S&R": "Lora Stack apply [Eclipse]"
       },
       "widgets_values": [],
       "color": "#4e4e4e",
@@ -647,7 +647,7 @@
     },
     {
       "id": 116,
-      "type": "Preview Image [RvTools]",
+      "type": "Preview Image [Eclipse]",
       "pos": [
         1298,
         -34
@@ -685,9 +685,9 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI_RvTools_X",
+        "aux_id": "r-vage/ComfyUI_Eclipse_X",
         "ver": "799ba12d15c38ce9079fdfc10d302d9de1775f4a",
-        "Node name for S&R": "Preview Image [RvTools]"
+        "Node name for S&R": "Preview Image [Eclipse]"
       },
       "widgets_values": [
         -1
@@ -698,7 +698,7 @@
     },
     {
       "id": 101,
-      "type": "Pipe Out Checkpoint Loader [RvTools]",
+      "type": "Pipe Out Checkpoint Loader [Eclipse]",
       "pos": [
         -507,
         188
@@ -828,9 +828,9 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI_RvTools_X",
+        "aux_id": "r-vage/ComfyUI_Eclipse_X",
         "ver": "799ba12d15c38ce9079fdfc10d302d9de1775f4a",
-        "Node name for S&R": "Pipe Out Checkpoint Loader [RvTools]"
+        "Node name for S&R": "Pipe Out Checkpoint Loader [Eclipse]"
       },
       "widgets_values": [],
       "color": "#4e4e4e",
@@ -839,7 +839,7 @@
     },
     {
       "id": 119,
-      "type": "Show Any [RvTools]",
+      "type": "Show Any [Eclipse]",
       "pos": [
         102,
         -257
@@ -878,9 +878,9 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI_RvTools_X",
+        "aux_id": "r-vage/ComfyUI_Eclipse_X",
         "ver": "799ba12d15c38ce9079fdfc10d302d9de1775f4a",
-        "Node name for S&R": "Show Any [RvTools]"
+        "Node name for S&R": "Show Any [Eclipse]"
       },
       "widgets_values": [
         "hide",
@@ -892,7 +892,7 @@
     },
     {
       "id": 117,
-      "type": "Sampler Settings NI+Seed [RvTools]",
+      "type": "Sampler Settings NI+Seed [Eclipse]",
       "pos": [
         -550,
         -219
@@ -1009,9 +1009,9 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI_RvTools_X",
+        "aux_id": "r-vage/ComfyUI_Eclipse_X",
         "ver": "799ba12d15c38ce9079fdfc10d302d9de1775f4a",
-        "Node name for S&R": "Sampler Settings NI+Seed [RvTools]"
+        "Node name for S&R": "Sampler Settings NI+Seed [Eclipse]"
       },
       "widgets_values": [
         true,
@@ -1034,7 +1034,7 @@
     },
     {
       "id": 114,
-      "type": "Lora Stack [RvTools]",
+      "type": "Lora Stack [Eclipse]",
       "pos": [
         -509,
         533
@@ -1444,9 +1444,9 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI_RvTools_X",
+        "aux_id": "r-vage/ComfyUI_Eclipse_X",
         "ver": "799ba12d15c38ce9079fdfc10d302d9de1775f4a",
-        "Node name for S&R": "Lora Stack [RvTools]"
+        "Node name for S&R": "Lora Stack [Eclipse]"
       },
       "widgets_values": [
         true,
@@ -1498,7 +1498,7 @@
     },
     {
       "id": 118,
-      "type": "Pipe IO Sampler Settings [RvTools]",
+      "type": "Pipe IO Sampler Settings [Eclipse]",
       "pos": [
         -170.30912396694202,
         -56.0522028150321
@@ -1660,9 +1660,9 @@
       ],
       "title": "Pipe IO",
       "properties": {
-        "aux_id": "r-vage/ComfyUI_RvTools_X",
+        "aux_id": "r-vage/ComfyUI_Eclipse_X",
         "ver": "799ba12d15c38ce9079fdfc10d302d9de1775f4a",
-        "Node name for S&R": "Pipe IO Sampler Settings [RvTools]"
+        "Node name for S&R": "Pipe IO Sampler Settings [Eclipse]"
       },
       "widgets_values": [],
       "color": "#4e4e4e",
@@ -1671,7 +1671,7 @@
     },
     {
       "id": 111,
-      "type": "Smart Loader Plus [RvTools]",
+      "type": "Smart Loader Plus [Eclipse]",
       "pos": [
         -944,
         184
@@ -2092,9 +2092,9 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI_RvTools_X",
+        "aux_id": "r-vage/ComfyUI_Eclipse_X",
         "ver": "799ba12d15c38ce9079fdfc10d302d9de1775f4a",
-        "Node name for S&R": "Smart Loader Plus [RvTools]"
+        "Node name for S&R": "Smart Loader Plus [Eclipse]"
       },
       "widgets_values": [
         "Load",
@@ -2206,7 +2206,7 @@
     },
     {
       "id": 120,
-      "type": "Wildcard Processor [RvTools]",
+      "type": "Wildcard Processor [Eclipse]",
       "pos": [
         -202,
         567
@@ -2277,9 +2277,9 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI_RvTools",
+        "aux_id": "r-vage/ComfyUI_Eclipse",
         "ver": "80934985ff7d068974d8da434c4bbd529fab4d44",
-        "Node name for S&R": "Wildcard Processor [RvTools]"
+        "Node name for S&R": "Wildcard Processor [Eclipse]"
       },
       "widgets_values": [
         "a beautiful woman with {pale|fair|white} skin, and long, {straight|messy|wavy} {blonde|white|red|black} hair. She has {blue|green|grey|brown} eyes and a {subtle tasteful|dark} makeup look that accentuates her features, she wears a {red|white|black|pink} form fitting {dress|suit|lace babydoll}, skin press, she has medium breasts, a sultry, knowing smile playing on her lips, seductivly",

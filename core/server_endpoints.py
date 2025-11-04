@@ -11,12 +11,12 @@
 # limitations under the License.
 
 """
-RvTools Wildcard Processor - Server Endpoints
+Eclipse Wildcard Processor - Server Endpoints
 
 Provides REST API endpoints for wildcard management:
-- GET /rvtools/wildcards/list - Get list of available wildcards
-- GET /rvtools/wildcards/refresh - Reload wildcards from disk
-- POST /rvtools/wildcards - Process text with wildcards
+- GET /eclipse/wildcards/list - Get list of available wildcards
+- GET /eclipse/wildcards/refresh - Reload wildcards from disk
+- POST /eclipse/wildcards - Process text with wildcards
 """
 
 import json
@@ -47,7 +47,7 @@ class WildcardEndpoints:
         self.wildcard_path = wildcard_path
         
         # Load wildcards on initialization
-        logging.info(f"[RvTools Wildcard] Loading wildcards from: {wildcard_path}")
+        logging.info(f"[Eclipse Wildcard] Loading wildcards from: {wildcard_path}")
         wildcard_load(wildcard_path)
         
         self._register_endpoints()
@@ -67,7 +67,7 @@ class WildcardEndpoints:
         extension_root = os.path.dirname(os.path.dirname(__file__))
         extension_wildcard_path = os.path.join(extension_root, "wildcards")
         
-        # Try to find ComfyUI root (go up from custom_nodes/ComfyUI_RvTools_X)
+        # Try to find ComfyUI root (go up from custom_nodes/ComfyUI_Eclipse_X)
         comfyui_root = os.path.abspath(os.path.join(extension_root, "..", ".."))
         models_wildcard_path = os.path.join(comfyui_root, "models", "wildcards")
         
@@ -77,19 +77,19 @@ class WildcardEndpoints:
             if not os.path.exists(models_wildcard_path):
                 try:
                     os.makedirs(models_wildcard_path, exist_ok=True)
-                    logging.info(f"[RvTools Wildcard] Created directory: {models_wildcard_path}")
+                    logging.info(f"[Eclipse Wildcard] Created directory: {models_wildcard_path}")
                     
                     # Copy example files from extension's wildcards folder
                     if os.path.exists(extension_wildcard_path):
                         self._copy_example_wildcards(extension_wildcard_path, models_wildcard_path)
                 except Exception as e:
-                    logging.error(f"[RvTools Wildcard] Failed to create {models_wildcard_path}: {e}")
+                    logging.error(f"[Eclipse Wildcard] Failed to create {models_wildcard_path}: {e}")
                     return extension_wildcard_path
             
             return models_wildcard_path
         else:
             # Not in a standard ComfyUI structure, use extension folder
-            logging.info("[RvTools Wildcard] Using extension's wildcard folder (ComfyUI models dir not found)")
+            logging.info("[Eclipse Wildcard] Using extension's wildcard folder (ComfyUI models dir not found)")
             return extension_wildcard_path
     
     def _copy_example_wildcards(self, source_dir: str, dest_dir: str) -> None:
@@ -115,17 +115,17 @@ class WildcardEndpoints:
                         copied_count += 1
             
             if copied_count > 0:
-                logging.info(f"[RvTools Wildcard] Copied {copied_count} example wildcard files to {dest_dir}")
+                logging.info(f"[Eclipse Wildcard] Copied {copied_count} example wildcard files to {dest_dir}")
         except Exception as e:
-            logging.error(f"[RvTools Wildcard] Error copying example wildcards: {e}")
+            logging.error(f"[Eclipse Wildcard] Error copying example wildcards: {e}")
 
     def _register_endpoints(self):
         """Register all endpoints with PromptServer."""
         
-        @PromptServer.instance.routes.get("/rvtools/wildcards/list")
+        @PromptServer.instance.routes.get("/eclipse/wildcards/list")
         async def handle_get_wildcard_list(request):
             """
-            GET /rvtools/wildcards/list
+            GET /eclipse/wildcards/list
             
             Returns:
                 JSON list of available wildcards in format: ['__keyword1__', '__keyword2__', ...]
@@ -134,13 +134,13 @@ class WildcardEndpoints:
                 wildcard_list = get_wildcard_list()
                 return web.json_response(wildcard_list)
             except Exception as e:
-                logging.error(f"[RvTools Wildcard] Error getting wildcard list: {e}")
+                logging.error(f"[Eclipse Wildcard] Error getting wildcard list: {e}")
                 return web.json_response([])
 
-        @PromptServer.instance.routes.get("/rvtools/wildcards/refresh")
+        @PromptServer.instance.routes.get("/eclipse/wildcards/refresh")
         async def handle_refresh_wildcards(request):
             """
-            GET /rvtools/wildcards/refresh
+            GET /eclipse/wildcards/refresh
             
             Reloads wildcards from disk. Useful for discovering newly added wildcard files.
             
@@ -157,17 +157,17 @@ class WildcardEndpoints:
                     "count": len(wildcard_list)
                 })
             except Exception as e:
-                logging.error(f"[RvTools Wildcard] Error refreshing wildcards: {e}")
+                logging.error(f"[Eclipse Wildcard] Error refreshing wildcards: {e}")
                 return web.json_response({
                     "success": False,
                     "message": str(e),
                     "count": 0
                 })
 
-        @PromptServer.instance.routes.post("/rvtools/wildcards/process")
+        @PromptServer.instance.routes.post("/eclipse/wildcards/process")
         async def handle_process_wildcards(request):
             """
-            POST /rvtools/wildcards/process
+            POST /eclipse/wildcards/process
             
             Process text with wildcard expansion.
             
@@ -207,13 +207,13 @@ class WildcardEndpoints:
                 })
 
             except Exception as e:
-                logging.error(f"[RvTools Wildcard] Error processing wildcards: {e}")
+                logging.error(f"[Eclipse Wildcard] Error processing wildcards: {e}")
                 return web.json_response({
                     "success": False,
                     "error": str(e)
                 })
 
-        logging.info("[RvTools Wildcard] Registered server endpoints")
+        logging.info("[Eclipse Wildcard] Registered server endpoints")
 
 
 def onprompt_populate_wildcards(json_data):
@@ -234,7 +234,7 @@ def onprompt_populate_wildcards(json_data):
         if 'class_type' not in node_data:
             continue
             
-        if node_data['class_type'] != 'Wildcard Processor [RvTools]':
+        if node_data['class_type'] != 'Wildcard Processor [Eclipse]':
             continue
         
         inputs = node_data.get('inputs', {})
@@ -268,7 +268,7 @@ def onprompt_populate_wildcards(json_data):
                 connected_node = prompt.get(connected_node_id)
                 
                 if not connected_node:
-                    logging.warning(f"[RvTools Wildcard] Connected seed node {connected_node_id} not found")
+                    logging.warning(f"[Eclipse Wildcard] Connected seed node {connected_node_id} not found")
                     continue
                 
                 class_type = connected_node.get('class_type', '')
@@ -290,11 +290,11 @@ def onprompt_populate_wildcards(json_data):
                                 break
                     
                     if input_seed is None:
-                        logging.warning(f"[RvTools Wildcard] Could not extract seed from node type: {class_type}")
+                        logging.warning(f"[Eclipse Wildcard] Could not extract seed from node type: {class_type}")
                         continue
                 
             except Exception as e:
-                logging.error(f"[RvTools Wildcard] Error extracting seed from connection: {e}")
+                logging.error(f"[Eclipse Wildcard] Error extracting seed from connection: {e}")
                 continue
         else:
             # Seed is a direct value
@@ -312,7 +312,7 @@ def onprompt_populate_wildcards(json_data):
             inputs['seed'] = input_seed
             
         except Exception as e:
-            logging.error(f"[RvTools Wildcard] Error processing wildcards for node {node_id}: {e}")
+            logging.error(f"[Eclipse Wildcard] Error processing wildcards for node {node_id}: {e}")
     
     # CRITICAL: Must return json_data for the handler chain to continue
     return json_data
@@ -332,6 +332,6 @@ def initialize_endpoints(wildcard_path: Optional[str] = None):
         # Register prompt handler for wildcard preprocessing (Impact Pack approach)
         PromptServer.instance.add_on_prompt_handler(onprompt_populate_wildcards)
         
-        logging.info("[RvTools Wildcard] Server endpoints and prompt handler initialized successfully")
+        logging.info("[Eclipse Wildcard] Server endpoints and prompt handler initialized successfully")
     except Exception as e:
-        logging.error(f"[RvTools Wildcard] Failed to initialize endpoints: {e}")
+        logging.error(f"[Eclipse Wildcard] Failed to initialize endpoints: {e}")

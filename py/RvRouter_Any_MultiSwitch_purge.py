@@ -59,7 +59,7 @@ class RvRouter_Any_MultiSwitch_purge:
 
         raise RuntimeError(f"RvRouter_Any_MultiSwitch_purge: no value found among any_1..any_{inputcount}.")
 
-NODE_NAME = 'Any Multi-Switch Purge [RvTools]'
+NODE_NAME = 'Any Multi-Switch Purge [Eclipse]'
 NODE_DESC = 'Any Multi-Switch Purge'
 
 NODE_CLASS_MAPPINGS = {

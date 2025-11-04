@@ -55,7 +55,7 @@ class RvRouter_Any_MultiSwitch:
 
         raise RuntimeError(f"RvRouter_Any_MultiSwitch: no value found among any_1..any_{inputcount}.")
 
-NODE_NAME = 'Any Multi-Switch [RvTools]'
+NODE_NAME = 'Any Multi-Switch [Eclipse]'
 NODE_DESC = 'Any Multi-Switch'
 
 NODE_CLASS_MAPPINGS = {

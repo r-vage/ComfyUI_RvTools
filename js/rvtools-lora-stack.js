@@ -16,10 +16,10 @@
 
 import { app } from "../../scripts/app.js";
 
-const NODE_NAME = "Lora Stack [RvTools]";
+const NODE_NAME = "Lora Stack [Eclipse]";
 
 app.registerExtension({
-    name: "RvTools.LoraStack",
+    name: "Eclipse.LoraStack",
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
         if (nodeData.name !== NODE_NAME) {
             return;

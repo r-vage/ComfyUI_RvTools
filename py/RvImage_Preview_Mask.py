@@ -118,7 +118,7 @@ class RvImage_Preview_Mask():
 
         return {"ui": {"images": results}, "result": (masks,)}
 
-NODE_NAME = 'Preview Mask [RvTools]'
+NODE_NAME = 'Preview Mask [Eclipse]'
 NODE_DESC = 'Preview Mask'
 
 NODE_CLASS_MAPPINGS = {

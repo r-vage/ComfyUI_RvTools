@@ -40,7 +40,7 @@ class RvRouter_Any_DualSwitch:
         else:
             return (input2,)
 
-NODE_NAME = 'Any Dual-Switch [RvTools]'
+NODE_NAME = 'Any Dual-Switch [Eclipse]'
 NODE_DESC = 'Any Dual-Switch'
 
 NODE_CLASS_MAPPINGS = {

@@ -39,7 +39,7 @@ class RvLogic_IntegerGen:
             value = 1
         return (int(value),)
 
-NODE_NAME = 'Integer Generate [RvTools]'
+NODE_NAME = 'Integer Generate [Eclipse]'
 NODE_DESC = 'Integer Generate'
 
 NODE_CLASS_MAPPINGS = {

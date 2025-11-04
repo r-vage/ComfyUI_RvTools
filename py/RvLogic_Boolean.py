@@ -37,7 +37,7 @@ class RvLogic_Boolean:
             value = True
         return (value,)
 
-NODE_NAME = 'Boolean [RvTools]'
+NODE_NAME = 'Boolean [Eclipse]'
 NODE_DESC = 'Boolean'
 
 NODE_CLASS_MAPPINGS = {

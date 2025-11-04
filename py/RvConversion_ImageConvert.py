@@ -191,7 +191,7 @@ class RvConversion_ImageConvert:
         return torch.cat(tensors, dim=0)
 
 
-NODE_NAME = 'Image Convert [RvTools]'
+NODE_NAME = 'Image Convert [Eclipse]'
 NODE_DESC = 'Image Convert'
 
 NODE_CLASS_MAPPINGS = {

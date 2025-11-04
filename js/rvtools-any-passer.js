@@ -14,12 +14,12 @@
 */
 
 import { app } from "../../scripts/app.js";
-import { setupAnyTypeHandling } from "./rvtools-any-type-handler.js";
+import { setupAnyTypeHandling } from "./eclipse-any-type-handler.js";
 
 app.registerExtension({
-    name: "RvTools.RouterAnyPasser",
+    name: "Eclipse.RouterAnyPasser",
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
-        if (nodeData.name === "Any Passer [RvTools]") {
+        if (nodeData.name === "Any Passer [Eclipse]") {
             const onNodeCreated = nodeType.prototype.onNodeCreated;
             nodeType.prototype.onNodeCreated = function () {
                 if (onNodeCreated) {

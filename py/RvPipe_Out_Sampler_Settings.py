@@ -58,7 +58,7 @@ class RvPipe_Out_Sampler_Settings:
         return (steps, cfg, sampler, scheduler, guidance, denoise, sigmas_denoise, noise_strength, seed)
 
 
-NODE_NAME = "Pipe Out Sampler Settings [RvTools]"
+NODE_NAME = "Pipe Out Sampler Settings [Eclipse]"
 NODE_DESC = "Pipe Out Sampler Settings"
 
 NODE_CLASS_MAPPINGS = {

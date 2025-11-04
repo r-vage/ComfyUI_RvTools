@@ -1304,7 +1304,7 @@ class RvLoader_SmartLoader_Plus:
         return (pipe,)
 
 
-NODE_NAME = 'Smart Loader Plus [RvTools]'
+NODE_NAME = 'Smart Loader Plus [Eclipse]'
 NODE_DESC = 'Smart Loader Plus'
 
 NODE_CLASS_MAPPINGS = {

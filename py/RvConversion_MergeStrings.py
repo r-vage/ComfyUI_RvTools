@@ -61,7 +61,7 @@ class RvConversion_MergeStrings:
             merged_text = re.sub(r"[\r\n]+", " ", merged_text)
             return ([merged_text],)
 
-NODE_NAME = 'Merge Strings [RvTools]'
+NODE_NAME = 'Merge Strings [Eclipse]'
 NODE_DESC = 'Merge Strings'
 
 NODE_CLASS_MAPPINGS = {

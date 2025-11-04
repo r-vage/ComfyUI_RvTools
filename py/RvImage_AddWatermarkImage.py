@@ -175,7 +175,7 @@ class RvImage_AddWatermarkImage:
 
         return (original_image,)
 
-NODE_NAME = 'Add Watermark Image [RvTools]'
+NODE_NAME = 'Add Watermark Image [Eclipse]'
 NODE_DESC = 'Add Watermark Image'
 
 NODE_CLASS_MAPPINGS = {

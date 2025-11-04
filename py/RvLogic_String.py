@@ -37,7 +37,7 @@ class RvLogic_String:
             value = ""
         return (value,)
 
-NODE_NAME = 'String [RvTools]'
+NODE_NAME = 'String [Eclipse]'
 NODE_DESC = 'String'
 
 NODE_CLASS_MAPPINGS = {

@@ -16,7 +16,7 @@ import torch
 
 from ..core import CATEGORY, cstr
 
-class RvTools_LoopCalc:
+class Eclipse_LoopCalc:
 #     Calculates required number of loops for processing frames with overlap
     def __init__(self):
         pass
@@ -64,11 +64,11 @@ class RvTools_LoopCalc:
             cstr(f"Loop calculation failed: {str(e)}").error.print()
             return (1,)
 
-NODE_NAME = 'Loop Calculator [RvTools]'
+NODE_NAME = 'Loop Calculator [Eclipse]'
 NODE_DESC = 'Loop Calculator'
 
 NODE_CLASS_MAPPINGS = {
-    NODE_NAME: RvTools_LoopCalc
+    NODE_NAME: Eclipse_LoopCalc
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {

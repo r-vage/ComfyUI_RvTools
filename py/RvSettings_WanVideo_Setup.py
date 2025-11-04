@@ -48,7 +48,7 @@ class RvSettings_WanVideo_Setup:
         }
         return (pipe,)
 
-NODE_NAME = 'WanVideo Setup [RvTools]'
+NODE_NAME = 'WanVideo Setup [Eclipse]'
 NODE_DESC = 'WanVideo Setup'
 
 NODE_CLASS_MAPPINGS = {

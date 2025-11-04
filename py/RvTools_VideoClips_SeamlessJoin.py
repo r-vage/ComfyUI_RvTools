@@ -20,7 +20,7 @@ from ..core import CATEGORY, cstr
 
 FPS = float(30.0)
 
-class RvTools_VideoClips_SeamlessJoin:
+class Eclipse_VideoClips_SeamlessJoin:
     CATEGORY = CATEGORY.MAIN.value + CATEGORY.TOOLS.value
     RETURN_TYPES = ("IMAGE", "IMAGE")
     RETURN_NAMES = ("image", "mask")
@@ -183,11 +183,11 @@ class RvTools_VideoClips_SeamlessJoin:
             cstr(f"[WanVideo] Error creating tensors: {str(e)}").error.print()
             raise ValueError(f"Error creating output tensors: {str(e)}")
 
-NODE_NAME = 'Seamless Join Video Clips [RvTools]'
+NODE_NAME = 'Seamless Join Video Clips [Eclipse]'
 NODE_DESC = 'Seamless Join Video Clips'
 
 NODE_CLASS_MAPPINGS = {
-    NODE_NAME: RvTools_VideoClips_SeamlessJoin
+    NODE_NAME: Eclipse_VideoClips_SeamlessJoin
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {

@@ -51,7 +51,7 @@ class RvPipe_Out_LoadDirectorySettings:
 
         return (directory, start_index, load_cap)
 
-NODE_NAME = 'Pipe Out Load Directory Settings [RvTools]'
+NODE_NAME = 'Pipe Out Load Directory Settings [Eclipse]'
 NODE_DESC = 'Pipe Out Load Directory Settings'
 
 NODE_CLASS_MAPPINGS = {

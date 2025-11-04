@@ -285,7 +285,7 @@ def copy_prompt_files_once(source_dir: str, target_dir: str) -> bool:
     This is a one-time operation to enable wildcard integration.
     
     Args:
-        source_dir: Source directory path (ComfyUI_RvTools/prompt/)
+        source_dir: Source directory path (ComfyUI_Eclipse/prompt/)
         target_dir: Target directory path (ComfyUI/models/wildcards/smartprompt/)
     
     Returns:

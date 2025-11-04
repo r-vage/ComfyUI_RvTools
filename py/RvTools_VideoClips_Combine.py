@@ -19,7 +19,7 @@ from ..core import CATEGORY, cstr
 
 FPS = float(30.0)
 
-class RvTools_VideoClips_Combine:
+class Eclipse_VideoClips_Combine:
     CATEGORY = CATEGORY.MAIN.value + CATEGORY.TOOLS.value
     RETURN_TYPES = ("IMAGE", "FLOAT")
     RETURN_NAMES = ("image", "fps")
@@ -178,11 +178,11 @@ class RvTools_VideoClips_Combine:
             cstr(f"Error creating tensor: {str(e)}").msg.print()
             raise ValueError(f"Error creating output tensor: {str(e)}")
 
-NODE_NAME = 'Combine Video Clips [RvTools]'
+NODE_NAME = 'Combine Video Clips [Eclipse]'
 NODE_DESC = 'Combine Video Clips'
 
 NODE_CLASS_MAPPINGS = {
-    NODE_NAME: RvTools_VideoClips_Combine
+    NODE_NAME: Eclipse_VideoClips_Combine
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {

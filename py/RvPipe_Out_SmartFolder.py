@@ -123,7 +123,7 @@ class RvPipe_Out_SmartFolder:
         return ({"samples": latent},)
                 
 
-NODE_NAME = 'Pipe Out Smart Folder [RvTools]'
+NODE_NAME = 'Pipe Out Smart Folder [Eclipse]'
 NODE_DESC = 'Pipe Out Smart Folder'
 
 NODE_CLASS_MAPPINGS = {

@@ -160,7 +160,7 @@ class RvPipe_IO_Context_Video:
         # Return the updated pipe and all individual values
         return get_context_return_tuple(ctx)
 
-NODE_NAME = 'Context Video [RvTools]'
+NODE_NAME = 'Context Video [Eclipse]'
 NODE_DESC = 'Context Video'
 
 NODE_CLASS_MAPPINGS = {

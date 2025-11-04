@@ -77,7 +77,7 @@ class RvConversion_Join:
             return self._join_primitives(inputs, delimiter)
         
         # Fallback: return first input
-        print(f"[RvTools Join] Unknown type: {type(first_input)}, returning first input")
+        print(f"[Eclipse Join] Unknown type: {type(first_input)}, returning first input")
         return (first_input,)
     
     def _join_images(self, inputs):
@@ -206,7 +206,7 @@ class RvConversion_Join:
         return (merged_text,)
 
 
-NODE_NAME = 'Join [RvTools]'
+NODE_NAME = 'Join [Eclipse]'
 NODE_DESC = 'Join'
 
 NODE_CLASS_MAPPINGS = {

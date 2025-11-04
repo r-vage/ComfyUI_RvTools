@@ -68,7 +68,7 @@ class RvConversion_WidgetToString:
                     node_id = id
                     break
             elif any_input is not None:
-                if node["type"] == "Widget to String [RvTools]" and node["id"] == int(unique_id) and not link_id:
+                if node["type"] == "Widget to String [Eclipse]" and node["id"] == int(unique_id) and not link_id:
                     for node_input in node["inputs"]:
                         if node_input["name"] == "any_input":
                             link_id = node_input["link"]
@@ -117,7 +117,7 @@ class RvConversion_WidgetToString:
                 raise NameError(f"Widget not found: {node_id}.{widget_name}")
         return (', '.join(results).strip(', '), )
 
-NODE_NAME = 'Widget to String [RvTools]'
+NODE_NAME = 'Widget to String [Eclipse]'
 NODE_DESC = 'Widget to String'
 
 NODE_CLASS_MAPPINGS = {

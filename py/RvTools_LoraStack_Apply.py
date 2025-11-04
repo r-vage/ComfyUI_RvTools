@@ -47,7 +47,7 @@ def is_nunchaku_model(model: Any) -> bool:
     except Exception:
         return False
 
-class RvTools_LoraStack_Apply:
+class Eclipse_LoraStack_Apply:
 
 
     @classmethod
@@ -78,7 +78,7 @@ class RvTools_LoraStack_Apply:
 
         # Check if this is a Nunchaku model
         if is_nunchaku_model(model):
-            print("RvTools: [LoraStack Apply] Detected Nunchaku model, applying LoRAs via wrapper")
+            print("Eclipse: [LoraStack Apply] Detected Nunchaku model, applying LoRAs via wrapper")
             return self._apply_lora_stack_nunchaku(model, clip, lora_params)
         else:
             # Standard model - use ComfyUI's load_lora_for_models
@@ -237,11 +237,11 @@ class RvTools_LoraStack_Apply:
         # For Nunchaku, CLIP is not modified (FLUX doesn't use separate CLIP)
         return (ret_model, clip, lora_string)
 
-NODE_NAME = 'Lora Stack apply [RvTools]'
+NODE_NAME = 'Lora Stack apply [Eclipse]'
 NODE_DESC = 'Lora Stack apply'
 
 NODE_CLASS_MAPPINGS = {
-   NODE_NAME: RvTools_LoraStack_Apply
+   NODE_NAME: Eclipse_LoraStack_Apply
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {

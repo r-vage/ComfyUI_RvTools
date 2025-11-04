@@ -10,7 +10,7 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 *
-* Unified UI enhancements for RvTools
+* Unified UI enhancements for Eclipse
 * Includes: Settings, Reroutes, Groups, and Colors
 */
 
@@ -71,11 +71,11 @@ let loading = false;
 
 // Force Box Nodes Setting
 app.registerExtension({
-  name: "RvTools.forceBoxNodes",
+  name: "Eclipse.forceBoxNodes",
   async init(app) {
     app.ui.settings.addSetting({
-      id: "RvTools.forceBoxNodes",
-      name: "📦 RvTools Force Box Nodes",
+      id: "Eclipse.forceBoxNodes",
+      name: "📦 Eclipse Force Box Nodes",
       type: "boolean",
       tooltip: "Remove rounded corners - nodes will always be boxes.",
       defaultValue: false,
@@ -90,10 +90,10 @@ app.registerExtension({
 
 // Colors Enhancement
 app.registerExtension({
-  name: "RvTools.colors",
+  name: "Eclipse.colors",
   async setup(app) {
     const value = +(
-      window.localStorage.getItem("Comfy.Settings.RvTools.colors") ?? "0"
+      window.localStorage.getItem("Comfy.Settings.Eclipse.colors") ?? "0"
     );
     app.graph._nodes.forEach((node) => {
       node._bgcolor = node._bgcolor ?? node.bgcolor;
@@ -109,7 +109,7 @@ app.registerExtension({
       setTimeout(function () {
         loading = false;
         const value = +(
-          window.localStorage.getItem("Comfy.Settings.RvTools.colors") ?? "0"
+          window.localStorage.getItem("Comfy.Settings.Eclipse.colors") ?? "0"
         );
         setColorMode(value, app);
       }, 500);
@@ -374,18 +374,18 @@ app.registerExtension({
 });
 
 
-// Adds a "RvTools Node Dimensions" option to node right-click menu which opens
+// Adds a "Eclipse Node Dimensions" option to node right-click menu which opens
 // a small dialog to set width/height for any node.
-if (!LGraphCanvas.prototype.rvtoolsSetNodeDimension) {
+if (!LGraphCanvas.prototype.eclipseSetNodeDimension) {
   // Flag to track if new API is being used for node menu items
-  window.rvtools_newNodeMenuAPIUsed = false;
+  window.eclipse_newNodeMenuAPIUsed = false;
   
-  // Ensure rvtools dialog CSS exists so dialog is visible even without TinyTerRa
-  if (!document.getElementById("rvtools-dialog-style")) {
+  // Ensure eclipse dialog CSS exists so dialog is visible even without TinyTerRa
+  if (!document.getElementById("eclipse-dialog-style")) {
     const style = document.createElement("style");
-    style.id = "rvtools-dialog-style";
+    style.id = "eclipse-dialog-style";
     style.innerHTML = `
-    .rvtools-dialog {
+    .eclipse-dialog {
       position: fixed;
       top: 10px;
       left: 10px;
@@ -399,17 +399,17 @@ if (!LGraphCanvas.prototype.rvtoolsSetNodeDimension) {
       border-radius: 7px;
       padding: 7px 7px;
     }
-    .rvtools-dialog .name { display:inline-block; font-size:14px; padding:0; justify-self:center; }
-    .rvtools-dialog input, .rvtools-dialog textarea, .rvtools-dialog select { margin:3px; min-width:60px; min-height:1.5em; background-color: var(--comfy-input-bg, #333); border:2px solid var(--border-color, #444); color: var(--input-text, #fff); border-radius:14px; padding-left:10px; outline:none; }
-    .rvtools-dialog button { margin-top:3px; vertical-align:top; background-color:#999; border:0; padding:4px 18px; border-radius:20px; cursor:pointer; }
+    .eclipse-dialog .name { display:inline-block; font-size:14px; padding:0; justify-self:center; }
+    .eclipse-dialog input, .eclipse-dialog textarea, .eclipse-dialog select { margin:3px; min-width:60px; min-height:1.5em; background-color: var(--comfy-input-bg, #333); border:2px solid var(--border-color, #444); color: var(--input-text, #fff); border-radius:14px; padding-left:10px; outline:none; }
+    .eclipse-dialog button { margin-top:3px; vertical-align:top; background-color:#999; border:0; padding:4px 18px; border-radius:20px; cursor:pointer; }
     `;
     document.head.appendChild(style);
   }
 
-  LGraphCanvas.prototype.rvtoolsCreateDialog = function (htmlContent, onOK, onCancel) {
+  LGraphCanvas.prototype.eclipseCreateDialog = function (htmlContent, onOK, onCancel) {
     var dialog = document.createElement("div");
     dialog.is_modified = false;
-    dialog.className = "rvtools-dialog";
+    dialog.className = "eclipse-dialog";
     dialog.innerHTML = htmlContent + "<button id='ok'>OK</button>";
 
     dialog.close = function () {
@@ -487,14 +487,14 @@ if (!LGraphCanvas.prototype.rvtoolsSetNodeDimension) {
     return dialog;
   };
 
-  LGraphCanvas.prototype.rvtoolsSetNodeDimension = function (node) {
+  LGraphCanvas.prototype.eclipseSetNodeDimension = function (node) {
     const nodeWidth = node.size[0];
     const nodeHeight = node.size[1];
 
     let input_html = "<input type='text' class='width' value='" + nodeWidth + "'></input>";
     input_html += "<input type='text' class='height' value='" + nodeHeight + "'></input>";
 
-    LGraphCanvas.prototype.rvtoolsCreateDialog("<span class='name'>Width/Height</span>" + input_html,
+    LGraphCanvas.prototype.eclipseCreateDialog("<span class='name'>Width/Height</span>" + input_html,
       function (dialog, values) {
         var widthValue = Number(values[0]) ? values[0] : nodeWidth;
         var heightValue = Number(values[1]) ? values[1] : nodeHeight;
@@ -519,9 +519,9 @@ if (!LGraphCanvas.prototype.rvtoolsSetNodeDimension) {
     LGraphCanvas.prototype.showContextMenu = origOnShowNodeMenu;
     
     // If new API hasn't been called yet, apply the fallback
-    if (!window.rvtools_newNodeMenuAPIUsed && !fallbackApplied) {
+    if (!window.eclipse_newNodeMenuAPIUsed && !fallbackApplied) {
       fallbackApplied = true;
-      console.log('[RvTools.nodeMenuItems] Using legacy API fallback for older ComfyUI version');
+      console.log('[Eclipse.nodeMenuItems] Using legacy API fallback for older ComfyUI version');
       
       const origGetNodeMenuOptions = LGraphCanvas.prototype.getNodeMenuOptions;
       LGraphCanvas.prototype.getNodeMenuOptions = function (node) {
@@ -529,24 +529,24 @@ if (!LGraphCanvas.prototype.rvtoolsSetNodeDimension) {
         // Insert our item just before the last separator
         try {
           const item = {
-            content: "RvTools: Node Dimensions",
+            content: "Eclipse: Node Dimensions",
             callback: () => {
-              LGraphCanvas.prototype.rvtoolsSetNodeDimension(node);
+              LGraphCanvas.prototype.eclipseSetNodeDimension(node);
             },
           };
           const reloadItem = {
-            content: "RvTools: Reload Node",
+            content: "Eclipse: Reload Node",
             callback: () => {
               try {
-                LGraphCanvas.prototype.rvtoolsReloadNode(node);
+                LGraphCanvas.prototype.eclipseReloadNode(node);
               } catch (e) {
-                console.debug('rvtools: Reload Node failed', e);
+                console.debug('eclipse: Reload Node failed', e);
               }
             },
           };
           // Insert both items adjacent with no separator.
-          const hasNodeDimensions = options.some((o) => o && o.content && String(o.content).includes("RvTools: Node Dimensions"));
-          const hasReloadNode = options.some((o) => o && o.content && String(o.content).includes("RvTools: Reload Node"));
+          const hasNodeDimensions = options.some((o) => o && o.content && String(o.content).includes("Eclipse: Node Dimensions"));
+          const hasReloadNode = options.some((o) => o && o.content && String(o.content).includes("Eclipse: Reload Node"));
           // If neither exist, insert both together. If one exists, insert the missing one next to it.
           if (!hasNodeDimensions && !hasReloadNode) {
             options.splice(options.length - 1, 0, item, reloadItem);
@@ -562,7 +562,7 @@ if (!LGraphCanvas.prototype.rvtoolsSetNodeDimension) {
             }
           }
         } catch (e) {
-          console.debug('rvtools: failed to inject Node Dimensions menu item', e);
+          console.debug('eclipse: failed to inject Node Dimensions menu item', e);
         }
         return options;
       };
@@ -572,8 +572,8 @@ if (!LGraphCanvas.prototype.rvtoolsSetNodeDimension) {
     return origOnShowNodeMenu.apply(this, arguments);
   };
 
-  // Full rvtoolsReloadNode implementation (adapted from TinyTerra tinyterraReloadNode)
-  LGraphCanvas.prototype.rvtoolsReloadNode = function (node) {
+  // Full eclipseReloadNode implementation (adapted from TinyTerra tinyterraReloadNode)
+  LGraphCanvas.prototype.eclipseReloadNode = function (node) {
     try {
       const CONVERTED_TYPE = "converted-widget";
       const GET_CONFIG = Symbol();
@@ -781,33 +781,33 @@ if (!LGraphCanvas.prototype.rvtoolsSetNodeDimension) {
       newNode.onResize([0, 0]);
       newNode.setDirtyCanvas(true, true);
     } catch (e) {
-      console.debug('rvtools: rvtoolsReloadNode exception', e);
+      console.debug('eclipse: eclipseReloadNode exception', e);
     }
   };
 }
 
 // New API: Register extension with getNodeMenuItems hook (ComfyUI v1.0+)
 app.registerExtension({
-  name: "RvTools.nodeMenuItems",
+  name: "Eclipse.nodeMenuItems",
   
   getNodeMenuItems(node) {
     // Mark that new API is in use
-    window.rvtools_newNodeMenuAPIUsed = true;
+    window.eclipse_newNodeMenuAPIUsed = true;
     
     return [
       {
-        content: "RvTools: Node Dimensions",
+        content: "Eclipse: Node Dimensions",
         callback: () => {
-          LGraphCanvas.prototype.rvtoolsSetNodeDimension(node);
+          LGraphCanvas.prototype.eclipseSetNodeDimension(node);
         },
       },
       {
-        content: "RvTools: Reload Node",
+        content: "Eclipse: Reload Node",
         callback: () => {
           try {
-            LGraphCanvas.prototype.rvtoolsReloadNode(node);
+            LGraphCanvas.prototype.eclipseReloadNode(node);
           } catch (e) {
-            console.debug('rvtools: Reload Node failed', e);
+            console.debug('eclipse: Reload Node failed', e);
           }
         },
       },
@@ -816,19 +816,19 @@ app.registerExtension({
 });
 
 app.registerExtension({
-  name: "RvTools.appearance",
+  name: "Eclipse.appearance",
 
   nodeCreated(node) {
-    // Only apply appearance to RvTools nodes (nodes created by this extension)
-    // Prefer matching the displayed NODE_NAME which commonly includes '[RvTools]'
+    // Only apply appearance to Eclipse nodes (nodes created by this extension)
+    // Prefer matching the displayed NODE_NAME which commonly includes '[Eclipse]'
     try {
       const title = node.title || node.constructor?.title || "";
       const comfy = node.comfyClass || "";
       const ctorType = node.constructor?.type || "";
       const nodeType = node.type || "";
 
-      // Flexible detection: match if any identifier contains the RvTools marker or 'Rv' prefix
-      const matchesTag = (s) => typeof s === 'string' && s.includes('[RvTools]');
+      // Flexible detection: match if any identifier contains the Eclipse marker or 'Rv' prefix
+      const matchesTag = (s) => typeof s === 'string' && s.includes('[Eclipse]');
       const matchesRv = (s) =>
         typeof s === 'string' &&
         (s.startsWith('Rv') || s.includes('Rv') || s.toLowerCase().includes('rv'));
@@ -846,34 +846,34 @@ app.registerExtension({
         node.bgcolor = "#3a3a3a";
         node.shape = "box";
         node.setDirtyCanvas?.(true, true);
-        node._rvtools_appearance_applied = true;
+        node._Eclipse_appearance_applied = true;
       }
 
       if (isRvNode) {
         // Don't overwrite if we've already applied appearance
-        if (node._rvtools_appearance_applied) {
+        if (node._Eclipse_appearance_applied) {
           // already applied, nothing to do
         } else {
           // Record initial colors so we can detect if something/user changed them
-          if (node._rvtools_initial_bgcolor === undefined)
-            node._rvtools_initial_bgcolor = node.bgcolor;
-          if (node._rvtools_initial_color === undefined)
-            node._rvtools_initial_color = node.color;
+          if (node._Eclipse_initial_bgcolor === undefined)
+            node._Eclipse_initial_bgcolor = node.bgcolor;
+          if (node._Eclipse_initial_color === undefined)
+            node._Eclipse_initial_color = node.color;
 
           // Only apply if the node's current colors still equal the initial values (i.e., not user-customized)
           const stillDefault =
-            node.bgcolor === node._rvtools_initial_bgcolor &&
-            node.color === node._rvtools_initial_color;
+            node.bgcolor === node._Eclipse_initial_bgcolor &&
+            node.color === node._Eclipse_initial_color;
           if (stillDefault) {
             applyAppearanceNow();
           }
 
           // One short re-check to handle cases where node construction finishes after this hook
           setTimeout(() => {
-            if (node._rvtools_appearance_applied) return;
+            if (node._Eclipse_appearance_applied) return;
             const stillDefaultLater =
-              node.bgcolor === node._rvtools_initial_bgcolor &&
-              node.color === node._rvtools_initial_color;
+              node.bgcolor === node._Eclipse_initial_bgcolor &&
+              node.color === node._Eclipse_initial_color;
             if (stillDefaultLater) {
               applyAppearanceNow();
             } else {

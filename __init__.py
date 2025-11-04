@@ -1,6 +1,6 @@
-# Comfyui_RvTools Extension Loader
+# Comfyui_Eclipse Extension Loader
 #
-# Initializes and loads all custom nodes for Comfyui_RvTools, providing NODE_CLASS_MAPPINGS and NODE_DISPLAY_NAME_MAPPINGS for the extension.
+# Initializes and loads all custom nodes for Comfyui_Eclipse, providing NODE_CLASS_MAPPINGS and NODE_DISPLAY_NAME_MAPPINGS for the extension.
 #
 # Author: r-vage
 #
@@ -31,10 +31,10 @@ NODE_CLASS_MAPPINGS: Dict[str, Type[Any]] = {}
 NODE_DISPLAY_NAME_MAPPINGS: Dict[str, str] = {}
 
 # MESSAGE TEMPLATES
-cstr.color.add_code("msg", f"{cstr.color.LIGHTGREEN}RvTools: {cstr.color.END}")
-cstr.color.add_code("warning", f"{cstr.color.LIGHTGREEN}RvTools {cstr.color.LIGHTYELLOW}Warning: {cstr.color.END}")
-cstr.color.add_code("debug", f"{cstr.color.LIGHTGREEN}RvTools {cstr.color.LIGHTBEIGE}Debug: {cstr.color.END}")
-cstr.color.add_code("error", f"{cstr.color.RED}RvTools {cstr.color.END}Error: {cstr.color.END}")
+cstr.color.add_code("msg", f"{cstr.color.LIGHTGREEN}Eclipse: {cstr.color.END}")
+cstr.color.add_code("warning", f"{cstr.color.LIGHTGREEN}Eclipse {cstr.color.LIGHTYELLOW}Warning: {cstr.color.END}")
+cstr.color.add_code("debug", f"{cstr.color.LIGHTGREEN}Eclipse {cstr.color.LIGHTBEIGE}Debug: {cstr.color.END}")
+cstr.color.add_code("error", f"{cstr.color.RED}Eclipse {cstr.color.END}Error: {cstr.color.END}")
 
 cstr(f'Version: {version}').msg.print()
 
@@ -56,7 +56,7 @@ if not os.path.exists(models_smartprompt_dir) and os.path.exists(repo_prompt_dir
     copy_prompt_files_once(repo_prompt_dir, models_smartprompt_dir)
 
 # API route for serving loader templates
-@server.PromptServer.instance.routes.get("/rvtools/loader_templates/{filename}")
+@server.PromptServer.instance.routes.get("/eclipse/loader_templates/{filename}")
 async def serve_loader_template(request):
     filename = request.match_info.get('filename', '')
     if not filename.endswith('.json'):
@@ -75,14 +75,14 @@ async def serve_loader_template(request):
         return web.Response(status=404, text="Template not found")
 
 # API route for getting template list
-@server.PromptServer.instance.routes.get("/rvtools/loader_templates_list")
+@server.PromptServer.instance.routes.get("/eclipse/loader_templates_list")
 async def get_loader_templates_list(request):
     from .py.RvLoader_SmartLoader import get_template_list
     templates = get_template_list()
     return web.json_response(templates)
 
 # API route for getting folder files for RandomPrompt
-@server.PromptServer.instance.routes.get("/rvtools/folder_files/{folder}")
+@server.PromptServer.instance.routes.get("/eclipse/folder_files/{folder}")
 async def get_folder_files(request):
     folder = request.match_info.get('folder', '')
     if not folder:
@@ -127,7 +127,7 @@ async def get_folder_files(request):
     return web.json_response(files)
 
 # API route for getting widget-to-folder mapping for RandomPrompt
-@server.PromptServer.instance.routes.get("/rvtools/widget_folder_mapping")
+@server.PromptServer.instance.routes.get("/eclipse/widget_folder_mapping")
 async def get_widget_folder_mapping(request):
     import os
     import re

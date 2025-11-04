@@ -70,19 +70,19 @@ Select "beautiful woman" and it appears in your final prompt. Select "Random" an
 ### File Location
 
 **Primary Location:** `ComfyUI/models/wildcards/smartprompt/`  
-**Fallback Location:** `ComfyUI_RvTools/prompt/`
+**Fallback Location:** `ComfyUI_Eclipse/prompt/`
 
 Smart Prompt uses a dual-location system:
 
 1. **Primary (Wildcards Integration):** On first run, Smart Prompt automatically copies files from the extension's `prompt/` folder to `ComfyUI/models/wildcards/smartprompt/`. This enables wildcard integration while keeping the original files safe in the extension directory.
 
-2. **Fallback (Extension Directory):** If the smartprompt folder doesn't exist or is deleted, Smart Prompt falls back to using `ComfyUI_RvTools/prompt/` directly.
+2. **Fallback (Extension Directory):** If the smartprompt folder doesn't exist or is deleted, Smart Prompt falls back to using `ComfyUI_Eclipse/prompt/` directly.
 
 **Benefits:**
 - **Wildcard Integration:** Files in `smartprompt/` can be used with the Wildcard Processor node (e.g., `__smartprompt/subjects/character__`)
 - **Safe Customization:** Edit files in `smartprompt/` without affecting the extension's originals
 - **Easy Reset:** Delete `smartprompt/` folder to get a fresh copy from the extension
-- **Updates Preserved:** Extension updates modify `ComfyUI_RvTools/prompt/`, not your customized `smartprompt/` files
+- **Updates Preserved:** Extension updates modify `ComfyUI_Eclipse/prompt/`, not your customized `smartprompt/` files
 
 ---
 
@@ -90,7 +90,7 @@ Smart Prompt uses a dual-location system:
 
 ### Step 1: Understand the File Structure
 
-Navigate to `ComfyUI/models/wildcards/smartprompt/` (created on first run) or `ComfyUI_RvTools/prompt/` (template location).
+Navigate to `ComfyUI/models/wildcards/smartprompt/` (created on first run) or `ComfyUI_Eclipse/prompt/` (template location).
 
 You'll find folders like:
 ```
@@ -114,7 +114,7 @@ Each numbered text file becomes a **dropdown widget**.
 ### Step 2: Add the Node
 
 1. Right-click in ComfyUI workflow
-2. Navigate to: `RvTools > Text > Smart Prompt`
+2. Navigate to: `Eclipse > Text > Smart Prompt`
 3. The node appears with:
    - **folder** dropdown (All, subjects, settings, environments, etc.)
    - Multiple dropdown widgets (one per text file)
@@ -284,7 +284,7 @@ sketch, draft style
    ```
    ComfyUI/models/wildcards/smartprompt/
    ```
-   (Or edit templates in `ComfyUI_RvTools/prompt/` and delete the smartprompt folder to get a fresh copy)
+   (Or edit templates in `ComfyUI_Eclipse/prompt/` and delete the smartprompt folder to get a fresh copy)
 
 2. **Choose or Create Folder:**
    - Use existing: `subjects/`, `settings/`, `environments/`
@@ -688,7 +688,7 @@ charcoal sketch, high contrast
 
 1. **Check folder exists:**
    - Primary: `ComfyUI/models/wildcards/smartprompt/`
-   - Fallback: `ComfyUI_RvTools/prompt/`
+   - Fallback: `ComfyUI_Eclipse/prompt/`
 
 2. **Check folder structure:**
    ```
@@ -796,7 +796,7 @@ charcoal sketch, high contrast
 
 2. **Check file location:**
    - Primary: Files in `ComfyUI/models/wildcards/smartprompt/`
-   - Fallback: Files in `ComfyUI_RvTools/prompt/`
+   - Fallback: Files in `ComfyUI_Eclipse/prompt/`
    - Files in correct subfolder?
 
 3. **Verify filename:**
@@ -930,7 +930,7 @@ Different prompt libraries for positive/negative prompts.
 
 ### File Location
 - Primary: `ComfyUI/models/wildcards/smartprompt/` (auto-created on first run)
-- Fallback: `ComfyUI_RvTools/prompt/` (template/backup)
+- Fallback: `ComfyUI_Eclipse/prompt/` (template/backup)
 - Wildcard syntax: `__smartprompt/folder/filename__`
 
 ### Selection Modes
@@ -960,9 +960,9 @@ Different prompt libraries for positive/negative prompts.
 ## Related Documentation
 
 - [Wildcard Processor Guide](Wildcard_Processor.md) - Template-based prompt expansion
-- [Main README](../README.md#node-spotlight-smart-prompt-rvtools) - Smart Prompt spotlight
-- [Pipe System](Pipe_System.md) - Working with RvTools pipes
+- [Main README](../README.md#node-spotlight-smart-prompt-eclipse) - Smart Prompt spotlight
+- [Pipe System](Pipe_System.md) - Working with Eclipse pipes
 
 ---
 
-**Need help?** Check the main [README](../README.md) or open an issue on the [GitHub repository](https://github.com/r-vage/ComfyUI_RvTools).
+**Need help?** Check the main [README](../README.md) or open an issue on the [GitHub repository](https://github.com/r-vage/ComfyUI_Eclipse).

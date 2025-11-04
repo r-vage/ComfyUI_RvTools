@@ -37,7 +37,7 @@ class RvText_DualText:
         
         return (txt_pos, txt_neg)
 
-NODE_NAME = 'String Dual [RvTools]'
+NODE_NAME = 'String Dual [Eclipse]'
 NODE_DESC = 'String Dual'
 
 NODE_CLASS_MAPPINGS = {

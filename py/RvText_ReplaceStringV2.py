@@ -191,7 +191,7 @@ class RvText_ReplaceStringV2:
             replaced = re.sub(r'[.,;:!?]+$', '', replaced).strip()
         return (replaced,)
 
-NODE_NAME = 'Replace String v2 [RvTools]'
+NODE_NAME = 'Replace String v2 [Eclipse]'
 NODE_DESC = 'Replace String v2'
 
 NODE_CLASS_MAPPINGS = {

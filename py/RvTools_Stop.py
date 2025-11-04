@@ -15,7 +15,7 @@ from ..core import CATEGORY, AnyType
 
 any = AnyType("*")
 
-class RvTools_Stop:
+class Eclipse_Stop:
     @classmethod
     def INPUT_TYPES(cls):
         return {
@@ -39,11 +39,11 @@ class RvTools_Stop:
         return (out,)
 
 
-NODE_NAME = 'Stop [RvTools]'
+NODE_NAME = 'Stop [Eclipse]'
 NODE_DESC = 'Stop'
 
 NODE_CLASS_MAPPINGS = {
-   NODE_NAME: RvTools_Stop
+   NODE_NAME: Eclipse_Stop
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {

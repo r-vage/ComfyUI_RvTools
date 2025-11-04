@@ -1,6 +1,6 @@
-# ComfyUI-RvTools User Documentation
+# ComfyUI_Eclipse User Documentation
 
-Welcome to the user documentation for ComfyUI-RvTools! This guide is designed for artists, creators, and users who want to understand how to use the nodes effectively - not for developers.
+Welcome to the user documentation for ComfyUI_Eclipse! This guide is designed for artists, creators, and users who want to understand how to use the nodes effectively - not for developers.
 
 ## Documentation Index
 
@@ -46,7 +46,7 @@ Welcome to the user documentation for ComfyUI-RvTools! This guide is designed fo
 
 ### Getting Started
 
-If you're new to ComfyUI-RvTools loaders:
+If you're new to ComfyUI_Eclipse loaders:
 
 1. **Start Here:** [Checkpoint Loaders Guide](Checkpoint_Loaders.md)
    - Learn the basics with traditional loaders
@@ -139,8 +139,8 @@ A: RTX 30 and 40 series GPUs work well with the primary benefit being lower VRAM
 | GGUF Models | `ComfyUI/models/gguf/` |
 | CLIP Files | `ComfyUI/models/clip/` |
 | VAE Files | `ComfyUI/models/vae/` |
-| Templates | `ComfyUI/custom_nodes/ComfyUI_RvTools/json/loader_templates/` |
-| Smart Prompt Files | `ComfyUI/models/wildcards/smartprompt/` (primary)<br>`ComfyUI_RvTools/prompt/` (fallback) |
+| Templates | `ComfyUI/custom_nodes/ComfyUI_Eclipse/json/loader_templates/` |
+| Smart Prompt Files | `ComfyUI/models/wildcards/smartprompt/` (primary)<br>`ComfyUI_Eclipse/prompt/` (fallback) |
 | Wildcard Files | `ComfyUI/models/wildcards/` |
 
 ### Required Extensions
@@ -174,16 +174,16 @@ Always prefer `.safetensors` when available for safety and speed.
 ### Support & Help
 
 - **Main README:** [../README.md](../README.md) - Overview and feature highlights
-- **GitHub Issues:** [Report bugs or request features](https://github.com/r-vage/ComfyUI_RvTools/issues)
+- **GitHub Issues:** [Report bugs or request features](https://github.com/r-vage/ComfyUI_Eclipse/issues)
 - **License:** GPL-3.0 - See [LICENSE](../LICENSE)
 
 ### What's Not Covered Here
 
-This user documentation focuses on model loaders. For other RvTools features:
+This user documentation focuses on model loaders. For other Eclipse features:
 
-- **Pipe System** - See main [README](../README.md#the-pipe-ecosystem-of-rvtools)
-- **Text Processing** - See [Smart Prompt](../README.md#node-spotlight-smart-prompt-rvtools) and [Wildcard Processor](../README.md#node-spotlight-wildcard-processor-rvtools)
-- **Image Saving** - See [Save Images](../README.md#node-spotlight-save-images-rvtools)
+- **Pipe System** - See main [README](../README.md#the-pipe-ecosystem-of-eclipse)
+- **Text Processing** - See [Smart Prompt](../README.md#node-spotlight-smart-prompt-eclipse) and [Wildcard Processor](../README.md#node-spotlight-wildcard-processor-eclipse)
+- **Image Saving** - See [Save Images](../README.md#node-spotlight-save-images-eclipse)
 - **Other Nodes** - See [Files by Category](../README.md#files-by-category)
 
 ---
@@ -200,4 +200,4 @@ Found an error or want to improve these guides?
 
 ---
 
-**Happy creating!** If these guides helped you, consider starring the [repository](https://github.com/r-vage/ComfyUI_RvTools) ⭐
+**Happy creating!** If these guides helped you, consider starring the [repository](https://github.com/r-vage/ComfyUI_Eclipse) ⭐

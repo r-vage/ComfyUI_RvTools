@@ -46,7 +46,7 @@ class RvConversion_ConvertPrimitive:
         
         # Check for list/tuple input and reject it
         if isinstance(input, (list, tuple)):
-            print(f"[RvTools ConvertPrimitive] Warning: List/tuple input detected. Use ConvertToList node first to extract values.")
+            print(f"[Eclipse ConvertPrimitive] Warning: List/tuple input detected. Use ConvertToList node first to extract values.")
             # Take first element as fallback
             if len(input) > 0:
                 input = input[0]
@@ -112,7 +112,7 @@ class RvConversion_ConvertPrimitive:
             
         except (ValueError, TypeError) as e:
             # If conversion fails, return defaults
-            print(f"[RvTools ConvertPrimitive] Conversion error: {e}")
+            print(f"[Eclipse ConvertPrimitive] Conversion error: {e}")
             if convert_to == "STRING":
                 return ("",)
             elif convert_to == "INT":
@@ -161,7 +161,7 @@ class RvConversion_ConvertPrimitive:
                 # First element is selected by default
                 return ((options[0], options),)
             except Exception as e:
-                print(f"[RvTools ConvertPrimitive] COMBO conversion from iterable failed: {e}")
+                print(f"[Eclipse ConvertPrimitive] COMBO conversion from iterable failed: {e}")
                 return (("", [""]),)
         else:
             # Single value -> create combo with single option
@@ -169,7 +169,7 @@ class RvConversion_ConvertPrimitive:
             return ((str_val, [str_val]),)
 
 
-NODE_NAME = "Convert Primitive [RvTools]"
+NODE_NAME = "Convert Primitive [Eclipse]"
 NODE_DESC = "Convert Primitive"
 
 NODE_CLASS_MAPPINGS = {

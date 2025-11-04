@@ -77,7 +77,7 @@ class RvSettings_VCNameGen_v1:
 
         return (pipe,)
 
-NODE_NAME = 'VC-Filename Generator I [RvTools]'
+NODE_NAME = 'VC-Filename Generator I [Eclipse]'
 NODE_DESC = 'VC-Filename Generator I'
 
 NODE_CLASS_MAPPINGS = {

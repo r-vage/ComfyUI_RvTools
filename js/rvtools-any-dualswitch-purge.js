@@ -16,9 +16,9 @@
 import { app } from "../../scripts/app.js";
 
 app.registerExtension({
-    name: "RvTools.RouterAnyDualSwitchPurge",
+    name: "Eclipse.RouterAnyDualSwitchPurge",
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
-        if (nodeData.name === "Any Dual-Switch Purge [RvTools]") {
+        if (nodeData.name === "Any Dual-Switch Purge [Eclipse]") {
             const onNodeCreated = nodeType.prototype.onNodeCreated;
             nodeType.prototype.onNodeCreated = function () {
                 if (onNodeCreated) {

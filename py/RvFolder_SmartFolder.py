@@ -23,17 +23,17 @@ MAX_RESOLUTION = 32768
 
 initial_random_state = random.getstate()
 random.seed(datetime.now().timestamp())
-rvtools_seed_random_state = random.getstate()
+eclipse_seed_random_state = random.getstate()
 random.setstate(initial_random_state)
 
 
 def new_random_seed():
-    """ Gets a new random seed from the rvtools_seed_random_state and resetting the previous state."""
-    global rvtools_seed_random_state
+    """ Gets a new random seed from the eclipse_seed_random_state and resetting the previous state."""
+    global eclipse_seed_random_state
     prev_random_state = random.getstate()
-    random.setstate(rvtools_seed_random_state)
+    random.setstate(eclipse_seed_random_state)
     seed = random.randint(1, 1125899906842624)
-    rvtools_seed_random_state = random.getstate()
+    eclipse_seed_random_state = random.getstate()
     random.setstate(prev_random_state)
     return seed
 
@@ -305,7 +305,7 @@ class RvFolder_SmartFolder:
         return (pipe,)
 
 
-NODE_NAME = 'Smart Folder [RvTools]'
+NODE_NAME = 'Smart Folder [Eclipse]'
 NODE_DESC = 'Smart Folder'
 
 NODE_CLASS_MAPPINGS = {

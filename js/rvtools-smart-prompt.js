@@ -17,7 +17,7 @@
 
 import { app } from "../../scripts/app.js";
 
-const NODE_NAME = "Smart Prompt [RvTools]";
+const NODE_NAME = "Smart Prompt [Eclipse]";
 
 // Seed constants (from seed.js)
 const LAST_SEED_BUTTON_LABEL = "♻️ (Use Last Queued Seed)";
@@ -27,7 +27,7 @@ const SPECIAL_SEED_DECREMENT = -3;
 const SPECIAL_SEEDS = [SPECIAL_SEED_RANDOM, SPECIAL_SEED_INCREMENT, SPECIAL_SEED_DECREMENT];
 
 app.registerExtension({
-    name: "RvTools.SmartPrompt",
+    name: "Eclipse.SmartPrompt",
     
     async setup() {
         // Hook into the graphToPrompt to modify seed values in the prompt data
@@ -39,7 +39,7 @@ app.registerExtension({
             // Now modify the prompt data for Smart Prompt nodes
             const nodes = app.graph._nodes;
             for (const node of nodes) {
-                if (node.type === NODE_NAME && node._rvtools_seedWidget) {
+                if (node.type === NODE_NAME && node._Eclipse_seedWidget) {
                     // Skip if node is muted or bypassed
                     if (node.mode === 2 || node.mode === 4) {
                         continue;
@@ -65,25 +65,25 @@ app.registerExtension({
                         }
 
                         // Update last seed tracking only when it actually changes
-                        if (Number(node._rvtools_lastSeed) !== Number(seedToUse)) {
-                            node._rvtools_lastSeed = seedToUse;
+                        if (Number(node._Eclipse_lastSeed) !== Number(seedToUse)) {
+                            node._Eclipse_lastSeed = seedToUse;
                         }
                         
                         // Clear the seed cache after use so next call generates fresh random seed
-                        node._rvtools_cachedInputSeed = null;
-                        node._rvtools_cachedResolvedSeed = null;
+                        node._Eclipse_cachedInputSeed = null;
+                        node._Eclipse_cachedResolvedSeed = null;
                         
                         // Update the last seed button - but DON'T change the widget value
-                        if (node._rvtools_lastSeedButton) {
-                            const currentWidgetValue = node._rvtools_seedWidget.value;
+                        if (node._Eclipse_lastSeedButton) {
+                            const currentWidgetValue = node._Eclipse_seedWidget.value;
                             if (SPECIAL_SEEDS.includes(currentWidgetValue)) {
                                 // Widget has special seed, show what was actually used
-                                node._rvtools_lastSeedButton.name = `♻️ ${seedToUse}`;
-                                node._rvtools_lastSeedButton.disabled = false;
+                                node._Eclipse_lastSeedButton.name = `♻️ ${seedToUse}`;
+                                node._Eclipse_lastSeedButton.disabled = false;
                             } else {
                                 // Widget has regular seed value
-                                node._rvtools_lastSeedButton.name = LAST_SEED_BUTTON_LABEL;
-                                node._rvtools_lastSeedButton.disabled = true;
+                                node._Eclipse_lastSeedButton.name = LAST_SEED_BUTTON_LABEL;
+                                node._Eclipse_lastSeedButton.disabled = true;
                             }
                         }
                         
@@ -91,7 +91,7 @@ app.registerExtension({
                         if (result.workflow && result.workflow.nodes) {
                             const workflowNode = result.workflow.nodes.find(n => n.id === node.id);
                             if (workflowNode && workflowNode.widgets_values) {
-                                const seedWidgetIndex = node.widgets.indexOf(node._rvtools_seedWidget);
+                                const seedWidgetIndex = node.widgets.indexOf(node._Eclipse_seedWidget);
                                 if (seedWidgetIndex >= 0) {
                                     // Only update workflow stored value if it differs
                                     if (workflowNode.widgets_values[seedWidgetIndex] !== seedToUse) {
@@ -115,9 +115,9 @@ app.registerExtension({
         
         // Method to generate random seed (from seed.js)
         nodeType.prototype.generateRandomSeed = function() {
-            const step = this._rvtools_seedWidget?.options?.step || 1;
-            const randomMin = this._rvtools_randomMin || 0;
-            const randomMax = this._rvtools_randomMax || 1125899906842624;
+            const step = this._Eclipse_seedWidget?.options?.step || 1;
+            const randomMin = this._Eclipse_randomMin || 0;
+            const randomMax = this._Eclipse_randomMax || 1125899906842624;
             const randomRange = (randomMax - randomMin) / (step / 10);
             let seed = Math.floor(Math.random() * randomRange) * (step / 10) + randomMin;
             
@@ -140,12 +140,12 @@ app.registerExtension({
             }
             
             // Normal seed generation logic when seed_input is not connected
-            const inputSeed = Number(this._rvtools_seedWidget.value);
+            const inputSeed = Number(this._Eclipse_seedWidget.value);
             
             // Check if we have a cached resolved seed for this input seed
             // This prevents generating different random seeds on multiple calls
-            if (this._rvtools_cachedInputSeed === inputSeed && this._rvtools_cachedResolvedSeed != null) {
-                return this._rvtools_cachedResolvedSeed;
+            if (this._Eclipse_cachedInputSeed === inputSeed && this._Eclipse_cachedResolvedSeed != null) {
+                return this._Eclipse_cachedResolvedSeed;
             }
             
             let seedToUse = null;
@@ -153,11 +153,11 @@ app.registerExtension({
             // If our input seed was a special seed, then handle it
             if (SPECIAL_SEEDS.includes(inputSeed)) {
                 // If the last seed was not a special seed and we have increment/decrement, then do that
-                if (typeof this._rvtools_lastSeed === "number" && !SPECIAL_SEEDS.includes(this._rvtools_lastSeed)) {
+                if (typeof this._Eclipse_lastSeed === "number" && !SPECIAL_SEEDS.includes(this._Eclipse_lastSeed)) {
                     if (inputSeed === SPECIAL_SEED_INCREMENT) {
-                        seedToUse = this._rvtools_lastSeed + 1;
+                        seedToUse = this._Eclipse_lastSeed + 1;
                     } else if (inputSeed === SPECIAL_SEED_DECREMENT) {
-                        seedToUse = this._rvtools_lastSeed - 1;
+                        seedToUse = this._Eclipse_lastSeed - 1;
                     }
                 }
                 
@@ -170,8 +170,8 @@ app.registerExtension({
             const finalSeed = seedToUse != null ? seedToUse : inputSeed;
             
             // Cache the resolved seed for this input seed
-            this._rvtools_cachedInputSeed = inputSeed;
-            this._rvtools_cachedResolvedSeed = finalSeed;
+            this._Eclipse_cachedInputSeed = inputSeed;
+            this._Eclipse_cachedResolvedSeed = finalSeed;
             
             return finalSeed;
         };
@@ -183,7 +183,7 @@ app.registerExtension({
             
             // Store the seed that was actually used if available
             if (message && message.seed !== undefined) {
-                this._rvtools_lastSeed = message.seed;
+                this._Eclipse_lastSeed = message.seed;
             }
             
             return result;
@@ -210,22 +210,22 @@ app.registerExtension({
             }
 
             if (!seedWidget) {
-                console.warn(`[RvTools-SmartPrompt] Could not find Seed widget. Widgets:`, this.widgets.map(w => ({ name: w.name, label: w.label })));
+                console.warn(`[Eclipse-SmartPrompt] Could not find Seed widget. Widgets:`, this.widgets.map(w => ({ name: w.name, label: w.label })));
             } else {
                 // Store seed widget and initialize seed tracking properties
-                this._rvtools_seedWidget = seedWidget;
-                this._rvtools_lastSeed = undefined;
-                this._rvtools_randomMin = 0;
-                this._rvtools_randomMax = 1125899906842624;
-                this._rvtools_cachedInputSeed = null;
-                this._rvtools_cachedResolvedSeed = null;
+                this._Eclipse_seedWidget = seedWidget;
+                this._Eclipse_lastSeed = undefined;
+                this._Eclipse_randomMin = 0;
+                this._Eclipse_randomMax = 1125899906842624;
+                this._Eclipse_cachedInputSeed = null;
+                this._Eclipse_cachedResolvedSeed = null;
                 
                 // Hook into the seed widget's value setter to clear cache when it changes
                 const originalCallback = seedWidget.callback;
                 seedWidget.callback = (value) => {
                     // Clear the seed cache when the seed value changes
-                    this._rvtools_cachedInputSeed = null;
-                    this._rvtools_cachedResolvedSeed = null;
+                    this._Eclipse_cachedInputSeed = null;
+                    this._Eclipse_cachedResolvedSeed = null;
                     // Call the original callback if it exists
                     if (originalCallback) {
                         return originalCallback.call(seedWidget, value);
@@ -272,8 +272,8 @@ app.registerExtension({
                     LAST_SEED_BUTTON_LABEL,
                     "",
                     () => {
-                        if (this._rvtools_lastSeed != null) {
-                            seedWidget.value = this._rvtools_lastSeed;
+                        if (this._Eclipse_lastSeed != null) {
+                            seedWidget.value = this._Eclipse_lastSeed;
                             lastSeedButton.name = LAST_SEED_BUTTON_LABEL;
                             lastSeedButton.disabled = true;
                         }
@@ -281,11 +281,11 @@ app.registerExtension({
                     { serialize: false }
                 );
                 lastSeedButton.disabled = true;
-                this._rvtools_lastSeedButton = lastSeedButton;
+                this._Eclipse_lastSeedButton = lastSeedButton;
                 
                 // Store references to seed buttons for connection state handling
-                this._rvtools_randomizeButton = randomizeButton;
-                this._rvtools_newRandomButton = newRandomButton;
+                this._Eclipse_randomizeButton = randomizeButton;
+                this._Eclipse_newRandomButton = newRandomButton;
                 
                 // Move buttons to be right after the seed widget
                 const buttonsToMove = [randomizeButton, newRandomButton, lastSeedButton];
@@ -469,9 +469,9 @@ app.registerExtension({
                     }
                     
                     // Skip seed control buttons (even if they're converted-widget)
-                    if (widget === node._rvtools_randomizeButton || 
-                        widget === node._rvtools_newRandomButton || 
-                        widget === node._rvtools_lastSeedButton) {
+                    if (widget === node._Eclipse_randomizeButton || 
+                        widget === node._Eclipse_newRandomButton || 
+                        widget === node._Eclipse_lastSeedButton) {
                         return;
                     }
 

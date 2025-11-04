@@ -45,7 +45,7 @@ class RvLogic_Float:
             value = 1.0
         return (float(value),)
 
-NODE_NAME = 'Float [RvTools]'
+NODE_NAME = 'Float [Eclipse]'
 NODE_DESC = 'Float'
 
 NODE_CLASS_MAPPINGS = {

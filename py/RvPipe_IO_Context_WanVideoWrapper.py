@@ -164,7 +164,7 @@ class RvPipe_IO_Context_WanVideoWrapper:
         # Return the updated pipe and all individual values
         return get_context_return_tuple(ctx)
 
-NODE_NAME = 'Context Video (WVW) [RvTools]'
+NODE_NAME = 'Context Video (WVW) [Eclipse]'
 NODE_DESC = 'Context Video (WVW)'
 
 NODE_CLASS_MAPPINGS = {
