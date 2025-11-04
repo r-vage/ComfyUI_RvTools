@@ -46,6 +46,7 @@ class RvPipe_Out_CheckpointLoader:
         "FLOAT",   # cfg: Classifier-free guidance scale (Smart Loader Plus only)
         any_type,  # sampler: Sampling algorithm (ANY type - Smart Loader Plus only)
         any_type,  # scheduler: Noise reduction scheduler (ANY type - Smart Loader Plus only)
+        "FLOAT",   # flux_guidance: Flux guidance scale
         "INT",     # clip_skip: Number of CLIP layers to skip (for style control)        
         "INT",     # width: Image width in pixels
         "INT",     # height: Image height in pixels
@@ -65,6 +66,7 @@ class RvPipe_Out_CheckpointLoader:
         "cfg",
         "sampler_name",
         "scheduler",
+        "flux_guidance",
         "clip_skip",        
         "width", 
         "height", 
@@ -134,6 +136,7 @@ class RvPipe_Out_CheckpointLoader:
         scheduler = pipe.get("scheduler")
         steps = pipe.get("steps", 20)
         cfg = pipe.get("cfg", 8.0)
+        flux_guidance = pipe.get("flux_guidance")
         
         # Coerce sampler numeric types
         try:
@@ -146,8 +149,13 @@ class RvPipe_Out_CheckpointLoader:
                 cfg = float(cfg)
         except Exception:
             cfg = 8.0
+        try:
+            if flux_guidance is not None:
+                flux_guidance = float(flux_guidance)
+        except Exception:
+            flux_guidance = None
 
-        return (model, clip, vae, output_latent, steps, cfg, sampler, scheduler, clip_skip,width, height, batch_size, model_name, vae_name)
+        return (model, clip, vae, output_latent, steps, cfg, sampler, scheduler, flux_guidance, clip_skip, width, height, batch_size, model_name, vae_name)
 
 NODE_NAME = 'Pipe Out Checkpoint Loader [Eclipse]'
 NODE_DESC = 'Pipe Out Checkpoint Loader'
