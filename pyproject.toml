@@ -28,7 +28,7 @@ Documentation = "https://github.com/r-vage/ComfyUI_Eclipse/wiki"
 [tool.comfy]
 PublisherId = "rvage"
 DisplayName = "ComfyUI_Eclipse"
-Icon = ""
+Icon = "https://raw.githubusercontent.com/r-vage/ComfyUI_Eclipse/refs/heads/main/Readme/icon_eclipse.png"
 includes = [] 
 # "requires-comfyui" = ">=1.0.0"  # ComfyUI version compatibility
 
