@@ -133,10 +133,10 @@ A: RTX 30 and 40 series GPUs work well with the primary benefit being lower VRAM
 | Item | Location |
 |------|----------|
 | Standard Checkpoints | `ComfyUI/models/checkpoints/` |
-| UNet Models | `ComfyUI/models/unet/` |
-| Nunchaku Models | `ComfyUI/models/nunchaku/` |
-| Qwen Models | `ComfyUI/models/qwen/` |
-| GGUF Models | `ComfyUI/models/gguf/` |
+| UNet Models | `ComfyUI/models/diffusion_models/` |
+| Nunchaku Models | `ComfyUI/models/diffusion_models/` |
+| Qwen Models | `ComfyUI/models/diffusion_models/` |
+| GGUF Models | `ComfyUI/models/diffusion_models/` |
 | CLIP Files | `ComfyUI/models/clip/` |
 | VAE Files | `ComfyUI/models/vae/` |
 | Templates | `ComfyUI/custom_nodes/ComfyUI_Eclipse/json/loader_templates/` |
