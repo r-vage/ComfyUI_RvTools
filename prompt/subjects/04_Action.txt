@@ -1,4 +1,3 @@
-holding
 \||/
 \m/
 \n/
@@ -31,13 +30,12 @@ balancing
 battoujutsu stance
 beckoning
 belly grab
-breast grab
 bent over
 bikini pull
 bowing
+breast grab
 bunching hair
 bunny pose
-butterfly sitting
 caramelldansen
 carry me
 carrying over shoulder
@@ -68,11 +66,8 @@ drying hair
 dual wielding
 faceplant
 feeding
-fetal position
 fidgeting
 fig sign
-fighting stance
-figure four sitting
 finger counting
 finger frame
 finger gun
@@ -83,8 +78,8 @@ flapping
 fox shadow puppet
 full scorpion
 glomp
-grabbing another's hair
 grabbing
+grabbing another's hair
 hair flip
 hair tucking
 hair twirling
@@ -92,6 +87,7 @@ hand between legs
 hand glasses
 hand in hair
 hand in pocket
+hand on another's
 hand on another's cheek
 hand on another's chin
 hand on another's hand
@@ -99,7 +95,6 @@ hand on another's head
 hand on another's neck
 hand on another's shoulder
 hand on another's stomach
-hand on another's
 hand on ear
 hand on headwear
 hand on hip
@@ -121,20 +116,19 @@ hands on feet
 hands on hips
 hands on own face
 hands on own knees
-handstand
 hat tip
 head back
 head down
 head rest
 head tilt
-headstand
 heart arms
+heart hands
 heart hands duo
 heart hands trio
-heart hands
-heart tail duo
 heart tail
+heart tail duo
 high five
+holding
 holding arrow
 holding eyewear
 holding flower
@@ -148,16 +142,15 @@ humpbacked
 index finger raised
 indian style
 inward v
-jumping
 kamina pose
 kissing neck
 kneeling
 knees to chest
 kuji-in
+leaning
 leaning back
 leaning forward
 leaning to the side
-leaning
 leg lift
 leg up
 legs apart
@@ -176,9 +169,6 @@ necktie grab
 noogie
 ohikaenasutte
 ok sign
-on back
-on side
-on stomach
 one knee
 open dress
 open hand
@@ -189,19 +179,17 @@ outstretched hand
 outstretched leg
 own hands clasped
 own hands together
+palm
 palm-fist greeting
 palm-fist tap
-palm
-paw pose
-pigeon pose
 pinky out
 pinky swear
+pointing
 pointing at self
 pointing at viewer
 pointing down
 pointing forward
 pointing up
-pointing
 power fist
 presenting armpit
 princess carry
@@ -213,7 +201,6 @@ rubbing eyes
 running
 salute
 saturday night fever
-scorpion pose
 seiza
 shading eyes
 shadow puppet
@@ -224,8 +211,6 @@ shocker (gesture)
 shoujo kitou-chuu
 shrugging
 shushing
-sitting on lap
-sitting
 skirt pull
 slit throat (gesture)
 slouching
@@ -234,17 +219,12 @@ split
 spread arms
 spread fingers
 spread legs
-squatting
-standing on one leg
-standing split
-standing
 steepled fingers
 straddling
 stretching
 stroking own chin
 superhero landing
 talking on phone
-the pose
 thigh straddling
 thumbs down
 thumbs up
@@ -253,8 +233,8 @@ top-down bottom-up
 tsuki ni kawatte oshioki yo
 twisted torso
 two-finger salute
-tying hair
 tying
+tying hair
 undressing
 upright straddle
 upshirt
@@ -271,4 +251,3 @@ watson cross
 yawning
 yoga
 yokozuwari
-zombie pose
