@@ -397,7 +397,7 @@ class RvLoader_SmartLoader_Plus:
                     "default": "None",
                     "tooltip": "Select Nunchaku Qwen model"
                 }),
-                "gguf_name": (["None"] + folder_paths.get_filename_list("diffusion_models_gguf"), {
+                "gguf_name": (["None"] + (folder_paths.get_filename_list("diffusion_models_gguf") if "diffusion_models_gguf" in folder_paths.folder_names_and_paths else []), {
                     "default": "None",
                     "tooltip": "Select GGUF model"
                 }),
