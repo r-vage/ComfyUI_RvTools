@@ -158,7 +158,11 @@ try:
             #print(f"[Nunchaku Wrapper] ✓ ComfyFluxWrapper module: {ComfyFluxWrapper.__module__}")
             print(f"[Nunchaku Wrapper] ✓ All Nunchaku classes imported successfully")
         else:
-            raise ImportError("ComfyUI-nunchaku not found")
+            print("[Nunchaku Wrapper] ComfyUI-nunchaku extension not found")
+            ComfyFluxWrapper = None
+            QwenConfig = None
+            QwenModelBase = None
+            NunchakuModelPatcher = None
             
     except Exception as e:
         import traceback
