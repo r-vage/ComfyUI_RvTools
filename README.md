@@ -2,7 +2,7 @@
 
 ComfyUI_Eclipse is a collection of custom nodes, helpers and utilities for ComfyUI designed to make workflow building easier and more reliable. It includes convenience nodes for loading checkpoints and pipelines, type conversions, folder and filename helpers, simple image utilities, logic and flow helpers, and small toolkits for working with VAE/CLIP and latents.
 
-Note: Workflows created with Eclipse_v2 are NOT compatible with this version. This release contains a substantial cleanup and many improvements.
+Note: Workflows created with RvTools_v2 are NOT compatible with this version. This release contains a substantial cleanup and many improvements.
 
 ## Documentation
 
