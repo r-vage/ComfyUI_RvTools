@@ -11,8 +11,7 @@
 * limitations under the License.
 */
 
-import { app } from "../../scripts/app.js";
-import { ComfyWidgets } from "../../scripts/widgets.js";
+import { app, ComfyWidgets } from './comfy/index.js';
 
 const LAST_SEED_BUTTON_LABEL = "♻️ (Use Last Queued Seed)";
 

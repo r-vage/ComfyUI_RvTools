@@ -13,7 +13,7 @@
 * Dynamic type handling for Any Passer node
 */
 
-import { app } from "../../scripts/app.js";
+import { app } from './comfy/index.js';
 import { setupAnyTypeHandling } from "./eclipse-any-type-handler.js";
 
 app.registerExtension({

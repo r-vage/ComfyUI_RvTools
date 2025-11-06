@@ -12,8 +12,7 @@
 * Dynamically creates readonly text widgets to display any data type
 */
 
-import { app } from "../../scripts/app.js";
-import { ComfyWidgets } from "../../scripts/widgets.js";
+import { app, ComfyWidgets } from './comfy/index.js';
 
 const NODE_NAME = "Show Any [Eclipse]";
 

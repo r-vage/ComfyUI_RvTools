@@ -11,7 +11,7 @@
 * limitations under the License.
 */
 
-import { app } from "../../scripts/app.js";
+import { app } from './comfy/index.js';
 
 const canvasUtilsName = "Eclipse.canvasUtils";
 

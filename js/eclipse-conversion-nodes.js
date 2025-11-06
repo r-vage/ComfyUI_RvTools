@@ -13,7 +13,7 @@
 * Unified handler for all conversion nodes with widget-based type updates
 */
 
-import { app } from "../../scripts/app.js";
+import { app } from './comfy/index.js';
 import { setupAnyTypeHandling } from "./eclipse-any-type-handler.js";
 
 // Type mappings for each conversion node

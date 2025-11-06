@@ -14,8 +14,7 @@
 * Adds LoRA configuration management with dynamic slot visibility
 */
 
-import { app } from "../../scripts/app.js";
-import { api } from "../../scripts/api.js";
+import { app, api } from './comfy/index.js';
 
 const NODE_NAME = "Smart Loader Plus [Eclipse]";
 

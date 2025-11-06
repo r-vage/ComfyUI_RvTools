@@ -13,7 +13,7 @@
 * Dynamic type handling for Dual Any Switch Purge node
 */
 
-import { app } from "../../scripts/app.js";
+import { app } from './comfy/index.js';
 
 app.registerExtension({
     name: "Eclipse.RouterAnyDualSwitchPurge",

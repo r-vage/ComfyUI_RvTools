@@ -14,7 +14,7 @@
 // Shows/hides widgets based on generation mode selection and batch folder options
 // Handles auto-increment for batch_number and skip_calculation
 
-import { app } from "../../scripts/app.js";
+import { app } from './comfy/index.js';
 
 const NODE_NAME = "Smart Folder [Eclipse]";
 

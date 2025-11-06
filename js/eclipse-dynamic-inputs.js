@@ -10,7 +10,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { app } from "../../scripts/app.js";
+import { app } from './comfy/index.js';
 
 // Robust dynamic inputs helper for Eclipse multi-switch nodes
 // - Uses explicit name prefixes that match the Python optional input names (int_, float_, string_, pipe_, any_, basicpipe_)

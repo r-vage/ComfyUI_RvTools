@@ -20,7 +20,7 @@
  * limitations under the License.
  */
 
-import { app } from "../../scripts/app.js";
+import { app } from './comfy/index.js';
 
 // Seed constants
 const LAST_SEED_BUTTON_LABEL = "♻️ (Use Last Queued Seed)";

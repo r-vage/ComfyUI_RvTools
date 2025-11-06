@@ -11,8 +11,7 @@
 * limitations under the License.
 */
 
-import { app } from "../../scripts/app.js";
-import { api } from "../../scripts/api.js";
+import { app, api } from './comfy/index.js';
 app.registerExtension({
     name: "memory.cleanup",
     init() {

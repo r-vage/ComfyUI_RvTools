@@ -13,7 +13,7 @@
 * Centralized handler for AnyType nodes to support dynamic type changing and bypass
 */
 
-import { app } from "../../scripts/app.js";
+import { app } from './comfy/index.js';
 
 /**
  * Applies dynamic type changing to a node with AnyType inputs/outputs.

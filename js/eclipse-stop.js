@@ -13,7 +13,7 @@
 * Based on: ComfyUI.mxToolkit.Stop v.0.9.7 - Max Smirnov 2024
 */
 
-import { app } from "../../scripts/app.js";
+import { app } from './comfy/index.js';
 import { setupAnyTypeHandling } from "./eclipse-any-type-handler.js";
 
 class Eclipse_Stop

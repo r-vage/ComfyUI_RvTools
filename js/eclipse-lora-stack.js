@@ -14,7 +14,7 @@
 * Shows/hides clip_weight widgets based on simple mode toggle
 */
 
-import { app } from "../../scripts/app.js";
+import { app } from './comfy/index.js';
 
 const NODE_NAME = "Lora Stack [Eclipse]";
 

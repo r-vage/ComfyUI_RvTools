@@ -15,7 +15,7 @@
 * Includes auto-sizing functionality
 */
 
-import { app } from "../../scripts/app.js";
+import { app } from './comfy/index.js';
 
 const NODE_NAME = "Smart Prompt [Eclipse]";
 
