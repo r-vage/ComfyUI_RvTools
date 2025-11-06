@@ -63,12 +63,47 @@ from .wrappers.gguf_wrapper import (
     load_gguf_model
 )
 
-# Register custom folder path for GGUF files (if GGUF is available)
+# Register custom folder path for GGUF diffusion models (if GGUF is available)
 if GGUF_AVAILABLE:
     base = folder_paths.folder_names_and_paths.get("diffusion_models_gguf", ([], {}))
     base = base[0] if isinstance(base[0], (list, set, tuple)) else []
     orig, _ = folder_paths.folder_names_and_paths.get("diffusion_models", ([], {}))
     folder_paths.folder_names_and_paths["diffusion_models_gguf"] = (orig or base, {".gguf"})
+    
+    # Add .gguf extension support to clip and text_encoders folders
+    if "clip" in folder_paths.folder_names_and_paths:
+        clip_paths, clip_exts = folder_paths.folder_names_and_paths["clip"]
+        if ".gguf" not in clip_exts:
+            clip_exts = set(clip_exts) if isinstance(clip_exts, set) else set(clip_exts.keys()) if isinstance(clip_exts, dict) else set()
+            clip_exts.add(".gguf")
+            folder_paths.folder_names_and_paths["clip"] = (clip_paths, clip_exts)
+            # Clear cache to force re-scan with new extension
+            if hasattr(folder_paths, 'filename_list_cache') and "clip" in folder_paths.filename_list_cache:
+                del folder_paths.filename_list_cache["clip"]
+            if hasattr(folder_paths, 'cache_helper'):
+                folder_paths.cache_helper.clear()
+    
+    if "text_encoders" in folder_paths.folder_names_and_paths:
+        te_paths, te_exts = folder_paths.folder_names_and_paths["text_encoders"]
+        if ".gguf" not in te_exts:
+            te_exts = set(te_exts) if isinstance(te_exts, set) else set(te_exts.keys()) if isinstance(te_exts, dict) else set()
+            te_exts.add(".gguf")
+            folder_paths.folder_names_and_paths["text_encoders"] = (te_paths, te_exts)
+            # Clear cache to force re-scan with new extension
+            if hasattr(folder_paths, 'filename_list_cache') and "text_encoders" in folder_paths.filename_list_cache:
+                del folder_paths.filename_list_cache["text_encoders"]
+            if hasattr(folder_paths, 'cache_helper'):
+                folder_paths.cache_helper.clear()
+
+# Add .safetensors and .sft extension support to checkpoints and diffusion_models folders
+for folder_name in ["checkpoints", "diffusion_models"]:
+    if folder_name in folder_paths.folder_names_and_paths:
+        paths, exts = folder_paths.folder_names_and_paths[folder_name]
+        exts = set(exts) if isinstance(exts, set) else set(exts.keys()) if isinstance(exts, dict) else set()
+        # Ensure common extensions are present
+        for ext in [".safetensors", ".sft", ".ckpt", ".pt", ".bin"]:
+            exts.add(ext)
+        folder_paths.folder_names_and_paths[folder_name] = (paths, exts)
 
 MAX_RESOLUTION = 32768
 LATENT_CHANNELS = 4
@@ -360,6 +395,15 @@ class RvLoader_SmartLoader_Plus:
         # Get available LoRAs
         loras = ["None"] + folder_paths.get_filename_list("loras")
         
+        # Get available CLIP files from both clip and text_encoders folders
+        clip_files = []
+        # Get from clip folder
+        clip_files.extend(folder_paths.get_filename_list("clip"))
+        # Get from text_encoders folder if it exists
+        if "text_encoders" in folder_paths.folder_names_and_paths:
+            clip_files.extend(folder_paths.get_filename_list("text_encoders"))
+        clips = ["None"] + clip_files
+        
         inputs = {
             "required": {
                 # Template management
@@ -487,19 +531,19 @@ class RvLoader_SmartLoader_Plus:
                     "default": "1",
                     "tooltip": "Number of CLIP models"
                 }),
-                "clip_name1": (["None"] + folder_paths.get_filename_list("clip"), {
+                "clip_name1": (clips, {
                     "default": "None",
                     "tooltip": "Primary CLIP model"
                 }),
-                "clip_name2": (["None"] + folder_paths.get_filename_list("clip"), {
+                "clip_name2": (clips, {
                     "default": "None",
                     "tooltip": "Secondary CLIP model"
                 }),
-                "clip_name3": (["None"] + folder_paths.get_filename_list("clip"), {
+                "clip_name3": (clips, {
                     "default": "None",
                     "tooltip": "Third CLIP model"
                 }),
-                "clip_name4": (["None"] + folder_paths.get_filename_list("clip"), {
+                "clip_name4": (clips, {
                     "default": "None",
                     "tooltip": "Fourth CLIP model"
                 }),

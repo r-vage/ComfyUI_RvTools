@@ -301,6 +301,88 @@ app.registerExtension({
                 return widget ? widget.value : null;
             };
             
+            // Store original unfiltered CLIP options
+            const originalClipOptions = {};
+            
+            // Store original unfiltered model options
+            const originalModelOptions = {};
+            
+            // Filter model widget options based on model type
+            const filterModelOptions = () => {
+                const modelType = getWidgetValue("model_type");
+                
+                // Define which models to filter and their file extensions
+                const modelWidgets = {
+                    "ckpt_name": {
+                        show: modelType === "Standard Checkpoint",
+                        extensions: ['.safetensors', '.ckpt', '.pt', '.bin', '.sft']
+                    },
+                    "unet_name": {
+                        show: modelType === "UNet Model",
+                        extensions: ['.safetensors', '.pt', '.bin', '.sft']
+                    },
+                    "nunchaku_name": {
+                        show: modelType === "Nunchaku Flux",
+                        extensions: ['.safetensors', '.pt', '.bin', '.sft']
+                    },
+                    "qwen_name": {
+                        show: modelType === "Nunchaku Qwen",
+                        extensions: ['.safetensors', '.pt', '.bin', '.sft']
+                    },
+                    "gguf_name": {
+                        show: modelType === "GGUF Model",
+                        extensions: ['.gguf']
+                    }
+                };
+                
+                Object.entries(modelWidgets).forEach(([widgetName, config]) => {
+                    const widget = node.widgets?.find(w => w.name === widgetName);
+                    if (!widget || !widget.options) return;
+                    
+                    // Store original options on first run
+                    if (!originalModelOptions[widgetName]) {
+                        originalModelOptions[widgetName] = [...widget.options.values];
+                    }
+                    
+                    // Get the full unfiltered list
+                    const allOptions = originalModelOptions[widgetName];
+                    
+                    // Filter based on allowed extensions for this widget
+                    const filteredOptions = allOptions.filter(name => {
+                        if (name === "None") return true;
+                        const nameLower = name.toLowerCase();
+                        return config.extensions.some(ext => nameLower.endsWith(ext));
+                    });
+                    
+                    // Update widget options
+                    widget.options.values = filteredOptions;
+                    
+                    // If current value is filtered out, reset to "None"
+                    if (!filteredOptions.includes(widget.value)) {
+                        widget.value = "None";
+                    }
+                });
+            };
+            
+            // CLIP widget options - no filtering applied
+            // All CLIP files (.gguf, .safetensors, etc.) can be used with any model type
+            const filterClipOptions = () => {
+                const clipWidgets = ["clip_name1", "clip_name2", "clip_name3", "clip_name4"];
+                
+                clipWidgets.forEach(widgetName => {
+                    const widget = node.widgets?.find(w => w.name === widgetName);
+                    if (!widget || !widget.options) return;
+                    
+                    // Store original options on first run
+                    if (!originalClipOptions[widgetName]) {
+                        originalClipOptions[widgetName] = [...widget.options.values];
+                    }
+                    
+                    // Always show all CLIP files - no filtering by model type
+                    widget.options.values = originalClipOptions[widgetName];
+                });
+            };
+            
             const updateVisibility = () => {
                 const templateAction = getWidgetValue("template_action");
                 const modelType = getWidgetValue("model_type");
@@ -319,6 +401,10 @@ app.registerExtension({
                 const isGGUF = (modelType === "GGUF Model");
                 const useExternalClip = (clipSource === "External");
                 const useExternalVae = (vaeSource === "External");
+                
+                // Filter model and CLIP options based on model type
+                filterModelOptions();
+                filterClipOptions();
                 
                 // Template Management
                 const isLoadOrDelete = (templateAction === "Load" || templateAction === "Delete");
