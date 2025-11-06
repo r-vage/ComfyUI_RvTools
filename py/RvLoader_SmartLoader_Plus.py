@@ -74,8 +74,8 @@ MAX_RESOLUTION = 32768
 LATENT_CHANNELS = 4
 UNET_DOWNSAMPLE = 8
 
-# Template system
-TEMPLATE_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "json", "loader_templates")
+# Template system - use ComfyUI models folder as primary location
+TEMPLATE_DIR = os.path.join(folder_paths.models_dir, "smart_loader_templates")
 
 def cleanup_memory_before_load():
     """Clean up memory before loading a new model."""

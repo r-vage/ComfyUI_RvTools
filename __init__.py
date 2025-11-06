@@ -55,6 +55,12 @@ models_smartprompt_dir = os.path.join(comfyui_root, 'models', 'wildcards', 'smar
 if not os.path.exists(models_smartprompt_dir) and os.path.exists(repo_prompt_dir):
     copy_prompt_files_once(repo_prompt_dir, models_smartprompt_dir)
 
+# Initialize Smart Loader templates: copy bundled templates to primary models folder
+repo_loader_dir = os.path.join(os.path.dirname(__file__), 'json', 'loader_templates')
+models_loader_dir = os.path.join(comfyui_root, 'models', 'smart_loader_templates')
+if os.path.exists(repo_loader_dir):
+    copy_prompt_files_once(repo_loader_dir, models_loader_dir)
+
 # API route for serving loader templates
 @server.PromptServer.instance.routes.get("/eclipse/loader_templates/{filename}")
 async def serve_loader_template(request):
@@ -62,11 +68,12 @@ async def serve_loader_template(request):
     if not filename.endswith('.json'):
         return web.Response(status=400, text="Invalid file type")
     
-    template_dir = get_ext_dir("json/loader_templates")
+    # Serve from primary models folder
+    template_dir = models_loader_dir
     template_path = os.path.join(template_dir, filename)
     
     # Security: prevent directory traversal
-    if not os.path.abspath(template_path).startswith(template_dir):
+    if not os.path.abspath(template_path).startswith(os.path.abspath(template_dir)):
         return web.Response(status=403, text="Access denied")
     
     if os.path.exists(template_path) and os.path.isfile(template_path):
