@@ -290,10 +290,17 @@ app.registerExtension({
             const result = onExecuted ? onExecuted.apply(this, arguments) : undefined;
             
             // Update populated_text widget with actual result from execution
+            // BUT ONLY in populate mode - in fixed mode, user has manually set the text
             if (message && message.text && message.text.length > 0) {
+                const modeWidget = this.widgets?.find(w => w.name === "mode");
+                const currentMode = modeWidget?.value || "populate";
                 const populatedWidget = this.widgets?.find(w => w.name === "populated_text");
+                
                 if (populatedWidget) {
-                    populatedWidget.value = message.text[0];
+                    if (currentMode === "populate") {
+                        populatedWidget.value = message.text[0];
+                    }
+                    // In fixed mode, don't update - preserve user's manually set text
                 }
             }
             
@@ -622,6 +629,11 @@ app.registerExtension({
                         } else if (value === "fixed") {
                             // Fixed mode: make editable
                             if (populatedTextWidget) {
+                                // IMPORTANT: Clear the node's seed cache to prevent stale cached values
+                                // This ensures that if we switch back to populate mode, it will regenerate fresh
+                                node._Eclipse_cachedInputSeed = undefined;
+                                node._Eclipse_cachedResolvedSeed = undefined;
+                                
                                 populatedTextWidget.disabled = false;
                                 if (populatedTextWidget.element) {
                                     populatedTextWidget.element.style.opacity = "1.0";
@@ -784,6 +796,7 @@ app.registerExtension({
 
         const modeWidget = node.widgets?.find(w => w.name === "mode");
         const populatedWidget = node.widgets?.find(w => w.name === "populated_text");
+        const wildcardWidget = node.widgets?.find(w => w.name === "wildcard_text");
 
         // Refresh wildcard combo
         const wildcardCombo = node.widgets?.find(w => w.name === "wildcards");
@@ -824,6 +837,7 @@ app.registerExtension({
             
             // Apply correct UI state based on mode
             const currentMode = modeWidget?.value;
+            
             if (currentMode === "fixed" && populatedWidget) {
                 populatedWidget.disabled = false;
                 if (populatedWidget.element) {
