@@ -225,9 +225,12 @@ def onprompt_populate_wildcards(json_data):
     2. Extract actual seed values from connected nodes
     3. Process wildcards with the correct seed
     4. Update the prompt with processed text
-    5. Avoid double execution issues
+    5. Send feedback to frontend to update UI
     """
+    from server import PromptServer
+    
     prompt = json_data.get('prompt', {})
+    updated_widget_values = {}
     
     for node_id, node_data in prompt.items():
         # Check if this is a Wildcard Processor node
@@ -238,83 +241,115 @@ def onprompt_populate_wildcards(json_data):
             continue
         
         inputs = node_data.get('inputs', {})
+        
+        # Legacy adapter - convert boolean mode to string
+        if isinstance(inputs.get('mode'), bool):
+            inputs['mode'] = 'populate' if inputs['mode'] else 'fixed'
+        
+        # Legacy adapter - convert old 'reproduce' mode to 'fixed' and update UI
+        if inputs.get('mode') == 'reproduce':
+            inputs['mode'] = 'fixed'
+            # Send feedback to update the UI widget
+            PromptServer.instance.send_sync("eclipse-node-feedback", {
+                "node_id": node_id,
+                "widget_name": "mode",
+                "type": "STRING",
+                "value": 'fixed'
+            })
+        
         mode = inputs.get('mode', 'populate')
-        wildcard_text = inputs.get('wildcard_text', '')
-        populated_text = inputs.get('populated_text', '')
-        seed = inputs.get('seed', 0)
         
-        # In fixed mode, normalize the seed to 0 to ensure caching works
-        # The seed is not used for wildcard processing in fixed mode
-        if mode == 'fixed':
-            # Force seed to 0 in fixed mode so cache works regardless of seed changes
-            inputs['seed'] = 0
-            continue
-        
-        # Only process wildcards in populate mode
-        if mode != 'populate':
-            continue
-        
-        wildcard_text = inputs.get('wildcard_text', '')
-        if not wildcard_text or not isinstance(wildcard_text, str):
-            continue
-        
-        # Get seed - check if it's connected (list format) or widget value (int)
-        seed_value = inputs.get('seed', 0)
-        
-        if isinstance(seed_value, list):
-            # Seed is connected - extract actual value from connected node
-            try:
-                connected_node_id = str(seed_value[0])
-                connected_node = prompt.get(connected_node_id)
-                
-                if not connected_node:
-                    logging.warning(f"[Eclipse Wildcard] Connected seed node {connected_node_id} not found")
-                    continue
-                
-                class_type = connected_node.get('class_type', '')
-                connected_inputs = connected_node.get('inputs', {})
-                
-                # Handle different seed node types (like Impact Pack does)
-                if class_type == 'Seed (rgthree)':
-                    input_seed = int(connected_inputs.get('seed', 0))
-                elif class_type in ['ImpactInt', 'Primitive', 'PrimitiveNode']:
-                    input_seed = int(connected_inputs.get('value', 0))
-                else:
-                    # Try common parameter names
-                    input_seed = None
-                    for key in ['seed', 'value', 'number', 'int']:
-                        if key in connected_inputs:
-                            value = connected_inputs[key]
-                            if not isinstance(value, list):  # Not another connection
-                                input_seed = int(value)
-                                break
+        # Only process in populate mode
+        if mode == 'populate' and isinstance(inputs.get('populated_text'), str):
+            wildcard_text = inputs.get('wildcard_text', '')
+            if not wildcard_text:
+                continue
+            
+            # Get seed - handle connections and direct values
+            seed_value = inputs.get('seed', 0)
+            
+            if isinstance(seed_value, list):
+                # Seed is connected - extract actual value from connected node
+                try:
+                    connected_node_id = str(seed_value[0])
+                    connected_node = prompt.get(connected_node_id)
                     
-                    if input_seed is None:
-                        logging.warning(f"[Eclipse Wildcard] Could not extract seed from node type: {class_type}")
+                    if not connected_node:
+                        logging.warning(f"[Eclipse Wildcard] Connected seed node {connected_node_id} not found")
                         continue
+                    
+                    class_type = connected_node.get('class_type', '')
+                    connected_inputs = connected_node.get('inputs', {})
+                    
+                    # Handle different seed node types (same as Impact Pack)
+                    if class_type == 'Seed (rgthree)':
+                        input_seed = int(connected_inputs.get('seed', 0))
+                    elif class_type == 'ImpactInt':
+                        input_seed = int(connected_inputs.get('value', 0))
+                    elif class_type in ['Primitive', 'PrimitiveNode']:
+                        input_seed = int(connected_inputs.get('value', 0))
+                    else:
+                        # Try to find seed value from common parameter names
+                        input_seed = None
+                        for key in ['seed', 'value', 'int', 'number']:
+                            if key in connected_inputs:
+                                value = connected_inputs[key]
+                                if not isinstance(value, list):  # Not another connection
+                                    input_seed = int(value)
+                                    break
+                        
+                        if input_seed is None:
+                            logging.info(f"[Eclipse Wildcard] Only `ImpactInt`, `Seed (rgthree)` and `Primitive` Node are allowed as the seed. It will be ignored.")
+                            continue
+                    
+                except Exception:
+                    continue
+            else:
+                # Seed is a direct value
+                input_seed = int(seed_value)
+            
+            # Process wildcards with the determined seed
+            try:
+                processed_text = process(wildcard_text, seed=input_seed)
+                
+                # Update the populated_text in the prompt
+                inputs['populated_text'] = processed_text
+                
+                # Switch mode to 'fixed' to preserve the result on reload
+                inputs['mode'] = 'fixed'
+                
+                # Send feedback to frontend to update both widgets
+                PromptServer.instance.send_sync("eclipse-node-feedback", {
+                    "node_id": node_id,
+                    "widget_name": "populated_text",
+                    "type": "STRING",
+                    "value": processed_text
+                })
+                
+                PromptServer.instance.send_sync("eclipse-node-feedback", {
+                    "node_id": node_id,
+                    "widget_name": "mode",
+                    "type": "STRING",
+                    "value": 'fixed'
+                })
+                
+                # Track updated values for workflow metadata
+                updated_widget_values[node_id] = processed_text
                 
             except Exception as e:
-                logging.error(f"[Eclipse Wildcard] Error extracting seed from connection: {e}")
-                continue
-        else:
-            # Seed is a direct value
-            input_seed = int(seed_value)
-        
-        # Process wildcards with the determined seed
-        try:
-            processed_text = process(wildcard_text, seed=input_seed)
-            
-            # Update the populated_text in the prompt (this is what gets sent to execute)
-            inputs['populated_text'] = processed_text
-            
-            # Also update the seed input so execute() receives the actual seed used
-            # This ensures the seed is saved correctly in metadata
-            inputs['seed'] = input_seed
-            
-        except Exception as e:
-            logging.error(f"[Eclipse Wildcard] Error processing wildcards for node {node_id}: {e}")
+                logging.error(f"[Eclipse Wildcard] Error processing wildcards for node {node_id}: {e}")
     
-    # CRITICAL: Must return json_data for the handler chain to continue
+    # Update workflow metadata (extra_pnginfo) with the processed values
+    if 'extra_data' in json_data and 'extra_pnginfo' in json_data['extra_data']:
+        if 'workflow' in json_data['extra_data']['extra_pnginfo']:
+            for node in json_data['extra_data']['extra_pnginfo']['workflow']['nodes']:
+                key = str(node['id'])
+                if key in updated_widget_values:
+                    # Update populated_text widget value (index 1)
+                    node['widgets_values'][1] = updated_widget_values[key]
+                    # Set mode to 'fixed' (index 2)
+                    node['widgets_values'][2] = 'fixed'
+    
     return json_data
 
 

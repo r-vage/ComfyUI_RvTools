@@ -1,127 +1,58 @@
 /**
  * Eclipse Wildcard Processor - JavaScript Extension
- * 
- * Provides UI customization for the RvText_WildcardProcessor node:
- * - Dynamic wildcard combo loading from /eclipse/wildcards/list endpoint
- * - Mode-based UI state management (populate/fixed)
- * - Seed controls with special seed handling (-1, -2, -3)
- * - Real-time wildcard selection integration
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Simplified approach matching Impact Pack
  */
 
-import { app } from './comfy/index.js';
+import { app, api } from './comfy/index.js';
 
-// Seed constants
 const LAST_SEED_BUTTON_LABEL = "♻️ (Use Last Queued Seed)";
+
 const SPECIAL_SEED_RANDOM = -1;
 const SPECIAL_SEED_INCREMENT = -2;
 const SPECIAL_SEED_DECREMENT = -3;
 const SPECIAL_SEEDS = [SPECIAL_SEED_RANDOM, SPECIAL_SEED_INCREMENT, SPECIAL_SEED_DECREMENT];
 
-// Wildcard list cache
-let wildcardList = [];
-let wildcardListLoading = false;
+// Store last seeds per node ID
+const nodeLastSeeds = {};
 
-/**
- * Load available wildcards from server
- */
-async function loadWildcardList() {
-    if (wildcardListLoading) return;
-    wildcardListLoading = true;
+let wildcardsList = [];
 
+async function loadWildcards() {
     try {
-        const response = await fetch("/eclipse/wildcards/list");
+        const response = await api.fetchApi('/eclipse/wildcards/list');
         if (response.ok) {
-            wildcardList = await response.json();
+            wildcardsList = await response.json();
         }
     } catch (error) {
         console.warn("[Eclipse Wildcard] Failed to load wildcard list:", error);
-        wildcardList = [];
-    } finally {
-        wildcardListLoading = false;
+        wildcardsList = [];
     }
 }
 
-/**
- * Register the extension
- */
+function handleNodeFeedback(event) {
+    const { node_id, widget_name, value } = event.detail;
+    const node = app.graph.getNodeById(parseInt(node_id));
+    if (!node) return;
+    const widget = node.widgets?.find(w => w.name === widget_name);
+    if (!widget) return;
+    widget.value = value;
+    app.canvas.setDirty(true);
+}
+
 app.registerExtension({
     name: "Eclipse.WildcardProcessor",
     
     async setup() {
-        // Load wildcard list on startup
-        await loadWildcardList();
+        await loadWildcards();
+        api.addEventListener("eclipse-node-feedback", handleNodeFeedback);
         
-        // Hook into the graphToPrompt to resolve seeds before sending to server
+        // Hook into graphToPrompt to resolve special seeds before server execution
         const originalGraphToPrompt = app.graphToPrompt;
         app.graphToPrompt = async function() {
-            // FIRST: Process wildcards for nodes in populate mode BEFORE serialization
-            const nodes = app.graph._nodes;
-            for (const node of nodes) {
-                if (node.type === "Wildcard Processor [Eclipse]") {
-                    const wildcardTextWidget = node.widgets?.find(w => w.name === "wildcard_text");
-                    const populatedTextWidget = node.widgets?.find(w => w.name === "populated_text");
-                    const modeWidget = node.widgets?.find(w => w.name === "mode");
-                    
-                    if (!modeWidget || !wildcardTextWidget || !populatedTextWidget) {
-                        continue;
-                    }
-                    
-                    const mode = modeWidget.value;
-                    const wildcardText = wildcardTextWidget.value;
-                    
-                    // In fixed mode: keep populated_text as-is, don't process
-                    if (mode === "fixed") {
-                        continue;
-                    }
-                    
-                    // In populate mode: process the text with resolved seed
-                    if (mode === "populate" && wildcardText) {
-                        // Get seed to use (with fallback if method not available)
-                        const seedWidget = node.widgets?.find(w => w.name === "seed");
-                        const seedToUse = (node.getSeedToUse && typeof node.getSeedToUse === 'function') 
-                            ? node.getSeedToUse() 
-                            : (seedWidget?.value ?? 0);
-                        
-                        try {
-                            const response = await fetch("/eclipse/wildcards/process", {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({
-                                    text: wildcardText,
-                                    seed: seedToUse
-                                })
-                            });
-                            
-                            if (response.ok) {
-                                const result = await response.json();
-                                if (result.success) {
-                                    populatedTextWidget.value = result.output;
-                                    // Don't trigger callback - we're about to serialize
-                                }
-                            }
-                        } catch (error) {
-                            console.error("[Eclipse Wildcard] graphToPrompt wildcard processing error:", error);
-                        }
-                    }
-                }
-            }
-            
-            // NOW call the original graphToPrompt with updated widget values
             const result = await originalGraphToPrompt.apply(this, arguments);
-
-            // Now resolve seeds for Wildcard Processor nodes
+            
+            // Process all Wildcard Processor nodes
+            const nodes = app.graph._nodes;
             for (const node of nodes) {
                 if (node.type === "Wildcard Processor [Eclipse]" && node._Eclipse_seedWidget) {
                     // Skip if node is muted or bypassed
@@ -129,80 +60,44 @@ app.registerExtension({
                         continue;
                     }
                     
-                    // Check if this node is in the prompt
                     const nodeId = String(node.id);
                     if (result.output && result.output[nodeId]) {
-                        // Check if seed widget has a connection
-                        const seedWidget = node._Eclipse_seedWidget;
-                        const seedInput = node.inputs?.find(input => input.widget?.name === "seed");
-                        const seedIsConnected = seedInput && seedInput.link != null;
+                        const seedToUse = node.getSeedToUse();
                         
-                        let seedToUse;
+                        // Update the seed in the prompt output (what gets sent to server)
+                        if (result.output[nodeId].inputs && result.output[nodeId].inputs.seed !== undefined) {
+                            result.output[nodeId].inputs.seed = seedToUse;
+                        }
                         
-                        // If seed is connected, skip resolution - let server-side handler process it
-                        if (seedIsConnected) {
-                            // For connected seeds, we don't resolve here, but we still need to update metadata
-                            // Use the widget value (which may be a special seed or last used seed)
-                            seedToUse = seedWidget.value;
-                        } else {
-                            // Get seed to use (with safety check)
-                            seedToUse = (node.getSeedToUse && typeof node.getSeedToUse === 'function')
-                                ? node.getSeedToUse()
-                                : node._Eclipse_seedWidget.value;
-                            
-                            // Update the seed in the prompt output (what gets sent to server)
-                            if (result.output[nodeId].inputs && result.output[nodeId].inputs.seed !== undefined) {
-                                result.output[nodeId].inputs.seed = seedToUse;
-                            }
-
-                            // Update last seed tracking
+                        // Update last seed tracking
+                        if (Number(node._Eclipse_lastSeed) !== Number(seedToUse)) {
                             node._Eclipse_lastSeed = seedToUse;
-                            
-                            // Clear the seed cache after use so next call generates fresh random seed
-                            node._Eclipse_cachedInputSeed = null;
-                            node._Eclipse_cachedResolvedSeed = null;
-                            
-                            // Update the last seed button
-                            if (node._Eclipse_lastSeedButton) {
-                                const currentWidgetValue = node._Eclipse_seedWidget.value;
-                                if (SPECIAL_SEEDS.includes(currentWidgetValue)) {
-                                    // Widget has special seed, show what was actually used
-                                    node._Eclipse_lastSeedButton.name = `♻️ ${seedToUse}`;
-                                    node._Eclipse_lastSeedButton.disabled = false;
-                                } else {
-                                    // Widget has regular seed value
-                                    node._Eclipse_lastSeedButton.name = LAST_SEED_BUTTON_LABEL;
-                                    node._Eclipse_lastSeedButton.disabled = true;
-                                }
+                            nodeLastSeeds[node.id] = seedToUse;
+                        }
+                        
+                        // Clear the seed cache after use
+                        node._Eclipse_cachedInputSeed = null;
+                        node._Eclipse_cachedResolvedSeed = null;
+                        
+                        // Update the last seed button
+                        if (node._Eclipse_lastSeedButton) {
+                            const currentWidgetValue = node._Eclipse_seedWidget.value;
+                            if (SPECIAL_SEEDS.includes(currentWidgetValue)) {
+                                node._Eclipse_lastSeedButton.name = `♻️ ${seedToUse}`;
+                                node._Eclipse_lastSeedButton.disabled = false;
+                            } else {
+                                node._Eclipse_lastSeedButton.name = LAST_SEED_BUTTON_LABEL;
+                                node._Eclipse_lastSeedButton.disabled = true;
                             }
                         }
                         
-                        // Update workflow metadata for reproducibility when loading from saved images
+                        // Update workflow data if present
                         if (result.workflow && result.workflow.nodes) {
                             const workflowNode = result.workflow.nodes.find(n => n.id === node.id);
                             if (workflowNode && workflowNode.widgets_values) {
-                                // Find widget indices
-                                const modeWidget = node.widgets?.find(w => w.name === "mode");
-                                const seedWidget = node.widgets?.find(w => w.name === "seed");
-                                const populatedWidget = node.widgets?.find(w => w.name === "populated_text");
-                                
-                                const modeIndex = node.widgets.indexOf(modeWidget);
-                                const seedIndex = node.widgets.indexOf(seedWidget);
-                                const populatedIndex = node.widgets.indexOf(populatedWidget);
-                                
-                                // If in populate mode, save as fixed mode with actual values for reproducibility
-                                if (modeIndex >= 0 && modeWidget?.value === "populate") {
-                                    workflowNode.widgets_values[modeIndex] = "fixed";
-                                }
-                                
-                                // Save the actual seed used (not the special seed value)
-                                if (seedIndex >= 0) {
-                                    workflowNode.widgets_values[seedIndex] = seedToUse;
-                                }
-                                
-                                // Save the actual populated text that was generated
-                                if (populatedIndex >= 0 && populatedWidget) {
-                                    workflowNode.widgets_values[populatedIndex] = populatedWidget.value;
+                                const seedWidgetIndex = node.widgets.indexOf(node._Eclipse_seedWidget);
+                                if (seedWidgetIndex >= 0) {
+                                    workflowNode.widgets_values[seedWidgetIndex] = seedToUse;
                                 }
                             }
                         }
@@ -212,24 +107,202 @@ app.registerExtension({
             
             return result;
         };
-        
-        // Hook into graph execution to update populated_text before queue runs
-        // NOTE: Wildcard processing now happens in graphToPrompt hook above
-        const originalQueuePrompt = app.queuePrompt;
-        app.queuePrompt = async function() {
-            // Call original queuePrompt (which will call graphToPrompt internally)
-            return originalQueuePrompt.call(this);
-        };
     },
 
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
-        // Only process Wildcard Processor nodes
         if (nodeData.name !== "Wildcard Processor [Eclipse]" && 
             nodeData.class_type !== "Wildcard Processor [Eclipse]") {
             return;
         }
 
-        // Add seed helper methods to prototype FIRST (before onNodeCreated)
+        const originalOnNodeCreated = nodeType.prototype.onNodeCreated;
+
+        nodeType.prototype.onNodeCreated = function() {
+            if (originalOnNodeCreated) {
+                originalOnNodeCreated.call(this);
+            }
+
+            const node = this;
+            const wildcardTextWidget = this.widgets?.find(w => w.name === "wildcard_text");
+            const populatedTextWidget = this.widgets?.find(w => w.name === "populated_text");
+            const modeWidget = this.widgets?.find(w => w.name === "mode");
+            let seedWidget = null;
+            let wildcardCombo = this.widgets?.find(w => w.name === "Select to add Wildcard");
+            
+            // Find the seed widget and remove control_after_generate
+            for (const [i, widget] of this.widgets.entries()) {
+                const wname = (widget.name || '').toString().toLowerCase();
+                const wlabel = (widget.label || widget.options?.label || widget.options?.name || '').toString().toLowerCase();
+                if (wname === 'seed' || wlabel === 'seed') {
+                    seedWidget = widget;
+                } else if (wname === 'control_after_generate') {
+                    this.widgets.splice(i, 1);
+                }
+            }
+            
+            // Move wildcard combo before seed widget
+            if (wildcardCombo && seedWidget) {
+                const comboIndex = this.widgets.indexOf(wildcardCombo);
+                const seedIndex = this.widgets.indexOf(seedWidget);
+                
+                // Only move if combo is after seed
+                if (comboIndex > seedIndex) {
+                    this.widgets.splice(comboIndex, 1);
+                    const newSeedIndex = this.widgets.indexOf(seedWidget);
+                    this.widgets.splice(newSeedIndex, 0, wildcardCombo);
+                }
+            }
+            
+            if (wildcardTextWidget && wildcardTextWidget.inputEl) {
+                wildcardTextWidget.inputEl.placeholder = "Wildcard Prompt (User input)";
+            }
+            
+            if (populatedTextWidget && populatedTextWidget.inputEl) {
+                populatedTextWidget.inputEl.placeholder = "Populated Prompt (Will be generated automatically)";
+                populatedTextWidget.inputEl.disabled = true;
+            }
+
+            if (modeWidget) {
+                Object.defineProperty(modeWidget, "value", {
+                    set: function(value) {
+                        if (value === true) {
+                            this._modeValue = "populate";
+                        } else if (value === false) {
+                            this._modeValue = "fixed";
+                        } else {
+                            this._modeValue = value;
+                        }
+                        
+                        if (populatedTextWidget && populatedTextWidget.inputEl) {
+                            const isPopulate = this._modeValue === 'populate';
+                            populatedTextWidget.inputEl.disabled = isPopulate;
+                        }
+                    },
+                    get: function() {
+                        return this._modeValue !== undefined ? this._modeValue : 'populate';
+                    }
+                });
+            }
+
+            // Setup custom seed widget with buttons
+            if (seedWidget) {
+                // Store seed widget and tracking properties
+                node._Eclipse_seedWidget = seedWidget;
+                node._Eclipse_lastSeed = undefined;
+                node._Eclipse_randomMin = 0;
+                node._Eclipse_randomMax = 1125899906842624;
+                node._Eclipse_cachedInputSeed = null;
+                node._Eclipse_cachedResolvedSeed = null;
+                
+                // Hook into seed widget's callback to clear cache when it changes
+                const originalCallback = seedWidget.callback;
+                seedWidget.callback = (value) => {
+                    node._Eclipse_cachedInputSeed = null;
+                    node._Eclipse_cachedResolvedSeed = null;
+                    if (originalCallback) {
+                        return originalCallback.call(seedWidget, value);
+                    }
+                };
+                
+                // Button: Randomize Each Time (added at bottom)
+                const randomizeButton = this.addWidget(
+                    "button",
+                    "🎲 Randomize Each Time",
+                    "",
+                    () => {
+                        seedWidget.value = SPECIAL_SEED_RANDOM;
+                        if (seedWidget.callback) {
+                            seedWidget.callback(SPECIAL_SEED_RANDOM);
+                        }
+                    },
+                    { serialize: false }
+                );
+                
+                // Button: New Fixed Random (added at bottom)
+                const newRandomButton = this.addWidget(
+                    "button",
+                    "🎲 New Fixed Random",
+                    "",
+                    () => {
+                        const newSeed = node.generateRandomSeed();
+                        seedWidget.value = newSeed;
+                        if (seedWidget.callback) {
+                            seedWidget.callback(newSeed);
+                        }
+                    },
+                    { serialize: false }
+                );
+                
+                // Button: Use Last Queued Seed (added at bottom)
+                const lastSeedButton = this.addWidget(
+                    "button",
+                    LAST_SEED_BUTTON_LABEL,
+                    "",
+                    () => {
+                        if (node._Eclipse_lastSeed != null) {
+                            seedWidget.value = node._Eclipse_lastSeed;
+                            lastSeedButton.name = LAST_SEED_BUTTON_LABEL;
+                            lastSeedButton.disabled = true;
+                        }
+                    },
+                    { serialize: false }
+                );
+                lastSeedButton.disabled = true;
+                node._Eclipse_lastSeedButton = lastSeedButton;
+                
+                // Store button references for updating
+                node._Eclipse_randomizeButton = randomizeButton;
+                node._Eclipse_newRandomButton = newRandomButton;
+                
+                // Buttons are now at the bottom (no repositioning needed)
+                // They'll stay at the end of the widget list
+            }
+
+            if (wildcardCombo) {
+                // Initialize wildcard value storage on node (Impact Pack approach)
+                node._wildcard_value = "Select the Wildcard to add to the text";
+                
+                wildcardCombo.serializeValue = () => {
+                    return "Select the Wildcard to add to the text";
+                };
+                
+                Object.defineProperty(wildcardCombo, "value", {
+                    set: function(value) {
+                        if (value !== "Select the Wildcard to add to the text") {
+                            node._wildcard_value = value;
+                        }
+                    },
+                    get: function() {
+                        return "Select the Wildcard to add to the text";
+                    }
+                });
+
+                Object.defineProperty(wildcardCombo.options, "values", {
+                    set: function(x) {},
+                    get: function() {
+                        return ["Select the Wildcard to add to the text", ...wildcardsList];
+                    }
+                });
+                
+                wildcardCombo.callback = function(value, canvas, node, pos, e) {
+                    if (node && wildcardTextWidget) {
+                        // Add comma separator if text box is not empty
+                        if (wildcardTextWidget.value != '') {
+                            wildcardTextWidget.value += ', ';
+                        }
+                        
+                        // Append the wildcard value
+                        wildcardTextWidget.value += node._wildcard_value;
+                        
+                        // Trigger callback if exists to update internal state
+                        if (wildcardTextWidget.callback) {
+                            wildcardTextWidget.callback(wildcardTextWidget.value);
+                        }
+                    }
+                };
+            }
+        };
+        
         // Method to generate random seed
         nodeType.prototype.generateRandomSeed = function() {
             const step = this._Eclipse_seedWidget?.options?.step || 1;
@@ -247,20 +320,17 @@ app.registerExtension({
         
         // Method to determine seed to use
         nodeType.prototype.getSeedToUse = function() {
-            // Normal seed generation logic - seed widget can be connected directly
             const inputSeed = Number(this._Eclipse_seedWidget.value);
             
             // Check if we have a cached resolved seed for this input seed
-            // This prevents generating different random seeds on multiple calls
             if (this._Eclipse_cachedInputSeed === inputSeed && this._Eclipse_cachedResolvedSeed != null) {
                 return this._Eclipse_cachedResolvedSeed;
             }
             
             let seedToUse = null;
             
-            // If our input seed was a special seed, then handle it
+            // Handle special seeds
             if (SPECIAL_SEEDS.includes(inputSeed)) {
-                // If the last seed was not a special seed and we have increment/decrement, then do that
                 if (typeof this._Eclipse_lastSeed === "number" && !SPECIAL_SEEDS.includes(this._Eclipse_lastSeed)) {
                     if (inputSeed === SPECIAL_SEED_INCREMENT) {
                         seedToUse = this._Eclipse_lastSeed + 1;
@@ -269,7 +339,7 @@ app.registerExtension({
                     }
                 }
                 
-                // If we don't have a seed to use, or it's a special seed, randomize
+                // If we don't have a seed to use, randomize
                 if (seedToUse == null || SPECIAL_SEEDS.includes(seedToUse)) {
                     seedToUse = this.generateRandomSeed();
                 }
@@ -277,757 +347,102 @@ app.registerExtension({
             
             const finalSeed = seedToUse != null ? seedToUse : inputSeed;
             
-            // Cache the resolved seed for this input seed
+            // Cache the resolved seed
             this._Eclipse_cachedInputSeed = inputSeed;
             this._Eclipse_cachedResolvedSeed = finalSeed;
             
             return finalSeed;
         };
         
-        // Intercept execution to track last seed and update populated_text
-        const onExecuted = nodeType.prototype.onExecuted;
-        nodeType.prototype.onExecuted = function(message) {
-            const result = onExecuted ? onExecuted.apply(this, arguments) : undefined;
-            
-            // Update populated_text widget with actual result from execution
-            // BUT ONLY in populate mode - in fixed mode, user has manually set the text
-            if (message && message.text && message.text.length > 0) {
-                const modeWidget = this.widgets?.find(w => w.name === "mode");
-                const currentMode = modeWidget?.value || "populate";
-                const populatedWidget = this.widgets?.find(w => w.name === "populated_text");
-                
-                if (populatedWidget) {
-                    if (currentMode === "populate") {
-                        populatedWidget.value = message.text[0];
-                    }
-                    // In fixed mode, don't update - preserve user's manually set text
-                }
-            }
-            
-            // Store the seed that was actually used if available
-            if (message && message.seed !== undefined) {
-                // Handle both array and single value formats
-                this._Eclipse_lastSeed = Array.isArray(message.seed) ? message.seed[0] : message.seed;
-            }
-            
-            return result;
-        };
-
-        // Helper function to check if seed widget has a connection
-        nodeType.prototype.isSeedConnected = function() {
-            const seedInput = this.inputs?.find(input => input.widget?.name === "seed");
-            return seedInput && seedInput.link != null;
-        };
-
-        // Helper function to update seed button states based on mode and connection
+        // Method to update button states based on seed input connection
         nodeType.prototype.updateSeedButtonStates = function() {
-            const modeWidget = this.widgets?.find(w => w.name === "mode");
-            const currentMode = modeWidget?.value || "populate";
-            const seedIsConnected = this.isSeedConnected();
+            if (!this._Eclipse_seedWidget) return;
             
-            if (currentMode === "populate" && !seedIsConnected) {
-                // Enable buttons only in populate mode AND when seed is not connected
-                if (this._Eclipse_randomizeButton) {
-                    this._Eclipse_randomizeButton.disabled = false;
-                }
-                if (this._Eclipse_newRandomButton) {
-                    this._Eclipse_newRandomButton.disabled = false;
-                }
-                if (this._Eclipse_lastSeedButton && this._Eclipse_lastSeed != null) {
-                    const currentWidgetValue = this._Eclipse_seedWidget?.value;
-                    this._Eclipse_lastSeedButton.disabled = !SPECIAL_SEEDS.includes(currentWidgetValue);
-                }
-            } else {
-                // Disable buttons in fixed mode OR when seed is connected
-                if (this._Eclipse_randomizeButton) {
-                    this._Eclipse_randomizeButton.disabled = true;
-                }
-                if (this._Eclipse_newRandomButton) {
-                    this._Eclipse_newRandomButton.disabled = true;
-                }
-                if (this._Eclipse_lastSeedButton) {
-                    this._Eclipse_lastSeedButton.disabled = true;
-                }
+            // Check if seed widget has an input connection
+            const seedInput = this.inputs?.find(input => {
+                const inputName = input.name.toLowerCase();
+                return inputName === 'seed';
+            });
+            
+            const hasSeedConnection = seedInput && seedInput.link != null;
+            
+            // Disable/enable buttons based on connection state
+            if (this._Eclipse_randomizeButton) {
+                this._Eclipse_randomizeButton.disabled = hasSeedConnection;
+            }
+            if (this._Eclipse_newRandomButton) {
+                this._Eclipse_newRandomButton.disabled = hasSeedConnection;
+            }
+            if (this._Eclipse_lastSeedButton) {
+                // Last seed button is disabled if seed is connected OR if no last seed exists
+                this._Eclipse_lastSeedButton.disabled = hasSeedConnection || this._Eclipse_lastSeed == null;
             }
         };
-
-        // Store original onNodeCreated if it exists
-        const originalOnNodeCreated = nodeType.prototype.onNodeCreated;
-
-        /**
-         * Custom onNodeCreated handler for wildcard processor nodes
-         */
-        nodeType.prototype.onNodeCreated = function() {
-            // Set flag to prevent auto-population during initialization
-            this._isInitializing = true;
-            
-            // Call original if exists
-            if (originalOnNodeCreated) {
-                originalOnNodeCreated.call(this);
-            }
-
-            // Capture node reference for use in callbacks
-            const node = this;
-            
-            // ===== SEED WIDGET SETUP =====
-            // Find the seed widget and remove control_after_generate
-            // Important: Find first, remove later to avoid index shifting issues
-            let seedWidget = null;
-            let controlAfterGenerateIndex = -1;
-            
-            for (let i = 0; i < this.widgets.length; i++) {
-                const widget = this.widgets[i];
-                const wname = (widget.name || '').toString().toLowerCase();
-                if (wname === 'seed') {
-                    seedWidget = widget;
-                } else if (wname === 'control_after_generate') {
-                    controlAfterGenerateIndex = i;
-                }
+        
+        // Hook into onConnectionsChange to update button states
+        const originalOnConnectionsChange = nodeType.prototype.onConnectionsChange;
+        nodeType.prototype.onConnectionsChange = function(type, index, connected, link_info) {
+            if (originalOnConnectionsChange) {
+                originalOnConnectionsChange.apply(this, arguments);
             }
             
-            // Remove control_after_generate if found
-            if (controlAfterGenerateIndex >= 0) {
-                this.widgets.splice(controlAfterGenerateIndex, 1);
+            // Update button states when connections change
+            if (this.updateSeedButtonStates) {
+                this.updateSeedButtonStates();
             }
-            
-            if (!seedWidget) {
-                console.warn("[Eclipse Wildcard] Seed widget not found! Available widgets:", this.widgets.map(w => w.name));
-            }
-
-            if (seedWidget) {
-                // Initialize seed tracking properties
-                this._Eclipse_seedWidget = seedWidget;
-                this._Eclipse_lastSeed = undefined;
-                this._Eclipse_randomMin = 0;
-                this._Eclipse_randomMax = 1125899906842624;
-                this._Eclipse_cachedInputSeed = null;
-                this._Eclipse_cachedResolvedSeed = null;
-                
-                // Ensure seed widget is visible (not hidden)
-                if (seedWidget.type) {
-                    seedWidget.type = "number";  // Ensure it's displayed as a number input
-                }
-                seedWidget.hidden = false;
-                if (seedWidget.options) {
-                    seedWidget.options.hidden = false;
-                }
-                
-                // Store original callback for later wrapping
-                const originalSeedCallback = seedWidget.callback;
-                
-                // Add seed control buttons
-                const seedWidgetIndex = this.widgets.indexOf(seedWidget);
-                
-                // Button: Randomize Each Time
-                const randomizeButton = this.addWidget(
-                    "button",
-                    "🎲 Randomize Each Time",
-                    "",
-                    () => {
-                        seedWidget.value = SPECIAL_SEED_RANDOM;
-                        if (seedWidget.callback) {
-                            seedWidget.callback(SPECIAL_SEED_RANDOM);
-                        }
-                    },
-                    { serialize: false }
-                );
-                
-                // Button: New Fixed Random
-                const newRandomButton = this.addWidget(
-                    "button",
-                    "🎲 New Fixed Random",
-                    "",
-                    () => {
-                        const newSeed = this.generateRandomSeed();
-                        seedWidget.value = newSeed;
-                        if (seedWidget.callback) {
-                            seedWidget.callback(newSeed);
-                        }
-                    },
-                    { serialize: false }
-                );
-                
-                // Button: Use Last Queued Seed
-                const lastSeedButton = this.addWidget(
-                    "button",
-                    LAST_SEED_BUTTON_LABEL,
-                    "",
-                    () => {
-                        if (this._Eclipse_lastSeed != null) {
-                            seedWidget.value = this._Eclipse_lastSeed;
-                            lastSeedButton.name = LAST_SEED_BUTTON_LABEL;
-                            lastSeedButton.disabled = true;
-                        }
-                    },
-                    { serialize: false }
-                );
-                lastSeedButton.disabled = true;
-                this._Eclipse_lastSeedButton = lastSeedButton;
-                
-                // Store references to seed buttons for mode control
-                this._Eclipse_randomizeButton = randomizeButton;
-                this._Eclipse_newRandomButton = newRandomButton;
-                
-                // Find the wildcards combo and mode widget for positioning
-                const selectCombo = this.widgets?.find(w => w.name === "wildcards");
-                const modeWidget = this.widgets?.find(w => w.name === "mode");
-                const modeWidgetIndex = modeWidget ? this.widgets.indexOf(modeWidget) : -1;
-                
-                // Move wildcards combo to be right after mode widget
-                if (selectCombo && modeWidgetIndex >= 0) {
-                    const selectComboIndex = this.widgets.indexOf(selectCombo);
-                    if (selectComboIndex !== modeWidgetIndex + 1) {
-                        this.widgets.splice(selectComboIndex, 1);
-                        this.widgets.splice(modeWidgetIndex + 1, 0, selectCombo);
-                    }
-                }
-                
-                // Now move seed buttons to be right after seed widget (which is now after wildcards combo)
-                const buttonsToMove = [randomizeButton, newRandomButton, lastSeedButton];
-                for (let i = buttonsToMove.length - 1; i >= 0; i--) {
-                    const button = buttonsToMove[i];
-                    const currentIndex = this.widgets.indexOf(button);
-                    const currentSeedIndex = this.widgets.indexOf(seedWidget);
-                    if (currentIndex !== currentSeedIndex + 1) {
-                        this.widgets.splice(currentIndex, 1);
-                        this.widgets.splice(currentSeedIndex + 1, 0, button);
-                    }
-                }
-                
-                // Add invisible spacer for bottom padding
-                const spacer = {
-                    type: "SPACER",
-                    name: "spacer",
-                    computeSize: () => [0, 8],
-                    draw: () => {},
-                    mouse: () => {},
-                    serialize: false
-                };
-                this.widgets.push(spacer);
-            }
-            
-            // Override minimum node size to allow smaller width
-            // The default min width of 259 is too wide for this node
-            const originalOnResize = this.onResize;
-            this.onResize = function(size) {
-                // Set custom minimum dimensions
-                const minWidth = 200;  // Reduced from default 259
-                const minHeight = 100;
-                
-                // Enforce minimum size
-                size[0] = Math.max(size[0], minWidth);
-                size[1] = Math.max(size[1], minHeight);
-                
-                if (originalOnResize) {
-                    return originalOnResize.apply(this, [size]);
-                }
-            };
-            
-            // Set initial size to smaller width if currently at default
-            const currentSize = this.size;
-            if (currentSize[0] >= 259) {
-                this.size = [200, currentSize[1]];
-            }
-
-            // Find other widgets (seedWidget already defined above)
-            const wildcardTextWidget = this.widgets?.find(w => w.name === "wildcard_text");
-            const populatedTextWidget = this.widgets?.find(w => w.name === "populated_text");
-            const modeWidget = this.widgets?.find(w => w.name === "mode");
-            const wildcardCombo = this.widgets?.find(w => w.name === "wildcards");
-            
-            // Setup seed widget callback to clear cache and update preview
-            if (seedWidget) {
-                const originalSeedCallback = seedWidget.callback;
-                seedWidget.callback = (value) => {
-                    // Clear the seed cache when the seed value changes
-                    node._Eclipse_cachedInputSeed = null;
-                    node._Eclipse_cachedResolvedSeed = null;
-                    
-                    // Call the original callback if it exists
-                    if (originalSeedCallback) {
-                        originalSeedCallback.call(seedWidget, value);
-                    }
-                    
-                    // Skip auto-population during initialization
-                    if (node._isInitializing) {
-                        return;
-                    }
-                    
-                    // Update populated_text when seed changes (in populate mode)
-                    if (modeWidget?.value === "populate" && wildcardTextWidget?.value && populatedTextWidget) {
-                        const actualSeed = node.getSeedToUse();
-                        updatePopulatedText(populatedTextWidget, wildcardTextWidget.value, actualSeed);
-                    }
-                };
-            }
-            
-            // Hook wildcard_text for real-time processing
-            if (wildcardTextWidget && populatedTextWidget) {
-                const originalCallback = wildcardTextWidget.callback;
-                wildcardTextWidget.callback = function(value) {
-                    try {
-                        if (originalCallback) {
-                            originalCallback.call(this, value);
-                        }
-                        
-                        // Skip auto-population during node initialization/loading
-                        if (node._isInitializing) {
-                            return;
-                        }
-                        
-                        // Skip during graphToPrompt serialization - we don't want to regenerate during execution
-                        // Check if we're in the call stack of graphToPrompt by looking for serializeValue
-                        const stack = new Error().stack;
-                        if (stack && stack.includes('serializeValue')) {
-                            return;
-                        }
-                        
-                        // Update populated_text when wildcard_text changes (ONLY in populate mode)
-                        if (modeWidget?.value === "populate" && value && seedWidget) {
-                            const actualSeed = node.getSeedToUse();
-                            updatePopulatedText(populatedTextWidget, value, actualSeed);
-                        }
-                    } catch (e) {
-                        console.error("[Eclipse Wildcard] Error in wildcard_text callback:", e);
-                    }
-                };
-            }
-
-            // Hook mode widget to update populate behavior
-            if (modeWidget) {
-                const originalChange = modeWidget.callback;
-                modeWidget.callback = function(value) {
-                    try {
-                        if (originalChange) {
-                            originalChange.call(this, value);
-                        }
-                        
-                        // Skip auto-population during node initialization/loading
-                        if (node._isInitializing) {
-                            return;
-                        }
-                        
-                        // Update populated_text editability and content based on mode
-                        if (value === "populate") {
-                            // Populate mode: auto-generate and make read-only
-                            if (wildcardTextWidget && populatedTextWidget && seedWidget) {
-                                // Don't auto-generate during mode switch
-                                // This prevents overwriting loaded values from workflows
-                                // User can manually change the seed to regenerate
-                                
-                                // Make read-only by disabling the widget
-                                populatedTextWidget.disabled = true;
-                                if (populatedTextWidget.element) {
-                                    populatedTextWidget.element.style.opacity = "0.85";
-                                    populatedTextWidget.element.style.cursor = "not-allowed";
-                                    populatedTextWidget.element.title = "Auto-generated in populate mode. Change seed to generate new output, fix seed to keep same output.";
-                                }
-                            }
-                            
-                            // Update seed button states based on mode and connection
-                            node.updateSeedButtonStates();
-                        } else if (value === "fixed") {
-                            // Fixed mode: make editable
-                            if (populatedTextWidget) {
-                                // IMPORTANT: Clear the node's seed cache to prevent stale cached values
-                                // This ensures that if we switch back to populate mode, it will regenerate fresh
-                                node._Eclipse_cachedInputSeed = undefined;
-                                node._Eclipse_cachedResolvedSeed = undefined;
-                                
-                                populatedTextWidget.disabled = false;
-                                if (populatedTextWidget.element) {
-                                    populatedTextWidget.element.style.opacity = "1.0";
-                                    populatedTextWidget.element.style.cursor = "text";
-                                    populatedTextWidget.element.title = "Edit to customize the output";
-                                }
-                            }
-                            
-                            // Don't modify seed value in fixed mode
-                            // The seed is saved for reproducibility but not used in fixed mode
-                            // Modifying it would trigger callbacks that might re-process wildcards
-                            
-                            // Update seed button states based on mode and connection
-                            node.updateSeedButtonStates();
-                        }
-                        
-                        updateUIForMode(node, value);
-                    } catch (e) {
-                        console.error("[Eclipse Wildcard] Error in mode callback:", e);
-                    }
-                };
-            }
-
-            // Update combo widget
-            if (wildcardCombo) {
-                // Make combo update its options before drawing
-                const originalDraw = wildcardCombo.draw;
-                if (originalDraw) {
-                    wildcardCombo.draw = function(ctx, node, widgetWidth, y, height) {
-                        // Update options every time we draw (in case new wildcards were added)
-                        updateWildcardCombo(this);
-                        return originalDraw.call(this, ctx, node, widgetWidth, y, height);
-                    };
-                }
-                
-                // Add callback to insert wildcard into text when selected
-                const originalCallback = wildcardCombo.callback;
-                wildcardCombo.callback = function(value) {
-                    // Call original callback if exists
-                    if (originalCallback) {
-                        originalCallback.call(this, value);
-                    }
-                    
-                    // If a wildcard is selected (not "Select a Wildcard"), insert it into wildcard_text
-                    if (value && value !== "Select a Wildcard") {
-                        const wildcardTextWidget = node.widgets?.find(w => w.name === "wildcard_text");
-                        if (wildcardTextWidget) {
-                            let currentText = wildcardTextWidget.value || "";
-                            
-                            // Determine separator - add comma if text exists and doesn't already end with comma
-                            let separator = "";
-                            if (currentText) {
-                                const trimmedText = currentText.trimEnd();
-                                if (trimmedText && !trimmedText.endsWith(",")) {
-                                    separator = ", ";
-                                } else if (trimmedText.endsWith(",")) {
-                                    separator = " ";
-                                }
-                            }
-                            
-                            // Add the wildcard
-                            wildcardTextWidget.value = currentText + separator + value;
-                            
-                            // Clean up "., " patterns anywhere in the text (not just at the end)
-                            wildcardTextWidget.value = wildcardTextWidget.value.replace(/\.,\s+/g, ', ');
-                            
-                            // Clean up multiple whitespaces
-                            wildcardTextWidget.value = wildcardTextWidget.value.replace(/\s+/g, ' ').trim();
-                            
-                            // Trigger the wildcard_text callback to update populated_text
-                            if (wildcardTextWidget.callback) {
-                                wildcardTextWidget.callback(wildcardTextWidget.value);
-                            }
-                        }
-                        
-                        // Reset combo selection back to "Select a Wildcard"
-                        setTimeout(() => {
-                            wildcardCombo.value = "Select a Wildcard";
-                        }, 10);
-                    }
-                };
-                
-                // Also update immediately
-                updateWildcardCombo(wildcardCombo);
-            }
-            
-            // Clear initialization flag and apply final UI state after setup is complete
-            // Use setTimeout to ensure all widget values are loaded from workflow
-            setTimeout(() => {
-                this._isInitializing = false;
-                
-                // Now apply the correct UI state based on the actual loaded mode value
-                if (modeWidget && populatedTextWidget) {
-                    const currentMode = modeWidget.value;
-                    
-                    if (currentMode === "populate") {
-                        populatedTextWidget.disabled = true;
-                        if (populatedTextWidget.element) {
-                            populatedTextWidget.element.style.opacity = "0.85";
-                            populatedTextWidget.element.style.cursor = "not-allowed";
-                            populatedTextWidget.element.title = "Auto-generated in populate mode. Change seed to generate new output, fix seed to keep same output.";
-                        }
-                        
-                        // Don't auto-generate during initialization
-                        // Keep the loaded populated_text value intact
-                        
-                        // Update seed button states based on mode and connection
-                        node.updateSeedButtonStates();
-                    }
-                    updateUIForMode(node, currentMode);
-                }
-            }, 0);
-            
-            // Hook into onConnectionsChange to update button states when seed connections change
-            const originalOnConnectionsChange = this.onConnectionsChange;
-            this.onConnectionsChange = function(type, index, connected, link_info) {
-                // Call original if exists
-                if (originalOnConnectionsChange) {
-                    originalOnConnectionsChange.apply(this, arguments);
-                }
-                
-                // Check if this is the seed input
-                if (type === 1) { // 1 = input connection
-                    const input = this.inputs?.[index];
-                    if (input && input.widget && input.widget.name === "seed") {
-                        // Seed connection changed - update button states
-                        this.updateSeedButtonStates();
-                    }
-                }
-            };
         };
     },
 
     async nodeCreated(node, app) {
-        // Additional node created handling if needed
         if (node.type !== "Wildcard Processor [Eclipse]") {
             return;
         }
         
-        const modeWidget = node.widgets?.find(w => w.name === "mode");
-        const populatedWidget = node.widgets?.find(w => w.name === "populated_text");
-        const wildcardWidget = node.widgets?.find(w => w.name === "wildcard_text");
-        
-        // Force update the combo widget with current wildcard list
-        // This ensures widgets created from saved graphs get the updated list
-        const wildcardCombo = node.widgets?.find(w => w.name === "wildcards");
-        if (wildcardCombo) {
-            updateWildcardCombo(wildcardCombo);
+        // Update button states after node is fully created
+        if (node.updateSeedButtonStates) {
+            node.updateSeedButtonStates();
         }
-        
-        // DON'T initialize populated_text here - it happens too early
-        // The onNodeCreated handler with setTimeout will handle it properly after widget values load
     },
 
     async loadedGraphNode(node, app) {
-        // Handle loaded graph nodes
         if (node.type !== "Wildcard Processor [Eclipse]") {
             return;
         }
 
         const modeWidget = node.widgets?.find(w => w.name === "mode");
         const populatedWidget = node.widgets?.find(w => w.name === "populated_text");
-        const wildcardWidget = node.widgets?.find(w => w.name === "wildcard_text");
-
-        // Refresh wildcard combo
-        const wildcardCombo = node.widgets?.find(w => w.name === "wildcards");
-        if (wildcardCombo) {
-            updateWildcardCombo(wildcardCombo);
+        
+        if (modeWidget && populatedWidget && populatedWidget.inputEl) {
+            const currentMode = modeWidget.value;
+            
+            // Legacy: treat 'reproduce' as 'fixed'
+            if (currentMode === "fixed" || currentMode === "reproduce") {
+                populatedWidget.inputEl.disabled = false;
+                populatedWidget.inputEl.style.opacity = "1.0";
+            } else {
+                populatedWidget.inputEl.disabled = true;
+                populatedWidget.inputEl.style.opacity = "0.85";
+            }
         }
         
-        // Force clear initialization flag when loading from workflow
-        // The setTimeout in onNodeCreated doesn't fire when loading from saved workflows
-        setTimeout(() => {
-            node._isInitializing = false;
-            
-            // CRITICAL: Force the populated_text widget to refresh its visual display
-            // When loading from workflow, the widget value loads correctly but UI doesn't update
-            if (populatedWidget) {
-                const currentValue = populatedWidget.value;
-                
-                // Trigger the widget's callback to force UI update
-                if (populatedWidget.callback) {
-                    populatedWidget.callback(currentValue);
-                }
-                
-                // Force redraw of the widget element
-                if (populatedWidget.element) {
-                    populatedWidget.element.value = currentValue;
-                } else {
-                    // Widget element might not be created yet - force node to redraw
-                    if (node.onResize) {
-                        node.onResize(node.size);
-                    }
-                }
-                
-                // Mark widget as changed
-                if (populatedWidget.options) {
-                    populatedWidget.options.property = "populated_text";
-                }
-            }
-            
-            // Apply correct UI state based on mode
-            const currentMode = modeWidget?.value;
-            
-            if (currentMode === "fixed" && populatedWidget) {
-                populatedWidget.disabled = false;
-                if (populatedWidget.element) {
-                    populatedWidget.element.style.opacity = "1.0";
-                    populatedWidget.element.style.cursor = "text";
-                }
-            } else if (currentMode === "populate" && populatedWidget) {
-                populatedWidget.disabled = true;
-                if (populatedWidget.element) {
-                    populatedWidget.element.style.opacity = "0.85";
-                    populatedWidget.element.style.cursor = "not-allowed";
-                }
-            }
-            
-            // Update seed button states
-            if (node.updateSeedButtonStates) {
-                node.updateSeedButtonStates();
-            }
-            
-            // Force UI refresh
-            if (node.setDirtyCanvas) {
-                node.setDirtyCanvas(true, true);
-            }
-        }, 100);
+        // Update button states after graph is loaded
+        if (node.updateSeedButtonStates) {
+            node.updateSeedButtonStates();
+        }
     }
 });
 
-/**
- * Update wildcard combo with current wildcard list
- * @param {Widget} comboWidget - The combo widget to update
- */
-function updateWildcardCombo(comboWidget) {
-    if (!comboWidget) return;
-
-    // Preserve "Select a Wildcard" as first option and add all loaded wildcards
-    const options = ["Select a Wildcard", ...wildcardList];
-    
-    // Update combo options - support both array and object formats
-    if (comboWidget.options) {
-        if (typeof comboWidget.options === "object" && !Array.isArray(comboWidget.options)) {
-            // ComfyUI widget format: { values: [...] }
-            comboWidget.options.values = options;
-        } else if (Array.isArray(comboWidget.options)) {
-            // Direct array format
-            Object.defineProperty(comboWidget, 'options', {
-                value: options,
-                writable: true
-            });
-        }
-    } else {
-        // Fallback: set options directly
-        Object.defineProperty(comboWidget, 'options', {
-            value: options,
-            writable: true
-        });
-    }
-    
-    // Mark widget as needing redraw
-    if (comboWidget.element) {
-        comboWidget.element.style.setProperty('--changed', 'true', 'important');
-    }
-}
-
-/**
- * Clean up text after wildcard processing
- * Removes unresolved wildcards and orphaned punctuation
- * @param {string} text - The text to clean
- * @returns {string} Cleaned text
- */
-function cleanProcessedText(text) {
-    if (!text) return text;
-    
-    // Remove unresolved wildcard patterns like __keyword__ or __*/actress__
-    text = text.replace(/__[\w.\-+/*\\]+?__/g, '');
-    
-    // Clean up orphaned punctuation left behind
-    text = text.replace(/[,\s]*,[,\s]*,/g, ',');  // Multiple commas with spaces -> single comma
-    text = text.replace(/\.,\s*/g, ', ');         // "., " -> ", "
-    text = text.replace(/,\s*\./g, '.');          // ", ." -> "."
-    text = text.replace(/\s*,\s*,/g, ',');        // ", ," -> ","
-    text = text.replace(/^\s*,\s*/g, '');         // Leading comma
-    text = text.replace(/\s*,\s*$/g, '');         // Trailing comma
-    
-    // Clean up extra spaces
-    text = text.replace(/\s+/g, ' ').trim();
-    
-    return text;
-}
-
-/**
- * Update the populated_text widget with processed wildcard text
- * @param {Widget} populatedWidget - The populated_text widget to update
- * @param {string} wildcardText - The wildcard text to process
- * @param {number} seed - The seed to use for processing
- */
-async function updatePopulatedText(populatedWidget, wildcardText, seed) {
-    if (!populatedWidget || !wildcardText) {
-        return;
-    }
-
-    try {
-        const response = await fetch("/eclipse/wildcards/process", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                text: wildcardText,
-                seed: seed
-            })
-        });
-        
-        if (response.ok) {
-            const result = await response.json();
-            if (result.success) {
-                // Clean up the output text
-                const cleanedOutput = cleanProcessedText(result.output);
-                populatedWidget.value = cleanedOutput;
-                // Trigger callback to ensure widget updates properly
-                if (populatedWidget.callback) {
-                    populatedWidget.callback(cleanedOutput);
-                }
-            } else {
-                console.warn("[Eclipse Wildcard] Server error - success=false");
-            }
-        } else {
-            console.warn("[Eclipse Wildcard] Server returned status:", response.status);
-        }
-    } catch (error) {
-        console.error("[Eclipse Wildcard] Error updating preview:", error);
-    }
-}/**
- * Update UI state based on selected mode
- * @param {Node} node - The node instance
- * @param {string} mode - The selected mode (populate or fixed)
- */
-function updateUIForMode(node, mode) {
-    const seedWidget = node.widgets?.find(w => w.name === "seed");
-    
-    if (!seedWidget) return;
-
-    // In "populate" mode, seed controls generation: change to create new output, fix to keep same
-    // In "fixed" mode, seed is ignored
-
-    switch (mode) {
-        case "populate":
-            // Seed is active - full opacity
-            if (seedWidget.element) {
-                seedWidget.element.style.opacity = "1.0";
-                seedWidget.element.title = "Change seed to generate new output, fix seed to keep same output";
-            }
-            break;
-
-        case "fixed":
-            // Seed ignored - disable or gray out
-            if (seedWidget.element) {
-                seedWidget.element.style.opacity = "0.5";
-                seedWidget.element.title = "Seed is ignored in 'fixed' mode";
-            }
-            break;
-    }
-}
-
-/**
- * Setup periodic wildcard list refresh
- * Allows auto-loading of newly created wildcard files
- */
 setInterval(async () => {
     try {
-        const response = await fetch("/eclipse/wildcards/list");
+        const response = await api.fetchApi('/eclipse/wildcards/list');
         if (response.ok) {
             const newList = await response.json();
-            
-            // Check if list changed
-            if (JSON.stringify(newList) !== JSON.stringify(wildcardList)) {
-                wildcardList = newList;
-                
-                // Update all nodes with new list
-                for (const nodeId in app.graph._nodes) {
-                    const node = app.graph._nodes[nodeId];
-                    if (node.type === "Wildcard Processor [Eclipse]") {
-                        const combo = node.widgets?.find(w => w.name === "wildcards");
-                        if (combo) {
-                            updateWildcardCombo(combo);
-                        }
-                    }
-                }
+            if (JSON.stringify(newList) !== JSON.stringify(wildcardsList)) {
+                wildcardsList = newList;
+                app.canvas.setDirty(true);
             }
         }
-    } catch (error) {
-        // Silent fail - don't spam logs
-    }
-}, 5000); // Check every 5 seconds
+    } catch (error) {}
+}, 5000);
+
+loadWildcards();
