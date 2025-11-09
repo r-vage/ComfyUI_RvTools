@@ -13,6 +13,7 @@
 import torch
 import re
 from ..core import CATEGORY, AnyType
+from ..core.common import cstr
 from typing import Any, Dict, Tuple
 
 any_type = AnyType("*")
@@ -77,7 +78,7 @@ class RvConversion_Join:
             return self._join_primitives(inputs, delimiter)
         
         # Fallback: return first input
-        print(f"[Eclipse Join] Unknown type: {type(first_input)}, returning first input")
+        cstr(f"[Eclipse Join] Unknown type: {type(first_input)}, returning first input").warning.print()
         return (first_input,)
     
     def _join_images(self, inputs):

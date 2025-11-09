@@ -19,6 +19,7 @@ import torch
 from server import PromptServer
 from ..core import CATEGORY
 from ..core import AnyType
+from ..core.common import cstr
 
 any = AnyType("*")
 
@@ -125,13 +126,13 @@ class Eclipse_VRAMCleanup:
                 operations.append("Aggressive Cleanup")
             
             if not operations:
-                print("=== VRAM Cleanup Skipped ===")
-                print("No cleanup operations selected")
+                cstr("=== VRAM Cleanup Skipped ===").msg.print()
+                cstr("No cleanup operations selected").msg.print()
                 return (anything,)
 
             # Start message
-            print("=== VRAM Cleanup Started ===")
-            print(f"Operations: {', '.join(operations)}")
+            cstr("=== VRAM Cleanup Started ===").msg.print()
+            cstr(f"Operations: {', '.join(operations)}").msg.print()
 
             status_messages = []
             
@@ -161,15 +162,15 @@ class Eclipse_VRAMCleanup:
             elapsed = time.time() - start_time
             
             # Consolidated output
-            print(f"Status: {', '.join(status_messages)}")
-            print(f"Time: {elapsed:.2f}s")
-            print("=== VRAM Cleanup Complete ===")
+            cstr(f"Status: {', '.join(status_messages)}").msg.print()
+            cstr(f"Time: {elapsed:.2f}s").msg.print()
+            cstr("=== VRAM Cleanup Complete ===").msg.print()
 
         except Exception as e:
             elapsed = time.time() - start_time
-            print(f"Status: Error - {str(e)}")
-            print(f"Time: {elapsed:.2f}s")
-            print("=== VRAM Cleanup Complete ===")
+            cstr(f"Status: Error - {str(e)}").error.print()
+            cstr(f"Time: {elapsed:.2f}s").msg.print()
+            cstr("=== VRAM Cleanup Complete ===").msg.print()
 
         return (anything,)
 

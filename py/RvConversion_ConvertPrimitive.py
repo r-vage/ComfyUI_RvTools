@@ -11,6 +11,7 @@
 # limitations under the License.
 
 from ..core import CATEGORY, AnyType
+from ..core.common import cstr
 from typing import Any
 
 any_type = AnyType("*")
@@ -46,7 +47,7 @@ class RvConversion_ConvertPrimitive:
         
         # Check for list/tuple input and reject it
         if isinstance(input, (list, tuple)):
-            print(f"[Eclipse ConvertPrimitive] Warning: List/tuple input detected. Use ConvertToList node first to extract values.")
+            cstr(f"[Eclipse ConvertPrimitive] Warning: List/tuple input detected. Use ConvertToList node first to extract values.").warning.print()
             # Take first element as fallback
             if len(input) > 0:
                 input = input[0]
@@ -112,7 +113,7 @@ class RvConversion_ConvertPrimitive:
             
         except (ValueError, TypeError) as e:
             # If conversion fails, return defaults
-            print(f"[Eclipse ConvertPrimitive] Conversion error: {e}")
+            cstr(f"[Eclipse ConvertPrimitive] Conversion error: {e}").error.print()
             if convert_to == "STRING":
                 return ("",)
             elif convert_to == "INT":
@@ -161,7 +162,7 @@ class RvConversion_ConvertPrimitive:
                 # First element is selected by default
                 return ((options[0], options),)
             except Exception as e:
-                print(f"[Eclipse ConvertPrimitive] COMBO conversion from iterable failed: {e}")
+                cstr(f"[Eclipse ConvertPrimitive] COMBO conversion from iterable failed: {e}").error.print()
                 return (("", [""]),)
         else:
             # Single value -> create combo with single option

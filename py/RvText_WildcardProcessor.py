@@ -23,10 +23,10 @@
 
 
 import os
-import logging
 from typing import Any, Dict, Tuple, Optional, List
 
 from ..core import CATEGORY
+from ..core.common import cstr
 from ..core.wildcard_engine import wildcard_load, process
 
 
@@ -120,7 +120,7 @@ class RvText_WildcardProcessor:
             }
 
         except Exception as e:
-            logging.error(f"[Eclipse Wildcard] Error in execute: {e}")
+            cstr(f"[Eclipse Wildcard] Error in execute: {e}").error.print()
             return {
                 "ui": {"text": [populated_text]},
                 "result": (populated_text,)
@@ -136,7 +136,7 @@ class RvText_WildcardProcessor:
             )
 
         wildcard_load(path)
-        logging.info(f"[Eclipse Wildcard] Loaded wildcards from: {path}")
+        cstr(f"[Eclipse Wildcard] Loaded wildcards from: {path}").msg.print()
 
 
 # Ensure wildcard engine is initialized on import

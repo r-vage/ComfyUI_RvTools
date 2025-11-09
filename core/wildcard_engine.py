@@ -28,8 +28,8 @@ import os
 import threading
 import yaml  # type: ignore[import-untyped]
 import numpy as np
-import logging
 from typing import Dict, List, Optional, Tuple
+from .common import cstr
 
 # Global state for wildcard dictionary
 wildcard_lock = threading.Lock()
@@ -113,7 +113,7 @@ def read_wildcard(k: str, v) -> None:
 def read_wildcard_dict(wildcard_path: str) -> Dict[str, List[str]]:
     """Load all wildcards from directory of .txt and .yaml files."""
     if not os.path.exists(wildcard_path):
-        logging.warning(f"[Eclipse Wildcards] Path does not exist: {wildcard_path}")
+        cstr(f"[Eclipse Wildcards] Path does not exist: {wildcard_path}").warning.print()
         return wildcard_dict
 
     for root, directories, files in os.walk(wildcard_path, followlinks=True):
@@ -133,7 +133,7 @@ def read_wildcard_dict(wildcard_path: str) -> Dict[str, List[str]]:
                             if x.strip() and not x.strip().startswith('#')
                         ]
                 except Exception as e:
-                    logging.warning(f"[Eclipse Wildcards] Error reading {file_path}: {e}")
+                    cstr(f"[Eclipse Wildcards] Error reading {file_path}: {e}").warning.print()
 
         # Read .yaml/.yml files (structured format)
         for file in files:
@@ -147,7 +147,7 @@ def read_wildcard_dict(wildcard_path: str) -> Dict[str, List[str]]:
                             for k, v in yaml_data.items():
                                 read_wildcard(k, v)
                 except Exception as e:
-                    logging.warning(f"[Eclipse Wildcards] Error reading {file_path}: {e}")
+                    cstr(f"[Eclipse Wildcards] Error reading {file_path}: {e}").warning.print()
 
     return wildcard_dict
 
@@ -159,7 +159,7 @@ def wildcard_load(wildcard_path: str) -> None:
     with wildcard_lock:
         wildcard_dict = {}
         read_wildcard_dict(wildcard_path)
-        logging.info(f"[Eclipse Wildcards] Loaded {len(wildcard_dict)} wildcard groups")
+        cstr(f"[Eclipse Wildcards] Loaded {len(wildcard_dict)} wildcard groups").msg.print()
 
 
 def process(text: str, seed: Optional[int] = None) -> str:

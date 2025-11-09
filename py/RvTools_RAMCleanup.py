@@ -20,6 +20,7 @@ import platform
 import subprocess
 from ..core import CATEGORY
 from ..core import AnyType
+from ..core.common import cstr
 
 # Import Windows-specific modules only on Windows
 if platform.system() == "Windows":
@@ -113,7 +114,7 @@ class Eclipse_RAMCleanup:
         # Check if sudo is available first
         sudo_ok, sudo_msg = self._check_sudo_available()
         if not sudo_ok:
-            print(f"Cannot clear file cache on Linux: {sudo_msg}")
+            cstr(f"Cannot clear file cache on Linux: {sudo_msg}").warning.print()
             return False
         
         methods = [
@@ -192,7 +193,7 @@ class Eclipse_RAMCleanup:
     def clean_ram(self, anything, clean_file_cache, clean_processes, clean_dlls, retry_times, unique_id=None, extra_pnginfo=None):
         """Main RAM cleanup function with improved error handling and safety"""
         if retry_times < 1 or retry_times > 10:
-            print(f"Invalid retry_times value: {retry_times}. Using default of 3.")
+            cstr(f"Invalid retry_times value: {retry_times}. Using default of 3.").warning.print()
             retry_times = 3
 
         try:
@@ -200,8 +201,8 @@ class Eclipse_RAMCleanup:
             system = platform.system()
             
             # Start message
-            print(f"=== RAM Cleanup Started ===")
-            print(f"Initial - Usage: {initial_mem['percent']:.1f}% | Available: {initial_mem['available']:.1f}MB | Total: {initial_mem['total']:.1f}MB")
+            cstr(f"=== RAM Cleanup Started ===").msg.print()
+            cstr(f"Initial - Usage: {initial_mem['percent']:.1f}% | Available: {initial_mem['available']:.1f}MB | Total: {initial_mem['total']:.1f}MB").msg.print()
             
             total_cleaned_processes = 0
             operations_completed = set()
@@ -277,10 +278,10 @@ class Eclipse_RAMCleanup:
             summary_lines.append(f"Final - Usage: {final_mem['percent']:.1f}% | Available: {final_mem['available']:.1f}MB")
             
             # Print single consolidated message
-            print("\n".join(summary_lines))
+            cstr("\n".join(summary_lines)).msg.print()
 
         except Exception as e:
-            print(f"Critical error during RAM cleanup process: {e}")
+            cstr(f"Critical error during RAM cleanup process: {e}").error.print()
             import traceback
             traceback.print_exc()
 

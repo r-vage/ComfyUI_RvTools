@@ -1,8 +1,8 @@
 {
   "id": "fc9ec491-a26d-4bb9-b451-ee71a8d49065",
   "revision": 0,
-  "last_node_id": 44,
-  "last_link_id": 116,
+  "last_node_id": 45,
+  "last_link_id": 119,
   "nodes": [
     {
       "id": 6,
@@ -16,7 +16,7 @@
         164.31304931640625
       ],
       "flags": {},
-      "order": 15,
+      "order": 14,
       "mode": 0,
       "inputs": [
         {
@@ -70,7 +70,7 @@
         46
       ],
       "flags": {},
-      "order": 17,
+      "order": 16,
       "mode": 0,
       "inputs": [
         {
@@ -116,17 +116,17 @@
       ],
       "size": [
         215.73332824707032,
-        286
+        306
       ],
       "flags": {},
-      "order": 6,
+      "order": 5,
       "mode": 0,
       "inputs": [
         {
           "localized_name": "pipe",
           "name": "pipe",
           "type": "pipe",
-          "link": 40
+          "link": 118
         },
         {
           "localized_name": "latent",
@@ -203,6 +203,12 @@
           ]
         },
         {
+          "localized_name": "flux_guidance",
+          "name": "flux_guidance",
+          "type": "FLOAT",
+          "links": null
+        },
+        {
           "localized_name": "clip_skip",
           "name": "clip_skip",
           "type": "INT",
@@ -240,10 +246,10 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI_Eclipse",
+        "cnr_id": "ComfyUI_Eclipse",
         "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
         "Node name for S&R": "Pipe Out Checkpoint Loader [Eclipse]",
-        "cnr_id": "ComfyUI_Eclipse"
+        "aux_id": "r-vage/ComfyUI_Eclipse"
       },
       "widgets_values": [],
       "color": "#4e4e4e",
@@ -262,7 +268,7 @@
         725
       ],
       "flags": {},
-      "order": 16,
+      "order": 15,
       "mode": 0,
       "inputs": [
         {
@@ -385,7 +391,7 @@
         58
       ],
       "flags": {},
-      "order": 18,
+      "order": 17,
       "mode": 0,
       "inputs": [
         {
@@ -415,14 +421,11 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI_Eclipse",
+        "cnr_id": "ComfyUI_Eclipse",
         "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
         "Node name for S&R": "Any Passer [Eclipse]",
-        "cnr_id": "ComfyUI_Eclipse"
+        "aux_id": "r-vage/ComfyUI_Eclipse"
       },
-      "widgets_values": [
-        false
-      ],
       "color": "#4e4e4e",
       "bgcolor": "#3a3a3a",
       "shape": 1
@@ -439,7 +442,7 @@
         180.6060791015625
       ],
       "flags": {},
-      "order": 11,
+      "order": 10,
       "mode": 0,
       "inputs": [
         {
@@ -493,7 +496,7 @@
         183
       ],
       "flags": {},
-      "order": 13,
+      "order": 11,
       "mode": 0,
       "inputs": [
         {
@@ -522,14 +525,14 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI_Eclipse",
+        "cnr_id": "ComfyUI_Eclipse",
         "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
         "Node name for S&R": "Show Any [Eclipse]",
-        "cnr_id": "ComfyUI_Eclipse"
+        "aux_id": "r-vage/ComfyUI_Eclipse"
       },
       "widgets_values": [
         "hide",
-        "a beautiful woman with white skin, and long, straight black hair. She has blue eyes and dark makeup that accentuates her features, she wears a red suit, skin press, she has medium breasts, a sultry, knowing smile playing on her lips, seductivly, rope bridge: A suspended bridge made of ropes and planks, stretching over a ravine or river with dramatic views."
+        "a beautiful woman with fair skin, and wavy prom hairstyle, black colored hair. She has gold eyes and a dark makeup look that accentuates her features, lip liner, she wears a Burlap Brown colored beret or wide-brimmed hat, her expression is sick, she holds a large sign that reads \"Fast & Furious, ComfyUI with Nunchaku!\""
       ],
       "color": "#4e4e4e",
       "bgcolor": "#3a3a3a",
@@ -547,7 +550,7 @@
         715
       ],
       "flags": {},
-      "order": 19,
+      "order": 18,
       "mode": 0,
       "inputs": [
         {
@@ -577,89 +580,13 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI_Eclipse",
+        "cnr_id": "ComfyUI_Eclipse",
         "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
         "Node name for S&R": "Preview Image [Eclipse]",
-        "cnr_id": "ComfyUI_Eclipse"
+        "aux_id": "r-vage/ComfyUI_Eclipse"
       },
       "widgets_values": [
         -1
-      ],
-      "color": "#4e4e4e",
-      "bgcolor": "#3a3a3a",
-      "shape": 1
-    },
-    {
-      "id": 28,
-      "type": "Concat Pipe Multi [Eclipse]",
-      "pos": [
-        1373,
-        997
-      ],
-      "size": [
-        270,
-        127
-      ],
-      "flags": {},
-      "order": 8,
-      "mode": 0,
-      "inputs": [
-        {
-          "localized_name": "pipe_1",
-          "name": "pipe_1",
-          "type": "pipe",
-          "link": 67
-        },
-        {
-          "localized_name": "pipe_2",
-          "name": "pipe_2",
-          "shape": 7,
-          "type": "pipe",
-          "link": 68
-        },
-        {
-          "localized_name": "inputcount",
-          "name": "inputcount",
-          "type": "INT",
-          "widget": {
-            "name": "inputcount"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "merge_strategy",
-          "name": "merge_strategy",
-          "shape": 7,
-          "type": "COMBO",
-          "widget": {
-            "name": "merge_strategy"
-          },
-          "link": null
-        },
-        {
-          "name": "pipe_3",
-          "type": "PIPE",
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "localized_name": "pipe",
-          "name": "pipe",
-          "type": "pipe",
-          "links": [
-            70,
-            76
-          ]
-        }
-      ],
-      "properties": {
-        "aux_id": "r-vage/ComfyUI_Eclipse",
-        "ver": "e5119ec75b58ce68acd0d976755f8c4ad687a6bc"
-      },
-      "widgets_values": [
-        3,
-        "merge"
       ],
       "color": "#4e4e4e",
       "bgcolor": "#3a3a3a",
@@ -677,7 +604,7 @@
         452
       ],
       "flags": {},
-      "order": 12,
+      "order": 13,
       "mode": 0,
       "inputs": [
         {
@@ -706,14 +633,14 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI_Eclipse",
+        "cnr_id": "ComfyUI_Eclipse",
         "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
         "Node name for S&R": "Show Any [Eclipse]",
-        "cnr_id": "ComfyUI_Eclipse"
+        "aux_id": "r-vage/ComfyUI_Eclipse"
       },
       "widgets_values": [
         "hide",
-        "{'path': 'D:\\\\AI\\\\ComfyUI_windows_portable\\\\ComfyUI\\\\output\\\\images\\\\2025-10-26', 'width': 832, 'height': 1216, 'batch_size': 1, 'seed': 1026913805484213, 'model': <comfy.model_patcher.ModelPatcher object at 0x000001E3F614DDC0>, 'clip': <comfy.sd.CLIP object at 0x000001E3F651ECC0>, 'vae': <comfy.sd.VAE object at 0x000001E3D66E26F0>, 'latent': {'samples': tensor([[[[0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          ...,\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.]],\n\n         [[0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          ...,\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.]],\n\n         [[0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          ...,\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.]],\n\n         [[0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          ...,\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.]]]])}, 'model_name': 'PonyXL\\\\cyberrealisticPony_v140.safetensors', 'clip_skip': -2, 'is_nunchaku': False, 'flux_guidance': 3.5, 'sampler_name': 'dpmpp_2m', 'scheduler': 'sgm_uniform', 'steps': 20, 'cfg': 2.5, '_allow_overwrite': False, 'pipe': {...}}"
+        "{'path': 'D:\\\\AI\\\\ComfyUI_windows_portable\\\\ComfyUI\\\\output\\\\images\\\\2025-11-09', 'width': 832, 'height': 1216, 'batch_size': 1, 'seed': 1026913805484213, 'model': <comfy.model_patcher.ModelPatcher object at 0x00000260660BB1A0>, 'clip': <comfy.sd.CLIP object at 0x0000026066438530>, 'vae': <comfy.sd.VAE object at 0x0000026066162870>, 'latent': {'samples': tensor([[[[0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          ...,\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.]],\n\n         [[0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          ...,\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.]],\n\n         [[0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          ...,\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.]],\n\n         ...,\n\n         [[0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          ...,\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.]],\n\n         [[0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          ...,\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.]],\n\n         [[0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          ...,\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.]]]])}, 'model_name': 'flux\\\\Fluxmania_Kreamania_fp8.safetensors', 'vae_name': 'flux_vae.safetensors', 'is_nunchaku': False, 'flux_guidance': 2.5, 'sampler_name': 'dpmpp_2m', 'scheduler': 'sgm_uniform', 'steps': 20, 'cfg': 1.0, '_allow_overwrite': False, 'pipe': {...}}"
       ],
       "color": "#4e4e4e",
       "bgcolor": "#3a3a3a",
@@ -731,7 +658,7 @@
         486
       ],
       "flags": {},
-      "order": 22,
+      "order": 21,
       "mode": 0,
       "inputs": [
         {
@@ -926,9 +853,10 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI_Eclipse",
+        "cnr_id": "ComfyUI_RvTools",
         "ver": "e5119ec75b58ce68acd0d976755f8c4ad687a6bc",
-        "Node name for S&R": "Save Images [Eclipse]"
+        "Node name for S&R": "Save Images [Eclipse]",
+        "aux_id": "r-vage/ComfyUI_Eclipse"
       },
       "widgets_values": [
         "%Y-%M-%D\\%basemodel",
@@ -955,486 +883,6 @@
       "shape": 1
     },
     {
-      "id": 10,
-      "type": "Smart Loader Plus [Eclipse]",
-      "pos": [
-        -322,
-        186
-      ],
-      "size": [
-        275.3333435058594,
-        519
-      ],
-      "flags": {},
-      "order": 0,
-      "mode": 0,
-      "inputs": [
-        {
-          "localized_name": "template_action",
-          "name": "template_action",
-          "type": "COMBO",
-          "widget": {
-            "name": "template_action"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "template_name",
-          "name": "template_name",
-          "type": "COMBO",
-          "widget": {
-            "name": "template_name"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "new_template_name",
-          "name": "new_template_name",
-          "type": "STRING",
-          "widget": {
-            "name": "new_template_name"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "model_type",
-          "name": "model_type",
-          "type": "COMBO",
-          "widget": {
-            "name": "model_type"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "ckpt_name",
-          "name": "ckpt_name",
-          "type": "COMBO",
-          "widget": {
-            "name": "ckpt_name"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "unet_name",
-          "name": "unet_name",
-          "type": "COMBO",
-          "widget": {
-            "name": "unet_name"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "nunchaku_name",
-          "name": "nunchaku_name",
-          "type": "COMBO",
-          "widget": {
-            "name": "nunchaku_name"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "qwen_name",
-          "name": "qwen_name",
-          "type": "COMBO",
-          "widget": {
-            "name": "qwen_name"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "gguf_name",
-          "name": "gguf_name",
-          "type": "COMBO",
-          "widget": {
-            "name": "gguf_name"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "weight_dtype",
-          "name": "weight_dtype",
-          "type": "COMBO",
-          "widget": {
-            "name": "weight_dtype"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "data_type",
-          "name": "data_type",
-          "type": "COMBO",
-          "widget": {
-            "name": "data_type"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "cache_threshold",
-          "name": "cache_threshold",
-          "type": "FLOAT",
-          "widget": {
-            "name": "cache_threshold"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "attention",
-          "name": "attention",
-          "type": "COMBO",
-          "widget": {
-            "name": "attention"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "i2f_mode",
-          "name": "i2f_mode",
-          "type": "COMBO",
-          "widget": {
-            "name": "i2f_mode"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "cpu_offload",
-          "name": "cpu_offload",
-          "type": "COMBO",
-          "widget": {
-            "name": "cpu_offload"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "num_blocks_on_gpu",
-          "name": "num_blocks_on_gpu",
-          "type": "INT",
-          "widget": {
-            "name": "num_blocks_on_gpu"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "use_pin_memory",
-          "name": "use_pin_memory",
-          "type": "COMBO",
-          "widget": {
-            "name": "use_pin_memory"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "gguf_dequant_dtype",
-          "name": "gguf_dequant_dtype",
-          "type": "COMBO",
-          "widget": {
-            "name": "gguf_dequant_dtype"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "gguf_patch_dtype",
-          "name": "gguf_patch_dtype",
-          "type": "COMBO",
-          "widget": {
-            "name": "gguf_patch_dtype"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "gguf_patch_on_device",
-          "name": "gguf_patch_on_device",
-          "type": "BOOLEAN",
-          "widget": {
-            "name": "gguf_patch_on_device"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "configure_clip",
-          "name": "configure_clip",
-          "type": "BOOLEAN",
-          "widget": {
-            "name": "configure_clip"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "configure_vae",
-          "name": "configure_vae",
-          "type": "BOOLEAN",
-          "widget": {
-            "name": "configure_vae"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "configure_latent",
-          "name": "configure_latent",
-          "type": "BOOLEAN",
-          "widget": {
-            "name": "configure_latent"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "configure_sampler",
-          "name": "configure_sampler",
-          "type": "BOOLEAN",
-          "widget": {
-            "name": "configure_sampler"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "clip_source",
-          "name": "clip_source",
-          "type": "COMBO",
-          "widget": {
-            "name": "clip_source"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "clip_count",
-          "name": "clip_count",
-          "type": "COMBO",
-          "widget": {
-            "name": "clip_count"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "clip_name1",
-          "name": "clip_name1",
-          "type": "COMBO",
-          "widget": {
-            "name": "clip_name1"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "clip_name2",
-          "name": "clip_name2",
-          "type": "COMBO",
-          "widget": {
-            "name": "clip_name2"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "clip_name3",
-          "name": "clip_name3",
-          "type": "COMBO",
-          "widget": {
-            "name": "clip_name3"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "clip_name4",
-          "name": "clip_name4",
-          "type": "COMBO",
-          "widget": {
-            "name": "clip_name4"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "clip_type",
-          "name": "clip_type",
-          "type": "COMBO",
-          "widget": {
-            "name": "clip_type"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "enable_clip_layer",
-          "name": "enable_clip_layer",
-          "type": "BOOLEAN",
-          "widget": {
-            "name": "enable_clip_layer"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "stop_at_clip_layer",
-          "name": "stop_at_clip_layer",
-          "type": "INT",
-          "widget": {
-            "name": "stop_at_clip_layer"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "vae_source",
-          "name": "vae_source",
-          "type": "COMBO",
-          "widget": {
-            "name": "vae_source"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "vae_name",
-          "name": "vae_name",
-          "type": "COMBO",
-          "widget": {
-            "name": "vae_name"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "resolution",
-          "name": "resolution",
-          "type": "COMBO",
-          "widget": {
-            "name": "resolution"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "width",
-          "name": "width",
-          "type": "INT",
-          "widget": {
-            "name": "width"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "height",
-          "name": "height",
-          "type": "INT",
-          "widget": {
-            "name": "height"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "batch_size",
-          "name": "batch_size",
-          "type": "INT",
-          "widget": {
-            "name": "batch_size"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "sampler_name",
-          "name": "sampler_name",
-          "type": "COMBO",
-          "widget": {
-            "name": "sampler_name"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "scheduler",
-          "name": "scheduler",
-          "type": "COMBO",
-          "widget": {
-            "name": "scheduler"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "steps",
-          "name": "steps",
-          "type": "INT",
-          "widget": {
-            "name": "steps"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "cfg",
-          "name": "cfg",
-          "type": "FLOAT",
-          "widget": {
-            "name": "cfg"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "flux_guidance",
-          "name": "flux_guidance",
-          "type": "FLOAT",
-          "widget": {
-            "name": "flux_guidance"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "localized_name": "pipe",
-          "name": "pipe",
-          "type": "pipe",
-          "links": [
-            21,
-            40,
-            68
-          ]
-        }
-      ],
-      "properties": {
-        "aux_id": "r-vage/ComfyUI_Eclipse",
-        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
-        "Node name for S&R": "Smart Loader Plus [Eclipse]",
-        "cnr_id": "ComfyUI_Eclipse"
-      },
-      "widgets_values": [
-        "Load",
-        "Pony_Cyberrealistic",
-        "",
-        "Standard Checkpoint",
-        "PonyXL\\cyberrealisticPony_v140.safetensors",
-        "flux\\flux_dev_pruned.safetensors",
-        "nunchaku\\svdq-int4_r32-fluxmania-legacy.safetensors",
-        "nunchaku\\svdq-int4_r32-qwen-image.safetensors",
-        "flux\\amafluxFluxAmateur_10Q4KS.gguf",
-        "fp8_e4m3fn",
-        "bfloat16",
-        0,
-        "nunchaku-fp16",
-        "enabled",
-        "auto",
-        1,
-        "disable",
-        "default",
-        "default",
-        false,
-        true,
-        true,
-        true,
-        true,
-        "Baked",
-        "2",
-        "ViT-L-14-TEXT-detail-improved-hiT-GmP-TE-only-HF.safetensors",
-        "t5xxl_fp8_e4m3fn.safetensors",
-        "None",
-        "None",
-        "flux",
-        true,
-        -2,
-        "Baked",
-        "flux_vae.safetensors",
-        "832x1216 (2:3 Flux, SDXL)",
-        1024,
-        1024,
-        1,
-        "dpmpp_2m",
-        "sgm_uniform",
-        20,
-        2.5,
-        3.5
-      ],
-      "color": "#4e4e4e",
-      "bgcolor": "#3a3a3a",
-      "shape": 1
-    },
-    {
       "id": 23,
       "type": "Merge Strings [Eclipse]",
       "pos": [
@@ -1446,7 +894,7 @@
         151
       ],
       "flags": {},
-      "order": 14,
+      "order": 12,
       "mode": 0,
       "inputs": [
         {
@@ -1509,9 +957,9 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI_Eclipse",
+        "cnr_id": "ComfyUI_Eclipse",
         "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
-        "cnr_id": "ComfyUI_Eclipse"
+        "aux_id": "r-vage/ComfyUI_Eclipse"
       },
       "widgets_values": [
         3,
@@ -1534,7 +982,7 @@
         200
       ],
       "flags": {},
-      "order": 1,
+      "order": 0,
       "mode": 0,
       "inputs": [
         {
@@ -1565,10 +1013,10 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI_Eclipse",
+        "cnr_id": "ComfyUI_Eclipse",
         "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
         "Node name for S&R": "String Multiline [Eclipse]",
-        "cnr_id": "ComfyUI_Eclipse"
+        "aux_id": "r-vage/ComfyUI_Eclipse"
       },
       "widgets_values": [
         ""
@@ -1589,7 +1037,7 @@
         246
       ],
       "flags": {},
-      "order": 7,
+      "order": 8,
       "mode": 0,
       "inputs": [
         {
@@ -1678,10 +1126,10 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI_Eclipse",
+        "cnr_id": "ComfyUI_Eclipse",
         "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
         "Node name for S&R": "Pipe Out Smart Folder [Eclipse]",
-        "cnr_id": "ComfyUI_Eclipse"
+        "aux_id": "r-vage/ComfyUI_Eclipse"
       },
       "widgets_values": [],
       "color": "#4e4e4e",
@@ -1700,7 +1148,7 @@
         586
       ],
       "flags": {},
-      "order": 20,
+      "order": 19,
       "mode": 0,
       "inputs": [
         {
@@ -2089,9 +1537,10 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI_Eclipse",
+        "cnr_id": "ComfyUI_RvTools",
         "ver": "e5119ec75b58ce68acd0d976755f8c4ad687a6bc",
-        "Node name for S&R": "Context Image [Eclipse]"
+        "Node name for S&R": "Context Image [Eclipse]",
+        "aux_id": "r-vage/ComfyUI_Eclipse"
       },
       "widgets_values": [],
       "color": "#4e4e4e",
@@ -2110,7 +1559,7 @@
         452
       ],
       "flags": {},
-      "order": 21,
+      "order": 20,
       "mode": 0,
       "inputs": [
         {
@@ -2139,326 +1588,14 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI_Eclipse",
+        "cnr_id": "ComfyUI_Eclipse",
         "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
         "Node name for S&R": "Show Any [Eclipse]",
-        "cnr_id": "ComfyUI_Eclipse"
+        "aux_id": "r-vage/ComfyUI_Eclipse"
       },
       "widgets_values": [
         "show",
-        "{'model': <comfy.model_patcher.ModelPatcher object at 0x000001E3F614DDC0>, 'clip': <comfy.sd.CLIP object at 0x000001E3F651ECC0>, 'vae': <comfy.sd.VAE object at 0x000001E3D66E26F0>, 'latent': {'samples': tensor([[[[0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          ...,\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.]],\n\n         [[0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          ...,\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.]],\n\n         [[0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          ...,\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.]],\n\n         [[0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          ...,\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.]]]])}, 'steps': 20, 'cfg': 2.5, 'sampler_name': 'dpmpp_2m', 'scheduler': 'sgm_uniform', 'clip_skip': -2, 'seed': 1026913805484213, 'width': 832, 'height': 1216, 'batch_size': 1, 'model_name': 'PonyXL\\\\cyberrealisticPony_v140.safetensors', 'path': 'D:\\\\AI\\\\ComfyUI_windows_portable\\\\ComfyUI\\\\output\\\\images\\\\2025-10-26', 'images_output': tensor([[[[0.6040, 0.6484, 0.6572],\n          [0.6074, 0.6543, 0.6562],\n          [0.5967, 0.6426, 0.6416],\n          ...,\n          [0.0352, 0.0215, 0.0176],\n          [0.0391, 0.0215, 0.0137],\n          [0.0312, 0.0098, 0.0000]],\n\n         [[0.5996, 0.6523, 0.6533],\n          [0.6162, 0.6777, 0.6797],\n          [0.6367, 0.6992, 0.6875],\n          ...,\n          [0.0312, 0.0254, 0.0215],\n          [0.0391, 0.0293, 0.0254],\n          [0.0273, 0.0137, 0.0137]],\n\n         [[0.6328, 0.6807, 0.6895],\n          [0.6738, 0.7363, 0.7354],\n          [0.6855, 0.7480, 0.7363],\n          ...,\n          [0.0312, 0.0215, 0.0137],\n          [0.0391, 0.0293, 0.0215],\n          [0.0312, 0.0215, 0.0098]],\n\n         ...,\n\n         [[0.3857, 0.3955, 0.3232],\n          [0.3457, 0.3682, 0.2998],\n          [0.3193, 0.3330, 0.2656],\n          ...,\n          [0.3018, 0.3047, 0.2266],\n          [0.2861, 0.3008, 0.2207],\n          [0.3281, 0.3516, 0.2520]],\n\n         [[0.4004, 0.4131, 0.3506],\n          [0.3652, 0.3867, 0.3271],\n          [0.3506, 0.3701, 0.3047],\n          ...,\n          [0.2764, 0.2676, 0.1934],\n          [0.2939, 0.2910, 0.2090],\n          [0.3438, 0.3369, 0.2383]],\n\n         [[0.4033, 0.4092, 0.3418],\n          [0.3809, 0.3945, 0.3398],\n          [0.3682, 0.3750, 0.3184],\n          ...,\n          [0.3281, 0.3369, 0.2422],\n          [0.3193, 0.3213, 0.2441],\n          [0.3213, 0.3232, 0.2363]]]]), 'text_pos': 'a beautiful woman with white skin, and long, straight black hair. She has blue eyes and dark makeup that accentuates her features, she wears a red suit, skin press, she has medium breasts, a sultry, knowing smile playing on her lips, seductivly, rope bridge: A suspended bridge made of ropes and planks, stretching over a ravine or river with dramatic views'}"
-      ],
-      "color": "#4e4e4e",
-      "bgcolor": "#3a3a3a",
-      "shape": 1
-    },
-    {
-      "id": 20,
-      "type": "Smart Folder [Eclipse]",
-      "pos": [
-        -679,
-        186
-      ],
-      "size": [
-        293.3333282470703,
-        375
-      ],
-      "flags": {},
-      "order": 2,
-      "mode": 0,
-      "inputs": [
-        {
-          "localized_name": "generation_mode",
-          "name": "generation_mode",
-          "type": "COMBO",
-          "widget": {
-            "name": "generation_mode"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "root_folder_image",
-          "name": "root_folder_image",
-          "type": "STRING",
-          "widget": {
-            "name": "root_folder_image"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "root_folder_video",
-          "name": "root_folder_video",
-          "type": "STRING",
-          "widget": {
-            "name": "root_folder_video"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "create_date_time_folder",
-          "name": "create_date_time_folder",
-          "type": "BOOLEAN",
-          "widget": {
-            "name": "create_date_time_folder"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "date_time_format",
-          "name": "date_time_format",
-          "type": "STRING",
-          "widget": {
-            "name": "date_time_format"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "date_time_position",
-          "name": "date_time_position",
-          "type": "COMBO",
-          "widget": {
-            "name": "date_time_position"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "create_batch_folder",
-          "name": "create_batch_folder",
-          "type": "BOOLEAN",
-          "widget": {
-            "name": "create_batch_folder"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "batch_folder_name",
-          "name": "batch_folder_name",
-          "type": "STRING",
-          "widget": {
-            "name": "batch_folder_name"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "batch_number",
-          "name": "batch_number",
-          "type": "INT",
-          "widget": {
-            "name": "batch_number"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "batch_number_control",
-          "name": "batch_number_control",
-          "type": "COMBO",
-          "widget": {
-            "name": "batch_number_control"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "image_size",
-          "name": "image_size",
-          "type": "COMBO",
-          "widget": {
-            "name": "image_size"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "width",
-          "name": "width",
-          "type": "INT",
-          "widget": {
-            "name": "width"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "height",
-          "name": "height",
-          "type": "INT",
-          "widget": {
-            "name": "height"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "video_size",
-          "name": "video_size",
-          "type": "COMBO",
-          "widget": {
-            "name": "video_size"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "video_width",
-          "name": "video_width",
-          "type": "INT",
-          "widget": {
-            "name": "video_width"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "video_height",
-          "name": "video_height",
-          "type": "INT",
-          "widget": {
-            "name": "video_height"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "frame_rate",
-          "name": "frame_rate",
-          "type": "FLOAT",
-          "widget": {
-            "name": "frame_rate"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "frame_load_cap",
-          "name": "frame_load_cap",
-          "type": "INT",
-          "widget": {
-            "name": "frame_load_cap"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "context_length",
-          "name": "context_length",
-          "type": "INT",
-          "widget": {
-            "name": "context_length"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "loop_count",
-          "name": "loop_count",
-          "type": "INT",
-          "widget": {
-            "name": "loop_count"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "overlap",
-          "name": "overlap",
-          "type": "INT",
-          "widget": {
-            "name": "overlap"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "skip_first_frames",
-          "name": "skip_first_frames",
-          "type": "INT",
-          "widget": {
-            "name": "skip_first_frames"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "skip_calculation",
-          "name": "skip_calculation",
-          "type": "INT",
-          "widget": {
-            "name": "skip_calculation"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "skip_calculation_control",
-          "name": "skip_calculation_control",
-          "type": "COMBO",
-          "widget": {
-            "name": "skip_calculation_control"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "select_every_nth",
-          "name": "select_every_nth",
-          "type": "INT",
-          "widget": {
-            "name": "select_every_nth"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "batch_size",
-          "name": "batch_size",
-          "type": "INT",
-          "widget": {
-            "name": "batch_size"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "seed",
-          "name": "seed",
-          "type": "INT",
-          "widget": {
-            "name": "seed"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "localized_name": "pipe",
-          "name": "pipe",
-          "type": "pipe",
-          "links": [
-            52,
-            67
-          ]
-        }
-      ],
-      "properties": {
-        "aux_id": "r-vage/ComfyUI_Eclipse",
-        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
-        "Node name for S&R": "Smart Folder [Eclipse]",
-        "cnr_id": "ComfyUI_Eclipse"
-      },
-      "widgets_values": [
-        "Image Mode",
-        "images",
-        "videos",
-        true,
-        "%Y-%m-%d",
-        "postfix",
-        false,
-        "batch_{}",
-        1,
-        "fixed",
-        "Custom",
-        512,
-        512,
-        "Custom",
-        576,
-        1024,
-        30,
-        162,
-        81,
-        0,
-        0,
-        0,
-        0,
-        "fixed",
-        1,
-        1,
-        1026913805484213,
-        "",
-        "",
-        ""
+        "{'model': <comfy.model_patcher.ModelPatcher object at 0x00000260660BB1A0>, 'clip': <comfy.sd.CLIP object at 0x0000026066438530>, 'vae': <comfy.sd.VAE object at 0x0000026066162870>, 'latent': {'samples': tensor([[[[0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          ...,\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.]],\n\n         [[0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          ...,\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.]],\n\n         [[0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          ...,\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.]],\n\n         ...,\n\n         [[0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          ...,\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.]],\n\n         [[0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          ...,\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.]],\n\n         [[0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          ...,\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.]]]])}, 'steps': 20, 'cfg': 1.0, 'sampler_name': 'dpmpp_2m', 'scheduler': 'sgm_uniform', 'seed': 1026913805484213, 'width': 832, 'height': 1216, 'batch_size': 1, 'model_name': 'flux\\\\Fluxmania_Kreamania_fp8.safetensors', 'vae_name': 'flux_vae.safetensors', 'path': 'D:\\\\AI\\\\ComfyUI_windows_portable\\\\ComfyUI\\\\output\\\\images\\\\2025-11-09', 'images_output': tensor([[[[0.1875, 0.1699, 0.1426],\n          [0.1797, 0.1582, 0.1367],\n          [0.1855, 0.1660, 0.1367],\n          ...,\n          [0.1855, 0.1621, 0.1250],\n          [0.1816, 0.1562, 0.1152],\n          [0.1895, 0.1621, 0.1348]],\n\n         [[0.1855, 0.1660, 0.1289],\n          [0.1875, 0.1699, 0.1328],\n          [0.1855, 0.1680, 0.1387],\n          ...,\n          [0.1875, 0.1641, 0.1289],\n          [0.1875, 0.1680, 0.1270],\n          [0.1875, 0.1641, 0.1250]],\n\n         [[0.1816, 0.1641, 0.1348],\n          [0.1836, 0.1660, 0.1348],\n          [0.1816, 0.1680, 0.1348],\n          ...,\n          [0.1895, 0.1660, 0.1348],\n          [0.1855, 0.1641, 0.1309],\n          [0.1914, 0.1641, 0.1328]],\n\n         ...,\n\n         [[0.3496, 0.3486, 0.3643],\n          [0.3428, 0.3506, 0.3682],\n          [0.3281, 0.3379, 0.3467],\n          ...,\n          [0.3164, 0.3135, 0.3057],\n          [0.3174, 0.3135, 0.3037],\n          [0.3154, 0.3154, 0.3037]],\n\n         [[0.3496, 0.3486, 0.3584],\n          [0.3389, 0.3506, 0.3691],\n          [0.3252, 0.3408, 0.3535],\n          ...,\n          [0.3135, 0.3105, 0.3027],\n          [0.3164, 0.3115, 0.3008],\n          [0.3174, 0.3135, 0.3027]],\n\n         [[0.3574, 0.3564, 0.3750],\n          [0.3320, 0.3369, 0.3755],\n          [0.3350, 0.3418, 0.3818],\n          ...,\n          [0.3086, 0.3066, 0.2969],\n          [0.3096, 0.3105, 0.2939],\n          [0.3047, 0.3115, 0.3047]]]]), 'text_pos': 'a beautiful woman with fair skin, and wavy prom hairstyle, black colored hair. She has gold eyes and a dark makeup look that accentuates her features, lip liner, she wears a Burlap Brown colored beret or wide-brimmed hat, her expression is sick, she holds a large sign that reads \"Fast & Furious, ComfyUI with Nunchaku!\"'}"
       ],
       "color": "#4e4e4e",
       "bgcolor": "#3a3a3a",
@@ -2476,7 +1613,7 @@
         275
       ],
       "flags": {},
-      "order": 5,
+      "order": 4,
       "mode": 0,
       "inputs": [
         {
@@ -2484,7 +1621,7 @@
           "name": "anything",
           "shape": 7,
           "type": "*",
-          "link": 21
+          "link": 117
         },
         {
           "localized_name": "show_images",
@@ -2505,101 +1642,18 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI_Eclipse",
+        "cnr_id": "ComfyUI_Eclipse",
         "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
         "Node name for S&R": "Show Any [Eclipse]",
-        "cnr_id": "ComfyUI_Eclipse"
+        "aux_id": "r-vage/ComfyUI_Eclipse"
       },
       "widgets_values": [
         "hide",
-        "{'model': <comfy.model_patcher.ModelPatcher object at 0x000001E3F614DDC0>, 'clip': <comfy.sd.CLIP object at 0x000001E3F651ECC0>, 'vae': <comfy.sd.VAE object at 0x000001E3D66E26F0>, 'latent': {'samples': tensor([[[[0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          ...,\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.]],\n\n         [[0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          ...,\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.]],\n\n         [[0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          ...,\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.]],\n\n         [[0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          ...,\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.]]]])}, 'width': 832, 'height': 1216, 'batch_size': 1, 'model_name': 'PonyXL\\\\cyberrealisticPony_v140.safetensors', 'vae_name': '', 'clip_skip': -2, 'is_nunchaku': False, 'flux_guidance': 3.5, 'sampler_name': 'dpmpp_2m', 'scheduler': 'sgm_uniform', 'steps': 20, 'cfg': 2.5, '_allow_overwrite': False}"
+        "{'model': <comfy.model_patcher.ModelPatcher object at 0x00000260660BB1A0>, 'clip': <comfy.sd.CLIP object at 0x0000026066438530>, 'vae': <comfy.sd.VAE object at 0x0000026066162870>, 'latent': {'samples': tensor([[[[0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          ...,\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.]],\n\n         [[0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          ...,\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.]],\n\n         [[0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          ...,\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.]],\n\n         ...,\n\n         [[0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          ...,\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.]],\n\n         [[0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          ...,\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.]],\n\n         [[0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          ...,\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.],\n          [0., 0., 0.,  ..., 0., 0., 0.]]]])}, 'width': 832, 'height': 1216, 'batch_size': 1, 'model_name': 'flux\\\\Fluxmania_Kreamania_fp8.safetensors', 'vae_name': 'flux_vae.safetensors', 'clip_skip': None, 'is_nunchaku': False, 'flux_guidance': 2.5, 'sampler_name': 'dpmpp_2m', 'scheduler': 'sgm_uniform', 'steps': 20, 'cfg': 1.0, '_allow_overwrite': False}"
       ],
       "color": "#4e4e4e",
       "bgcolor": "#3a3a3a",
       "shape": 1
-    },
-    {
-      "id": 40,
-      "type": "ImpactWildcardProcessor",
-      "pos": [
-        -528,
-        1533
-      ],
-      "size": [
-        374,
-        406
-      ],
-      "flags": {},
-      "order": 3,
-      "mode": 4,
-      "inputs": [
-        {
-          "localized_name": "wildcard_text",
-          "name": "wildcard_text",
-          "type": "STRING",
-          "widget": {
-            "name": "wildcard_text"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "populated_text",
-          "name": "populated_text",
-          "type": "STRING",
-          "widget": {
-            "name": "populated_text"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "mode",
-          "name": "mode",
-          "type": "COMBO",
-          "widget": {
-            "name": "mode"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "seed",
-          "name": "seed",
-          "type": "INT",
-          "widget": {
-            "name": "seed"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "Select to add Wildcard",
-          "name": "Select to add Wildcard",
-          "type": "COMBO",
-          "widget": {
-            "name": "Select to add Wildcard"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "localized_name": "processed text",
-          "name": "processed text",
-          "type": "STRING",
-          "links": []
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfyui-impact-pack",
-        "ver": "8.25.1",
-        "Node name for S&R": "ImpactWildcardProcessor"
-      },
-      "widgets_values": [
-        "a beautiful woman with {pale|fair|white} skin, and long, {straight|messy|wavy} {blonde|white|red|black} hair. She has {blue|green|grey|brown} eyes and {subtle tasteful|dark|colorful} makeup that accentuates her features, she wears a {red|white|black|pink} {dress, skin tight dress|suit|lace babydoll, skin tight}, skin press, she has medium breasts, a sultry, knowing smile playing on her lips, seductivly, __smartprompt/environment_desc/03_outdoor_desc__",
-        "a beautiful woman with fair skin, and long, wavy black hair. She has grey eyes and dark makeup that accentuates her features, she wears a black lace babydoll, skin tight, skin press, she has medium breasts, a sultry, knowing smile playing on her lips, seductivly, floating island: A magical landmass hovering in the air, with lush greenery, waterfalls, and misty surroundings.",
-        "populate",
-        739949219035232,
-        "randomize",
-        "Select the Wildcard to add to the text"
-      ]
     },
     {
       "id": 36,
@@ -2613,7 +1667,7 @@
         514
       ],
       "flags": {},
-      "order": 9,
+      "order": 6,
       "mode": 2,
       "inputs": [
         {
@@ -3616,9 +2670,10 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI_Eclipse",
+        "cnr_id": "ComfyUI_RvTools",
         "ver": "a206f755375121efdd1f709db82162ea1be71c1a",
-        "Node name for S&R": "Smart Prompt [Eclipse]"
+        "Node name for S&R": "Smart Prompt [Eclipse]",
+        "aux_id": "r-vage/ComfyUI_Eclipse"
       },
       "widgets_values": [
         "settings",
@@ -3750,7 +2805,7 @@
         406
       ],
       "flags": {},
-      "order": 10,
+      "order": 7,
       "mode": 0,
       "inputs": [
         {
@@ -3812,19 +2867,696 @@
         }
       ],
       "properties": {
-        "aux_id": "r-vage/ComfyUI_Eclipse",
+        "cnr_id": "ComfyUI_RvTools",
         "ver": "c1669863e799ffd81292b745254e7a0f36b12715",
-        "Node name for S&R": "Wildcard Processor [Eclipse]"
+        "Node name for S&R": "Wildcard Processor [Eclipse]",
+        "aux_id": "r-vage/ComfyUI_Eclipse"
       },
       "widgets_values": [
-        "a beautiful woman with {pale|fair|white} skin, and long, {straight|messy|wavy} {blonde|white|red|black} hair. She has {blue|green|grey|brown} eyes and {subtle tasteful|dark|colorful} makeup that accentuates her features, she wears a {red|white|black|pink} {dress, skin tight dress|suit|lace babydoll, skin tight}, skin press, she has medium breasts, a sultry, knowing smile playing on her lips, seductivly, __smartprompt/environment_desc/03_outdoor_desc__",
-        "a beautiful woman with fair skin, and long, messy white hair. She has brown eyes and colorful makeup that accentuates her features, she wears a black dress, skin tight dress, skin press, she has medium breasts, a sultry, knowing smile playing on her lips, seductivly, dock: A wooden or concrete platform extending over water, with moored boats and nautical elements nearby.",
+        "a beautiful woman with fair skin, and {straight|messy|wavy} {__wildcardsv2.0/hair-female__|__wildcardsv2.0/hair-female-short__}, __wildcardsv2.0/hair-color__ colored hair. She has __wildcardsv2.0/eye-color__ eyes and a {subtle tasteful|dark} makeup look that accentuates her features, __wildcardsv2.0/makeup__, she wears a __wildcardsv2.0/color__ colored {__200wildcards/outfit-cottagecore__|__200wildcards/outfit-goth__|__200wildcards/outfit-preppy__|__200wildcards/outfit-steampunk__}, her expression is __200wildcards/expression__, she holds a large sign that reads \"Fast & Furious, ComfyUI with Nunchaku!\"",
+        "a beautiful woman with fair skin, and wavy prom hairstyle, black colored hair. She has gold eyes and a dark makeup look that accentuates her features, lip liner, she wears a Burlap Brown colored beret or wide-brimmed hat, her expression is sick, she holds a large sign that reads \"Fast & Furious, ComfyUI with Nunchaku!\"",
         "populate",
         "Select a Wildcard",
         177985275552286,
         "",
         "",
         ""
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 28,
+      "type": "Concat Pipe Multi [Eclipse]",
+      "pos": [
+        1373,
+        997
+      ],
+      "size": [
+        270,
+        127
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "pipe_1",
+          "name": "pipe_1",
+          "type": "pipe",
+          "link": 67
+        },
+        {
+          "localized_name": "pipe_2",
+          "name": "pipe_2",
+          "shape": 7,
+          "type": "pipe",
+          "link": 119
+        },
+        {
+          "localized_name": "inputcount",
+          "name": "inputcount",
+          "type": "INT",
+          "widget": {
+            "name": "inputcount"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "merge_strategy",
+          "name": "merge_strategy",
+          "shape": 7,
+          "type": "COMBO",
+          "widget": {
+            "name": "merge_strategy"
+          },
+          "link": null
+        },
+        {
+          "name": "pipe_3",
+          "type": "PIPE",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "pipe",
+          "name": "pipe",
+          "type": "pipe",
+          "links": [
+            70,
+            76
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "ComfyUI_RvTools",
+        "ver": "e5119ec75b58ce68acd0d976755f8c4ad687a6bc",
+        "aux_id": "r-vage/ComfyUI_Eclipse"
+      },
+      "widgets_values": [
+        3,
+        "merge"
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 45,
+      "type": "Smart Loader Plus [Eclipse]",
+      "pos": [
+        -322,
+        186
+      ],
+      "size": [
+        275.3333435058594,
+        663
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "template_action",
+          "name": "template_action",
+          "type": "COMBO",
+          "widget": {
+            "name": "template_action"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "template_name",
+          "name": "template_name",
+          "type": "COMBO",
+          "widget": {
+            "name": "template_name"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "new_template_name",
+          "name": "new_template_name",
+          "type": "STRING",
+          "widget": {
+            "name": "new_template_name"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "model_type",
+          "name": "model_type",
+          "type": "COMBO",
+          "widget": {
+            "name": "model_type"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "ckpt_name",
+          "name": "ckpt_name",
+          "type": "COMBO",
+          "widget": {
+            "name": "ckpt_name"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "unet_name",
+          "name": "unet_name",
+          "type": "COMBO",
+          "widget": {
+            "name": "unet_name"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "nunchaku_name",
+          "name": "nunchaku_name",
+          "type": "COMBO",
+          "widget": {
+            "name": "nunchaku_name"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "qwen_name",
+          "name": "qwen_name",
+          "type": "COMBO",
+          "widget": {
+            "name": "qwen_name"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "gguf_name",
+          "name": "gguf_name",
+          "type": "COMBO",
+          "widget": {
+            "name": "gguf_name"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "weight_dtype",
+          "name": "weight_dtype",
+          "type": "COMBO",
+          "widget": {
+            "name": "weight_dtype"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "data_type",
+          "name": "data_type",
+          "type": "COMBO",
+          "widget": {
+            "name": "data_type"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "cache_threshold",
+          "name": "cache_threshold",
+          "type": "FLOAT",
+          "widget": {
+            "name": "cache_threshold"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "attention",
+          "name": "attention",
+          "type": "COMBO",
+          "widget": {
+            "name": "attention"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "i2f_mode",
+          "name": "i2f_mode",
+          "type": "COMBO",
+          "widget": {
+            "name": "i2f_mode"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "cpu_offload",
+          "name": "cpu_offload",
+          "type": "COMBO",
+          "widget": {
+            "name": "cpu_offload"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "num_blocks_on_gpu",
+          "name": "num_blocks_on_gpu",
+          "type": "INT",
+          "widget": {
+            "name": "num_blocks_on_gpu"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "use_pin_memory",
+          "name": "use_pin_memory",
+          "type": "COMBO",
+          "widget": {
+            "name": "use_pin_memory"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "gguf_dequant_dtype",
+          "name": "gguf_dequant_dtype",
+          "type": "COMBO",
+          "widget": {
+            "name": "gguf_dequant_dtype"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "gguf_patch_dtype",
+          "name": "gguf_patch_dtype",
+          "type": "COMBO",
+          "widget": {
+            "name": "gguf_patch_dtype"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "gguf_patch_on_device",
+          "name": "gguf_patch_on_device",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "gguf_patch_on_device"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "configure_clip",
+          "name": "configure_clip",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "configure_clip"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "configure_vae",
+          "name": "configure_vae",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "configure_vae"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "configure_latent",
+          "name": "configure_latent",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "configure_latent"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "configure_sampler",
+          "name": "configure_sampler",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "configure_sampler"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "configure_model_only_lora",
+          "name": "configure_model_only_lora",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "configure_model_only_lora"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "clip_source",
+          "name": "clip_source",
+          "type": "COMBO",
+          "widget": {
+            "name": "clip_source"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "clip_count",
+          "name": "clip_count",
+          "type": "COMBO",
+          "widget": {
+            "name": "clip_count"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "clip_name1",
+          "name": "clip_name1",
+          "type": "COMBO",
+          "widget": {
+            "name": "clip_name1"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "clip_name2",
+          "name": "clip_name2",
+          "type": "COMBO",
+          "widget": {
+            "name": "clip_name2"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "clip_name3",
+          "name": "clip_name3",
+          "type": "COMBO",
+          "widget": {
+            "name": "clip_name3"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "clip_name4",
+          "name": "clip_name4",
+          "type": "COMBO",
+          "widget": {
+            "name": "clip_name4"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "clip_type",
+          "name": "clip_type",
+          "type": "COMBO",
+          "widget": {
+            "name": "clip_type"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "enable_clip_layer",
+          "name": "enable_clip_layer",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "enable_clip_layer"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "stop_at_clip_layer",
+          "name": "stop_at_clip_layer",
+          "type": "INT",
+          "widget": {
+            "name": "stop_at_clip_layer"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "vae_source",
+          "name": "vae_source",
+          "type": "COMBO",
+          "widget": {
+            "name": "vae_source"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "vae_name",
+          "name": "vae_name",
+          "type": "COMBO",
+          "widget": {
+            "name": "vae_name"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "resolution",
+          "name": "resolution",
+          "type": "COMBO",
+          "widget": {
+            "name": "resolution"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "width",
+          "name": "width",
+          "type": "INT",
+          "widget": {
+            "name": "width"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "height",
+          "name": "height",
+          "type": "INT",
+          "widget": {
+            "name": "height"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "lora_count",
+          "name": "lora_count",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_count"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "lora_switch_1",
+          "name": "lora_switch_1",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "lora_switch_1"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "lora_name_1",
+          "name": "lora_name_1",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_name_1"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "lora_weight_1",
+          "name": "lora_weight_1",
+          "type": "FLOAT",
+          "widget": {
+            "name": "lora_weight_1"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "lora_switch_2",
+          "name": "lora_switch_2",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "lora_switch_2"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "lora_name_2",
+          "name": "lora_name_2",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_name_2"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "lora_weight_2",
+          "name": "lora_weight_2",
+          "type": "FLOAT",
+          "widget": {
+            "name": "lora_weight_2"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "lora_switch_3",
+          "name": "lora_switch_3",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "lora_switch_3"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "lora_name_3",
+          "name": "lora_name_3",
+          "type": "COMBO",
+          "widget": {
+            "name": "lora_name_3"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "lora_weight_3",
+          "name": "lora_weight_3",
+          "type": "FLOAT",
+          "widget": {
+            "name": "lora_weight_3"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "sampler_name",
+          "name": "sampler_name",
+          "type": "COMBO",
+          "widget": {
+            "name": "sampler_name"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "scheduler",
+          "name": "scheduler",
+          "type": "COMBO",
+          "widget": {
+            "name": "scheduler"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "steps",
+          "name": "steps",
+          "type": "INT",
+          "widget": {
+            "name": "steps"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "cfg",
+          "name": "cfg",
+          "type": "FLOAT",
+          "widget": {
+            "name": "cfg"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "flux_guidance",
+          "name": "flux_guidance",
+          "type": "FLOAT",
+          "widget": {
+            "name": "flux_guidance"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "batch_size",
+          "name": "batch_size",
+          "type": "INT",
+          "widget": {
+            "name": "batch_size"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "memory_cleanup",
+          "name": "memory_cleanup",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "memory_cleanup"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "pipe",
+          "name": "pipe",
+          "type": "pipe",
+          "links": [
+            117,
+            118,
+            119
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "ComfyUI_RvTools",
+        "ver": "839c9020feaf5d97627b5e2707b6afa8295d5d5a",
+        "Node name for S&R": "Smart Loader Plus [Eclipse]"
+      },
+      "widgets_values": [
+        "Load",
+        "Flux_Kreamania",
+        "",
+        "UNet Model",
+        "None",
+        "flux\\Fluxmania_Kreamania_fp8.safetensors",
+        "None",
+        "None",
+        "None",
+        "fp8_e4m3fn",
+        "bfloat16",
+        0,
+        "flash-attention2",
+        "enabled",
+        "auto",
+        30,
+        "enable",
+        "default",
+        "default",
+        false,
+        true,
+        true,
+        true,
+        true,
+        false,
+        "External",
+        "2",
+        "ViT-L-14-TEXT-detail-improved-hiT-GmP-TE-only-HF.safetensors",
+        "t5xxl_fp8_e4m3fn.safetensors",
+        "None",
+        "None",
+        "flux",
+        true,
+        -2,
+        "External",
+        "flux_vae.safetensors",
+        "832x1216 (2:3 Flux, SDXL)",
+        1024,
+        1024,
+        "1",
+        false,
+        "None",
+        1,
+        false,
+        "None",
+        1,
+        false,
+        "None",
+        1,
+        "dpmpp_2m",
+        "sgm_uniform",
+        20,
+        1,
+        2.5,
+        1,
+        true
       ],
       "color": "#4e4e4e",
       "bgcolor": "#3a3a3a",
@@ -3842,7 +3574,7 @@
         130
       ],
       "flags": {},
-      "order": 4,
+      "order": 2,
       "mode": 0,
       "inputs": [],
       "outputs": [
@@ -3869,6 +3601,318 @@
         "",
         ""
       ]
+    },
+    {
+      "id": 20,
+      "type": "Smart Folder [Eclipse]",
+      "pos": [
+        -679,
+        186
+      ],
+      "size": [
+        293.3333282470703,
+        375
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "generation_mode",
+          "name": "generation_mode",
+          "type": "COMBO",
+          "widget": {
+            "name": "generation_mode"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "root_folder_image",
+          "name": "root_folder_image",
+          "type": "STRING",
+          "widget": {
+            "name": "root_folder_image"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "root_folder_video",
+          "name": "root_folder_video",
+          "type": "STRING",
+          "widget": {
+            "name": "root_folder_video"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "create_date_time_folder",
+          "name": "create_date_time_folder",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "create_date_time_folder"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "date_time_format",
+          "name": "date_time_format",
+          "type": "STRING",
+          "widget": {
+            "name": "date_time_format"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "date_time_position",
+          "name": "date_time_position",
+          "type": "COMBO",
+          "widget": {
+            "name": "date_time_position"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "create_batch_folder",
+          "name": "create_batch_folder",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "create_batch_folder"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "batch_folder_name",
+          "name": "batch_folder_name",
+          "type": "STRING",
+          "widget": {
+            "name": "batch_folder_name"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "batch_number",
+          "name": "batch_number",
+          "type": "INT",
+          "widget": {
+            "name": "batch_number"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "batch_number_control",
+          "name": "batch_number_control",
+          "type": "COMBO",
+          "widget": {
+            "name": "batch_number_control"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "image_size",
+          "name": "image_size",
+          "type": "COMBO",
+          "widget": {
+            "name": "image_size"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "width",
+          "name": "width",
+          "type": "INT",
+          "widget": {
+            "name": "width"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "height",
+          "name": "height",
+          "type": "INT",
+          "widget": {
+            "name": "height"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "video_size",
+          "name": "video_size",
+          "type": "COMBO",
+          "widget": {
+            "name": "video_size"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "video_width",
+          "name": "video_width",
+          "type": "INT",
+          "widget": {
+            "name": "video_width"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "video_height",
+          "name": "video_height",
+          "type": "INT",
+          "widget": {
+            "name": "video_height"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "frame_rate",
+          "name": "frame_rate",
+          "type": "FLOAT",
+          "widget": {
+            "name": "frame_rate"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "frame_load_cap",
+          "name": "frame_load_cap",
+          "type": "INT",
+          "widget": {
+            "name": "frame_load_cap"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "context_length",
+          "name": "context_length",
+          "type": "INT",
+          "widget": {
+            "name": "context_length"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "loop_count",
+          "name": "loop_count",
+          "type": "INT",
+          "widget": {
+            "name": "loop_count"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "overlap",
+          "name": "overlap",
+          "type": "INT",
+          "widget": {
+            "name": "overlap"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "skip_first_frames",
+          "name": "skip_first_frames",
+          "type": "INT",
+          "widget": {
+            "name": "skip_first_frames"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "skip_calculation",
+          "name": "skip_calculation",
+          "type": "INT",
+          "widget": {
+            "name": "skip_calculation"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "skip_calculation_control",
+          "name": "skip_calculation_control",
+          "type": "COMBO",
+          "widget": {
+            "name": "skip_calculation_control"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "select_every_nth",
+          "name": "select_every_nth",
+          "type": "INT",
+          "widget": {
+            "name": "select_every_nth"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "batch_size",
+          "name": "batch_size",
+          "type": "INT",
+          "widget": {
+            "name": "batch_size"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "seed",
+          "name": "seed",
+          "type": "INT",
+          "widget": {
+            "name": "seed"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "pipe",
+          "name": "pipe",
+          "type": "pipe",
+          "links": [
+            52,
+            67
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "ComfyUI_Eclipse",
+        "ver": "832e3eaf6413f2fb6fa59c068227f733d783e392",
+        "Node name for S&R": "Smart Folder [Eclipse]",
+        "aux_id": "r-vage/ComfyUI_Eclipse"
+      },
+      "widgets_values": [
+        "Image Mode",
+        "images",
+        "videos",
+        true,
+        "%Y-%m-%d",
+        "postfix",
+        false,
+        "batch_{}",
+        1,
+        "fixed",
+        "Custom",
+        512,
+        512,
+        "Custom",
+        576,
+        1024,
+        30,
+        162,
+        81,
+        0,
+        0,
+        0,
+        0,
+        "fixed",
+        1,
+        1,
+        1026913805484213,
+        "",
+        "",
+        ""
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
     }
   ],
   "links": [
@@ -3895,22 +3939,6 @@
       8,
       0,
       "LATENT"
-    ],
-    [
-      21,
-      10,
-      0,
-      13,
-      0,
-      "*"
-    ],
-    [
-      40,
-      10,
-      0,
-      17,
-      0,
-      "pipe"
     ],
     [
       41,
@@ -4049,14 +4077,6 @@
       "pipe"
     ],
     [
-      68,
-      10,
-      0,
-      28,
-      1,
-      "pipe"
-    ],
-    [
       70,
       28,
       0,
@@ -4151,16 +4171,40 @@
       44,
       3,
       "INT"
+    ],
+    [
+      117,
+      45,
+      0,
+      13,
+      0,
+      "*"
+    ],
+    [
+      118,
+      45,
+      0,
+      17,
+      0,
+      "pipe"
+    ],
+    [
+      119,
+      45,
+      0,
+      28,
+      1,
+      "pipe"
     ]
   ],
   "groups": [],
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.6830134553650705,
+      "scale": 0.7513148009015777,
       "offset": [
-        867.9237188238756,
-        76.26992516759381
+        542.6174188238762,
+        -30.094374832406036
       ]
     },
     "frontendVersion": "1.30.0",

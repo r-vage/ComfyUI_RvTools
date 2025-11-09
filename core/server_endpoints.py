@@ -20,7 +20,6 @@ Provides REST API endpoints for wildcard management:
 """
 
 import json
-import logging
 import os
 import sys
 from typing import Dict, Any, List, Optional
@@ -28,6 +27,7 @@ from typing import Dict, Any, List, Optional
 from server import PromptServer
 from aiohttp import web
 
+from .common import cstr
 from .wildcard_engine import (get_wildcard_list, wildcard_load, process)
 
 
@@ -47,7 +47,7 @@ class WildcardEndpoints:
         self.wildcard_path = wildcard_path
         
         # Load wildcards on initialization
-        logging.info(f"[Eclipse Wildcard] Loading wildcards from: {wildcard_path}")
+        cstr(f"[Eclipse Wildcard] Loading wildcards from: {wildcard_path}").msg.print()
         wildcard_load(wildcard_path)
         
         self._register_endpoints()
@@ -77,19 +77,19 @@ class WildcardEndpoints:
             if not os.path.exists(models_wildcard_path):
                 try:
                     os.makedirs(models_wildcard_path, exist_ok=True)
-                    logging.info(f"[Eclipse Wildcard] Created directory: {models_wildcard_path}")
+                    cstr(f"[Eclipse Wildcard] Created directory: {models_wildcard_path}").msg.print()
                     
                     # Copy example files from extension's wildcards folder
                     if os.path.exists(extension_wildcard_path):
                         self._copy_example_wildcards(extension_wildcard_path, models_wildcard_path)
                 except Exception as e:
-                    logging.error(f"[Eclipse Wildcard] Failed to create {models_wildcard_path}: {e}")
+                    cstr(f"[Eclipse Wildcard] Failed to create {models_wildcard_path}: {e}").error.print()
                     return extension_wildcard_path
             
             return models_wildcard_path
         else:
             # Not in a standard ComfyUI structure, use extension folder
-            logging.info("[Eclipse Wildcard] Using extension's wildcard folder (ComfyUI models dir not found)")
+            cstr("[Eclipse Wildcard] Using extension's wildcard folder (ComfyUI models dir not found)").msg.print()
             return extension_wildcard_path
     
     def _copy_example_wildcards(self, source_dir: str, dest_dir: str) -> None:
@@ -115,9 +115,9 @@ class WildcardEndpoints:
                         copied_count += 1
             
             if copied_count > 0:
-                logging.info(f"[Eclipse Wildcard] Copied {copied_count} example wildcard files to {dest_dir}")
+                cstr(f"[Eclipse Wildcard] Copied {copied_count} example wildcard files to {dest_dir}").msg.print()
         except Exception as e:
-            logging.error(f"[Eclipse Wildcard] Error copying example wildcards: {e}")
+            cstr(f"[Eclipse Wildcard] Error copying example wildcards: {e}").error.print()
 
     def _register_endpoints(self):
         """Register all endpoints with PromptServer."""
@@ -134,7 +134,7 @@ class WildcardEndpoints:
                 wildcard_list = get_wildcard_list()
                 return web.json_response(wildcard_list)
             except Exception as e:
-                logging.error(f"[Eclipse Wildcard] Error getting wildcard list: {e}")
+                cstr(f"[Eclipse Wildcard] Error getting wildcard list: {e}").error.print()
                 return web.json_response([])
 
         @PromptServer.instance.routes.get("/eclipse/wildcards/refresh")
@@ -157,7 +157,7 @@ class WildcardEndpoints:
                     "count": len(wildcard_list)
                 })
             except Exception as e:
-                logging.error(f"[Eclipse Wildcard] Error refreshing wildcards: {e}")
+                cstr(f"[Eclipse Wildcard] Error refreshing wildcards: {e}").error.print()
                 return web.json_response({
                     "success": False,
                     "message": str(e),
@@ -207,13 +207,13 @@ class WildcardEndpoints:
                 })
 
             except Exception as e:
-                logging.error(f"[Eclipse Wildcard] Error processing wildcards: {e}")
+                cstr(f"[Eclipse Wildcard] Error processing wildcards: {e}").error.print()
                 return web.json_response({
                     "success": False,
                     "error": str(e)
                 })
 
-        logging.info("[Eclipse Wildcard] Registered server endpoints")
+        cstr("[Eclipse Wildcard] Registered server endpoints").msg.print()
 
 
 def onprompt_populate_wildcards(json_data):
@@ -265,7 +265,7 @@ def onprompt_populate_wildcards(json_data):
                 connected_node = prompt.get(connected_node_id)
                 
                 if not connected_node:
-                    logging.warning(f"[Eclipse Wildcard] Connected seed node {connected_node_id} not found")
+                    cstr(f"[Eclipse Wildcard] Connected seed node {connected_node_id} not found").warning.print()
                     continue
                 
                 class_type = connected_node.get('class_type', '')
@@ -287,11 +287,11 @@ def onprompt_populate_wildcards(json_data):
                                 break
                     
                     if input_seed is None:
-                        logging.warning(f"[Eclipse Wildcard] Could not extract seed from node type: {class_type}")
+                        cstr(f"[Eclipse Wildcard] Could not extract seed from node type: {class_type}").warning.print()
                         continue
                 
             except Exception as e:
-                logging.error(f"[Eclipse Wildcard] Error extracting seed from connection: {e}")
+                cstr(f"[Eclipse Wildcard] Error extracting seed from connection: {e}").error.print()
                 continue
         else:
             # Seed is a direct value
@@ -309,7 +309,7 @@ def onprompt_populate_wildcards(json_data):
             inputs['seed'] = input_seed
             
         except Exception as e:
-            logging.error(f"[Eclipse Wildcard] Error processing wildcards for node {node_id}: {e}")
+            cstr(f"[Eclipse Wildcard] Error processing wildcards for node {node_id}: {e}").error.print()
     
     # CRITICAL: Must return json_data for the handler chain to continue
     return json_data
@@ -329,6 +329,6 @@ def initialize_endpoints(wildcard_path: Optional[str] = None):
         # Register prompt handler for wildcard preprocessing
         PromptServer.instance.add_on_prompt_handler(onprompt_populate_wildcards)
         
-        logging.info("[Eclipse Wildcard] Server endpoints and prompt handler initialized successfully")
+        cstr("[Eclipse Wildcard] Server endpoints and prompt handler initialized successfully").msg.print()
     except Exception as e:
-        logging.error(f"[Eclipse Wildcard] Failed to initialize endpoints: {e}")
+        cstr(f"[Eclipse Wildcard] Failed to initialize endpoints: {e}").error.print()

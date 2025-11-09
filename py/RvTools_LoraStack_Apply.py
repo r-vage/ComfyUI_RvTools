@@ -14,6 +14,7 @@ import comfy
 import folder_paths
 from typing import Any
 from ..core import CATEGORY, AnyType
+from ..core.common import cstr
 
 any = AnyType("*")
 
@@ -78,7 +79,7 @@ class Eclipse_LoraStack_Apply:
 
         # Check if this is a Nunchaku model
         if is_nunchaku_model(model):
-            print("Eclipse: [LoraStack Apply] Detected Nunchaku model, applying LoRAs via wrapper")
+            cstr("Eclipse: [LoraStack Apply] Detected Nunchaku model, applying LoRAs via wrapper").msg.print()
             return self._apply_lora_stack_nunchaku(model, clip, lora_params)
         else:
             # Standard model - use ComfyUI's load_lora_for_models
