@@ -267,14 +267,76 @@ class RvText_SmartPrompt_All:
         
         values = []
         random.seed(seed)
+        random_selections = {}  # Track which widgets had "Random" and their selected values
+        
         for display, lines in file_map.items():
             val = kwargs.get(display, "None")
             if val == "Random":
                 if lines:
                     selected = random.choice(lines)
                     values.append(selected)
+                    random_selections[display] = selected  # Store the resolved value
             elif val not in ("None", "disabled"):
                 values.append(val.strip())
+        
+        # Save resolved random values to workflow metadata (same pattern as seed resolution)
+        if random_selections and unique_id is not None and extra_pnginfo is not None:
+            cstr(f'Saving {len(random_selections)} resolved random selection(s) for node {unique_id}').msg.print()
+            workflow_node = next(
+                (x for x in extra_pnginfo['workflow']['nodes'] if str(x['id']) == str(unique_id)), None)
+            if workflow_node is not None and 'widgets_values' in workflow_node:
+                # Rebuild the widget list in the same order as INPUT_TYPES to find correct indices
+                widget_order = ['folder']  # First widget is always 'folder'
+                
+                # Rebuild widgets in the same order as INPUT_TYPES
+                prompt_folders = get_prompt_folders()
+                for folder in prompt_folders:
+                    if not os.path.isdir(folder):
+                        continue
+                    folder_name = os.path.basename(folder)
+                    clean_folder_name = re.sub(r'^[0-9_]+', '', folder_name)
+                    
+                    folder_files = []
+                    for fname in os.listdir(folder):
+                        if fname.lower().endswith('.txt') and fname.startswith(('0', '1', '2', '3', '4', '5', '6', '7', '8', '9')):
+                            try:
+                                number = int(fname.split('_')[0])
+                                folder_files.append((number, fname))
+                            except ValueError:
+                                continue
+                    
+                    folder_files.sort(key=lambda x: x[0])
+                    
+                    for number, fname in folder_files:
+                        base = os.path.splitext(fname)[0]
+                        clean_base = re.sub(r'^[0-9_]+', '', base).replace('_', ' ')
+                        display = f"{clean_folder_name} {clean_base}"
+                        widget_order.append(display)
+                
+                widget_order.append('seed')  # Seed is the last widget
+                
+                # Update widgets_values with resolved random selections
+                for widget_name, selected_value in random_selections.items():
+                    if widget_name in widget_order:
+                        index = widget_order.index(widget_name)
+                        if index < len(workflow_node['widgets_values']):
+                            old_value = workflow_node['widgets_values'][index]
+                            workflow_node['widgets_values'][index] = selected_value
+                            cstr(f'  [{widget_name}] index {index}: "{old_value}" -> "{selected_value}"').msg.print()
+                        else:
+                            cstr(f'  [{widget_name}] index {index} out of range (array length: {len(workflow_node["widgets_values"])})').warning.print()
+                    else:
+                        cstr(f'  [{widget_name}] not found in widget order').warning.print()
+        
+        # Also update the prompt inputs for consistency
+        if random_selections and prompt is not None:
+            prompt_node = prompt.get(str(unique_id))
+            if prompt_node is not None and 'inputs' in prompt_node:
+                cstr(f'Updating prompt inputs for node {unique_id}').msg.print()
+                for widget_name, selected_value in random_selections.items():
+                    if widget_name in prompt_node['inputs']:
+                        prompt_node['inputs'][widget_name] = selected_value
+                        cstr(f'  [{widget_name}] prompt input updated to "{selected_value}"').msg.print()
         
         # Clean up values: remove trailing punctuation and extra spaces
         values = [re.sub(r'[.,;:!?]+$', '', val.strip()) for val in values]
