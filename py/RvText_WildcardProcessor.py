@@ -12,9 +12,14 @@
 #
 # RvText_WildcardProcessor - Processes text with wildcard syntax
 #
-# Server-side wildcard processing (simplified from Impact Pack):
-# - populate mode: Server processes wildcard_text before execution, updates populated_text, then switches to fixed
-# - fixed mode: Uses populated_text as-is, ignoring wildcard_text (stays fixed until user changes it)
+# Supports two processing modes:
+# - populate: Expands all wildcards and options. Seed controls output - change seed for new output, fix seed for consistent output
+# - fixed: Uses populated_text as-is, ignoring wildcards
+#
+# Special seed values (from eclipse-seed.js extension):
+#   -1: Randomize each time (generates new random seed)
+#   -2: Increment from last seed
+#   -3: Decrement from last seed
 
 
 import os
@@ -22,21 +27,19 @@ import logging
 from typing import Any, Dict, Tuple, Optional, List
 
 from ..core import CATEGORY
-from ..core.wildcard_engine import wildcard_load, process, get_wildcard_list
+from ..core.wildcard_engine import wildcard_load, process
 
 
 class RvText_WildcardProcessor:
-    """
-    A wildcard text processor that expands wildcard patterns and options.
-    
-    Wildcard Syntax:
-    - {option1|option2|option3} - Random selection from options
-    - __keyword__ - Reference to wildcard group
-    - 2$$opt1|opt2 - Select N items with separator
-    - 1-3$$opt1|opt2|opt3 - Select range N-M items
-    - 1.0::item1|2.0::item2 - Probability weights (2x likelihood for item2)
-    - 3#__keyword__ - Use keyword 3 times
-    """
+    # A wildcard text processor that expands wildcard patterns and options.
+    #
+    # Wildcard Syntax:
+    # - {option1|option2|option3} - Random selection from options
+    # - __keyword__ - Reference to wildcard group
+    # - 2$$opt1|opt2 - Select N items with separator
+    # - 1-3$$opt1|opt2|opt3 - Select range N-M items
+    # - 1.0::item1|2.0::item2 - Probability weights (2x likelihood for item2)
+    # - 3#__keyword__ - Use keyword 3 times
 
     @classmethod
     def INPUT_TYPES(cls):
@@ -44,7 +47,7 @@ class RvText_WildcardProcessor:
             "required": {
                 "wildcard_text": ("STRING", {
                     "multiline": True,
-                    "default": "",
+                    "default": "Try using __wildcard__ or {option1|option2}",
                     "dynamicPrompts": False,
                     "tooltip": "Enter a prompt using wildcard syntax."
                 }),
@@ -52,85 +55,95 @@ class RvText_WildcardProcessor:
                     "multiline": True,
                     "default": "",
                     "dynamicPrompts": False,
-                    "tooltip": "The actual value passed during execution. "
-                               "In 'populate' mode, this is auto-generated before execution. "
-                               "In 'fixed' mode, you can edit this directly."
+                    "tooltip": "The actual value processed from 'wildcard_text'. In 'populate' mode, this is auto-updated. In 'fixed' mode, you can edit this value."
                 }),
                 "mode": (["populate", "fixed"], {
                     "default": "populate",
-                    "tooltip": "populate: Before running, overwrites populated_text with processed wildcard_text. This widget cannot be edited.\n"
-                               "fixed: Ignores wildcard_text and keeps populated_text as-is. You can edit populated_text in this mode. When you generate with 'populate', the mode automatically switches to 'fixed' to preserve the result."
+                    "tooltip": "populate: Auto-processes wildcard_text based on seed. Change seed for new output, fix seed for consistent output.\nfixed: Uses populated_text as-is, you can edit it"
                 }),
                 "seed": ("INT", {
                     "default": 0,
-                    "min": 0,
+                    "min": -3,
                     "max": 0xffffffffffffffff,
-                    "tooltip": "Determines the random seed used for wildcard processing."
+                    "tooltip": "Seed controls wildcard expansion in populate mode.\nSpecial values: -1=randomize each time, -2=increment from last, -3=decrement from last\nNormal: change to generate new outputs, fix to keep same output.\nCan be connected to seed nodes like rgthree's Seed node."
                 }),
-                "Select to add Wildcard": (["Select the Wildcard to add to the text"],),
+            },
+            "optional": {
+                # Combo will be populated dynamically by JavaScript
+                "wildcards": (["Select a Wildcard"],),
             },
         }
 
     RETURN_TYPES = ("STRING",)
-    RETURN_NAMES = ("text",)
-    FUNCTION = "doit"
+    RETURN_NAMES = ("processed_text",)
+    FUNCTION = "execute"
     CATEGORY = CATEGORY.MAIN.value + CATEGORY.TEXT.value
 
     OUTPUT_NODE = False
 
-    @staticmethod
-    def process_wildcards(**kwargs):
-        """Static method for processing wildcards - used by server handler too."""
-        return process(**kwargs)
+    # NO IS_CHANGED - we preprocess wildcards server-side like Impact Pack does
+    # The prompt handler in server_endpoints.py processes wildcards before execution
 
-    def doit(self, wildcard_text: str, populated_text: str, mode: str, seed: int, **kwargs) -> Tuple[str]:
-        """
-        Execute the wildcard processor.
-        
-        The server-side prompt handler (onprompt_populate_wildcards) already processed
-        wildcards and updated populated_text before execution, so we just process
-        populated_text one more time with the current seed to ensure consistency.
-        """
-        # Process the populated_text (which was already set by server handler)
-        # This ensures wildcards in populated_text are also expanded
-        processed_text = process(text=populated_text, seed=seed)
-        return (processed_text,)
+    def execute(
+        self,
+        wildcard_text: str,
+        populated_text: str,
+        mode: str,
+        seed: int,
+        wildcards: str = "Select a Wildcard"
+    ) -> Dict[str, Any]:
+
+        try:
+            # The server-side prompt handler (onprompt_populate_wildcards) already processed
+            # wildcards and updated populated_text before execution in populate mode.
+            # So we just use populated_text directly.
+            
+            # In "populate" mode: populated_text was already processed by server handler
+            # In "fixed" mode: populated_text contains manually edited text
+            result = populated_text
+            
+            # Add selected wildcard if not "Select a Wildcard"
+            if wildcards and wildcards != "Select a Wildcard":
+                if result and not result.endswith('\n'):
+                    result += '\n'
+                result += wildcards
+                # Process the added wildcard
+                result = process(result, seed=seed)
+            
+            # Return both the result and UI data for onExecuted handler
+            return {
+                "ui": {
+                    "text": [result],
+                    "seed": [seed]
+                },
+                "result": (result,)
+            }
+
+        except Exception as e:
+            logging.error(f"[Eclipse Wildcard] Error in execute: {e}")
+            return {
+                "ui": {"text": [populated_text]},
+                "result": (populated_text,)
+            }
 
     @staticmethod
     def load_wildcard_path(path: Optional[str] = None) -> None:
-        """Load wildcards from the specified path."""
         if path is None:
-            # Use same path resolution as server_endpoints.py
-            extension_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-            extension_wildcard_path = os.path.join(extension_root, "wildcards")
-            
-            # Try to find ComfyUI root
-            comfyui_root = os.path.abspath(os.path.join(extension_root, "..", ".."))
-            models_wildcard_path = os.path.join(comfyui_root, "models", "wildcards")
-            
-            # Priority: models/wildcards, then extension/wildcards
-            if os.path.exists(os.path.join(comfyui_root, "models")) and os.path.exists(models_wildcard_path):
-                path = models_wildcard_path
-            else:
-                path = extension_wildcard_path
+            # Default to root/wildcards/ in workspace
+            path = os.path.join(
+                os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+                "wildcards"
+            )
 
         wildcard_load(path)
         logging.info(f"[Eclipse Wildcard] Loaded wildcards from: {path}")
 
 
-# Ensure wildcard engine is initialized on import - use same logic
-def _get_initial_wildcard_path():
-    extension_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-    extension_wildcard_path = os.path.join(extension_root, "wildcards")
-    
-    comfyui_root = os.path.abspath(os.path.join(extension_root, "..", ".."))
-    models_wildcard_path = os.path.join(comfyui_root, "models", "wildcards")
-    
-    if os.path.exists(os.path.join(comfyui_root, "models")) and os.path.exists(models_wildcard_path):
-        return models_wildcard_path
-    return extension_wildcard_path
-
-_wildcard_path = _get_initial_wildcard_path()
+# Ensure wildcard engine is initialized on import
+_wildcard_path = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+    "wildcards"
+)
 if os.path.exists(_wildcard_path):
     RvText_WildcardProcessor.load_wildcard_path(_wildcard_path)
 
