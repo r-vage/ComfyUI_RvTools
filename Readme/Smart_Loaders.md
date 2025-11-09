@@ -95,7 +95,7 @@ Save and load complete loader configurations:
 - Captures all settings (model, CLIP, VAE, latent, sampler)
 - Store configurations for different workflows
 - Quick switching between setups
-- **Storage:** `json/loader_templates/`
+- **Storage:** `ComfyUI/models/smart_loader_templates/` (primary location, auto-created on first run)
 
 **Load Templates:**
 - Instantly restore saved configurations
@@ -112,11 +112,15 @@ Configure up to 4 CLIP modules:
 
 **Source Options:**
 - **Baked:** Use CLIP from checkpoint (Standard Checkpoint only)
-- **External:** Load separate CLIP files
+- **External:** Load separate CLIP files from `ComfyUI/models/clip/` and `ComfyUI/models/text_encoders/` folders
 
 **CLIP Count:**
 - 1 to 4 modules
 - Each module can use different CLIP types
+
+**Supported CLIP File Formats:**
+- `.safetensors` - Standard format (recommended)
+- `.gguf` - Quantized CLIP models (requires ComfyUI-GGUF extension)
 
 **CLIP Types Supported:**
 - Flux (flux_text_encoders)
@@ -292,7 +296,7 @@ Model-specific options for reduced VRAM:
 2. Set `template_action` to "Save"
 3. Enter name in `new_template_name` (auto-fills if updating existing template)
 4. Click "Execute Template Action" button
-5. Template saved to `json/loader_templates/<name>.json`
+5. Template saved to `ComfyUI/models/smart_loader_templates/<name>.json`
 6. Node automatically switches back to "Load" mode with saved template selected
 
 **Updating an Existing Template:**
@@ -502,7 +506,7 @@ Empty Latent Image ─> KSampler (latent input)
 
 ### GGUF Model (Quantized)
 
-**What it is:** GGUF format quantized models
+**What it is:** GGUF format quantized models (diffusion models and CLIP encoders)
 
 **Quantization levels:** Q4_0, Q4_1, Q5_0, Q5_1, Q8_0, F16, F32
 
@@ -516,12 +520,17 @@ Empty Latent Image ─> KSampler (latent input)
 - Alternative quantization format
 - Community-shared quantized models
 - Experimenting with different compression levels
+- Quantized CLIP encoders for reduced VRAM
 
-**Location:** `ComfyUI/models/diffusion_models/`
+**File Locations:**
+- Diffusion models: `ComfyUI/models/diffusion_models/`
+- CLIP encoders: `ComfyUI/models/clip/` or `ComfyUI/models/text_encoders/`
 
 **Recommended Settings:**
 - Dequant dtype: auto (let system decide)
 - Device: auto (automatic placement)
+
+**Note:** Both diffusion models and CLIP encoders in GGUF format are supported. The Smart Loaders automatically detect GGUF files in both `clip` and `text_encoders` folders when the ComfyUI-GGUF extension is installed.
 
 ---
 
@@ -587,6 +596,7 @@ The template system intelligently saves only relevant configuration for your set
 3. Set `template_action` to "Save"
 4. Enter descriptive name in `new_template_name`
 5. Click "Execute Template Action"
+6. Template saved to `ComfyUI/models/smart_loader_templates/<name>.json`
 
 **Naming Tips:**
 - Use descriptive names: `Flux_Dev_1024`, `SDXL_Portrait`, `Qwen_Analysis`
@@ -610,7 +620,8 @@ The template system intelligently saves only relevant configuration for your set
 2. Set `template_action` to "Save"
 3. Enter name in `new_template_name` (auto-fills with loaded template name if updating)
 4. Click "Execute Template Action" button
-5. Template saves and automatically switches back to "Load" mode
+5. Template saves to `ComfyUI/models/smart_loader_templates/<name>.json`
+6. Node automatically switches back to "Load" mode
 
 **Auto-Fill Feature:**
 - When switching from "Load" to "Save", the `new_template_name` field automatically fills with the currently loaded template name
@@ -629,11 +640,32 @@ The template system intelligently saves only relevant configuration for your set
 
 ### Managing Templates
 
+**Template File System:**
+
+Smart Loader uses a dual-location template system similar to SmartPrompt's wildcard system:
+
+**Primary Location:** `ComfyUI/models/smart_loader_templates/`
+- Active template storage (created automatically on first run)
+- Templates you create are saved here
+- Safe to customize without affecting the extension
+- Delete this folder to reset to bundled defaults
+
+**Bundled Templates:** `ComfyUI/custom_nodes/ComfyUI_Eclipse/json/loader_templates/`
+- Default templates included with the extension
+- Auto-copied to models folder on first run
+- Updated when you update the extension
+- Don't edit these directly - they'll be overwritten
+
+**How It Works:**
+1. First time you run ComfyUI with Eclipse extension, templates auto-copy from `json/loader_templates/` to `models/smart_loader_templates/`
+2. All template operations (save/load/delete) use the models folder
+3. Your custom templates stay safe during extension updates
+4. To reset templates: delete `models/smart_loader_templates/` folder and restart ComfyUI
+
 **Organization:**
-- Templates stored in `json/loader_templates/`
 - Files named: `<template_name>.json`
 - Edit JSON directly for advanced changes
-- Share templates by copying JSON files
+- Share templates by copying JSON files from models folder
 
 **Deleting:**
 
@@ -643,7 +675,7 @@ The template system intelligently saves only relevant configuration for your set
 4. Template removed immediately
 
 **Backup:**
-- Copy entire `json/loader_templates/` folder
+- Copy entire `ComfyUI/models/smart_loader_templates/` folder
 - Keep backups of important configurations
 - Version control with Git if desired
 
@@ -660,10 +692,17 @@ The template system intelligently saves only relevant configuration for your set
 - Fastest loading
 
 **External CLIP:**
-- Load separate CLIP files
+- Load separate CLIP files from `ComfyUI/models/clip/` or `ComfyUI/models/text_encoders/` folders
+- Supports `.safetensors` and `.gguf` formats (GGUF requires ComfyUI-GGUF extension)
 - Mix different CLIP types
 - Build CLIP ensembles (2-4 modules)
 - More control over text encoding
+
+**CLIP File Locations:**
+- Primary: `ComfyUI/models/clip/`
+- Alternative: `ComfyUI/models/text_encoders/`
+- Both folders are scanned automatically
+- GGUF CLIP models supported in both locations
 
 **CLIP Types Guide:**
 
@@ -970,7 +1009,7 @@ The template system intelligently saves only relevant configuration for your set
 
 **Solutions:**
 1. Verify template file exists:
-   - Check `json/loader_templates/`
+   - Check `ComfyUI/models/smart_loader_templates/`
    - File named `<template_name>.json`
 
 2. Check template format:

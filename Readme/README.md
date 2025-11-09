@@ -137,10 +137,10 @@ A: RTX 30 and 40 series GPUs work well with the primary benefit being lower VRAM
 | Nunchaku Models | `ComfyUI/models/diffusion_models/` |
 | Qwen Models | `ComfyUI/models/diffusion_models/` |
 | GGUF Models | `ComfyUI/models/diffusion_models/` |
-| CLIP Files | `ComfyUI/models/clip/` |
+| CLIP Files | `ComfyUI/models/clip/`<br>`ComfyUI/models/text_encoders/` |
 | VAE Files | `ComfyUI/models/vae/` |
-| Templates | `ComfyUI/custom_nodes/ComfyUI_Eclipse/json/loader_templates/` |
-| Smart Prompt Files | `ComfyUI/models/wildcards/smartprompt/` (primary)<br>`ComfyUI_Eclipse/prompt/` (fallback) |
+| Templates | `ComfyUI/models/smart_loader_templates/` (primary)<br>`ComfyUI_Eclipse/json/loader_templates/` (bundled) |
+| Smart Prompt Files | `ComfyUI/models/wildcards/smartprompt/` (primary)<br>`ComfyUI_Eclipse/prompt/` (bundled) |
 | Wildcard Files | `ComfyUI/models/wildcards/` |
 
 ### Required Extensions

@@ -399,7 +399,7 @@ The **Smart Loader Plus** is the flagship model loader for ComfyUI_Eclipse, repr
 - **Quick Loading:** Instantly restore complex configurations with a single template selection
 - **Template Organization:** Manage templates via dropdown with create/load/delete operations
 - **Cross-Version Compatibility:** Templates saved in Smart Loader Plus gracefully degrade when loaded in Smart Loader
-- **Persistent Storage:** Templates stored in `json/loader_templates/` directory
+- **Dual-Location Storage:** Templates stored in `ComfyUI/models/smart_loader_templates/` (primary location, auto-created on first run from bundled templates)
 
 #### Latent Configuration
 - **Resolution Presets:** Extensive preset library for common aspect ratios:
