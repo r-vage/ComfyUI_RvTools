@@ -99,7 +99,12 @@ if GGUF_AVAILABLE:
 # Add .safetensors and .sft extension support to checkpoints and diffusion_models folders
 for folder_name in ["checkpoints", "diffusion_models"]:
     if folder_name in folder_paths.folder_names_and_paths:
-        paths, exts = folder_paths.folder_names_and_paths[folder_name]
+        folder_data = folder_paths.folder_names_and_paths[folder_name]
+        # Handle both 2-tuple and 3-tuple formats
+        if len(folder_data) >= 2:
+            paths, exts = folder_data[0], folder_data[1]
+        else:
+            continue
         exts = set(exts) if isinstance(exts, set) else set(exts.keys()) if isinstance(exts, dict) else set()
         # Ensure common extensions are present
         for ext in [".safetensors", ".sft", ".ckpt", ".pt", ".bin"]:
