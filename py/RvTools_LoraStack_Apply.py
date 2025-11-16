@@ -19,7 +19,7 @@ from ..core.common import cstr
 any = AnyType("*")
 
 
-def is_nunchaku_model(model: Any) -> bool:
+def is_nunchaku_flux_model(model: Any) -> bool:
     """
     Check if a model is a Nunchaku FLUX model by detecting ComfyFluxWrapper.
     
@@ -45,6 +45,36 @@ def is_nunchaku_model(model: Any) -> bool:
         else:
             wrapper_class_name = type(model_wrapper).__name__
             return wrapper_class_name == 'ComfyFluxWrapper'
+    except Exception:
+        return False
+
+
+def is_nunchaku_qwen_model(model: Any) -> bool:
+    """
+    Check if a model is a Nunchaku Qwen model by detecting ComfyQwenImageWrapper.
+    
+    Parameters
+    ----------
+    model : Any
+        The model (ModelPatcher) to check.
+        
+    Returns
+    -------
+    bool
+        True if the model has ComfyQwenImageWrapper, False otherwise.
+    """
+    try:
+        model_wrapper = model.model.diffusion_model  # type: ignore
+        
+        # Check if it's a ComfyQwenImageWrapper
+        if hasattr(model_wrapper, '_orig_mod'):
+            # Handle torch.compile() optimized modules
+            actual_wrapper = model_wrapper._orig_mod  # type: ignore
+            wrapper_class_name = type(actual_wrapper).__name__
+            return wrapper_class_name == 'ComfyQwenImageWrapper'
+        else:
+            wrapper_class_name = type(model_wrapper).__name__
+            return wrapper_class_name == 'ComfyQwenImageWrapper'
     except Exception:
         return False
 
@@ -77,10 +107,14 @@ class Eclipse_LoraStack_Apply:
         else:
             return (model, clip, "")
 
-        # Check if this is a Nunchaku model
-        if is_nunchaku_model(model):
-            cstr("Eclipse: [LoraStack Apply] Detected Nunchaku model, applying LoRAs via wrapper").msg.print()
-            return self._apply_lora_stack_nunchaku(model, clip, lora_params)
+        # Check if this is a Nunchaku Qwen model
+        if is_nunchaku_qwen_model(model):
+            cstr("[LoraStack Apply] Detected Nunchaku Qwen model, applying LoRAs via ComfyQwenImageWrapper").msg.print()
+            return self._apply_lora_stack_nunchaku_qwen(model, clip, lora_params)
+        # Check if this is a Nunchaku Flux model
+        elif is_nunchaku_flux_model(model):
+            cstr("[LoraStack Apply] Detected Nunchaku Flux model, applying LoRAs via ComfyFluxWrapper").msg.print()
+            return self._apply_lora_stack_nunchaku_flux(model, clip, lora_params)
         else:
             # Standard model - use ComfyUI's load_lora_for_models
             return self._apply_lora_stack_standard(model, clip, lora_params)
@@ -115,7 +149,7 @@ class Eclipse_LoraStack_Apply:
 
         return (model_lora, clip_lora, lora_string)
 
-    def _apply_lora_stack_nunchaku(self, model: Any, clip: Any, lora_params: list[Any]) -> tuple[Any, Any, str]:
+    def _apply_lora_stack_nunchaku_flux(self, model: Any, clip: Any, lora_params: list[Any]) -> tuple[Any, Any, str]:
         """Apply LoRAs to Nunchaku FLUX models via ComfyFluxWrapper."""
         try:
             # Import required Nunchaku components
@@ -235,7 +269,112 @@ class Eclipse_LoraStack_Apply:
             except Exception:
                 lora_string = ""
 
-        # For Nunchaku, CLIP is not modified (FLUX doesn't use separate CLIP)
+        # For Nunchaku Flux, CLIP is not modified (FLUX doesn't use separate CLIP)
+        return (ret_model, clip, lora_string)
+
+    def _apply_lora_stack_nunchaku_qwen(self, model: Any, clip: Any, lora_params: list[Any]) -> tuple[Any, Any, str]:
+        """Apply LoRAs to Nunchaku Qwen models via ComfyQwenImageWrapper."""
+        try:
+            # Import required Qwen wrapper
+            from .wrappers.nunchaku_wrapper import ComfyQwenImageWrapper  # type: ignore
+        except ImportError as e:
+            raise RuntimeError(
+                f"Nunchaku Qwen wrapper not available for LoRA application: {e}\n"
+                "Please ensure ComfyUI_Eclipse is properly installed."
+            )
+
+        # Get the model wrapper
+        model_wrapper = model.model.diffusion_model  # type: ignore
+        
+        # Handle OptimizedModule case (if torch.compile() was used)
+        if hasattr(model_wrapper, '_orig_mod'):
+            transformer = model_wrapper._orig_mod.model  # type: ignore
+            
+            # Create a new model structure manually for OptimizedModule
+            ret_model = model.__class__(  # type: ignore
+                model.model, model.load_device, model.offload_device,  # type: ignore
+                model.size, model.weight_inplace_update  # type: ignore
+            )
+            ret_model.model = model.model  # type: ignore
+            
+            # Create a new ComfyQwenImageWrapper manually
+            original_wrapper = model_wrapper._orig_mod  # type: ignore
+            ret_model_wrapper = ComfyQwenImageWrapper(  # type: ignore
+                transformer,
+                original_wrapper.config,  # type: ignore
+                original_wrapper.customized_forward,  # type: ignore
+                original_wrapper.forward_kwargs,  # type: ignore
+                original_wrapper.cpu_offload_setting,  # type: ignore
+                original_wrapper.vram_margin_gb  # type: ignore
+            )
+            
+            # Copy internal state from original wrapper
+            ret_model_wrapper._prev_timestep = original_wrapper._prev_timestep  # type: ignore
+            ret_model_wrapper._cache_context = original_wrapper._cache_context  # type: ignore
+            
+            ret_model.model.diffusion_model = ret_model_wrapper  # type: ignore
+        else:
+            # Non-OptimizedModule case
+            transformer = model_wrapper.model  # type: ignore
+            
+            # Create a new ModelPatcher with the same parameters
+            ret_model = model.__class__(  # type: ignore
+                model.model, model.load_device, model.offload_device,  # type: ignore
+                model.size, model.weight_inplace_update  # type: ignore
+            )
+            
+            # Create a new ComfyQwenImageWrapper manually
+            original_wrapper = model_wrapper
+            ret_model_wrapper = ComfyQwenImageWrapper(  # type: ignore
+                transformer,
+                original_wrapper.config,  # type: ignore
+                original_wrapper.customized_forward,  # type: ignore
+                original_wrapper.forward_kwargs,  # type: ignore
+                original_wrapper.cpu_offload_setting,  # type: ignore
+                original_wrapper.vram_margin_gb  # type: ignore
+            )
+            
+            # Copy internal state from original wrapper
+            ret_model_wrapper._prev_timestep = original_wrapper._prev_timestep  # type: ignore
+            ret_model_wrapper._cache_context = original_wrapper._cache_context  # type: ignore
+            
+            ret_model.model.diffusion_model = ret_model_wrapper  # type: ignore
+        
+        # Restore transformer to the original wrapper (important for original model integrity)
+        if hasattr(model_wrapper, '_orig_mod'):
+            model_wrapper._orig_mod.model = transformer  # type: ignore
+        else:
+            model_wrapper.model = transformer  # type: ignore
+        
+        # Set transformer to the new wrapper
+        ret_model_wrapper.model = transformer  # type: ignore
+
+        # Clear existing LoRA list in the new wrapper
+        ret_model_wrapper.loras = []  # type: ignore
+
+        # Add all LoRAs to the wrapper's LoRA list
+        # lora_params format: [(lora_name, model_strength, clip_strength), ...]
+        # For Nunchaku Qwen, we use model_strength as the LoRA strength
+        lora_names_list = []
+        for lora_name, model_strength, clip_strength in lora_params:
+            lora_path = folder_paths.get_full_path_or_raise("loras", lora_name)
+            ret_model_wrapper.loras.append((lora_path, model_strength))  # type: ignore
+            lora_names_list.append(lora_name)
+
+        # Generate string output with weights
+        lora_string = ""
+        if lora_params:
+            try:
+                # Format: <lora:name:model_weight:clip_weight>
+                lora_string = ' '.join(
+                    f"<lora:{str(tup[0])}:{str(tup[1])}:{str(tup[2])}>"
+                    for tup in lora_params
+                    if isinstance(tup, (list, tuple)) and len(tup) >= 3
+                )
+            except Exception:
+                lora_string = ""
+
+        # For Nunchaku Qwen, CLIP is not modified (Qwen doesn't use separate CLIP)
         return (ret_model, clip, lora_string)
 
 NODE_NAME = 'Lora Stack apply [Eclipse]'

@@ -216,17 +216,17 @@ def _detect_latent_channels_from_vae_obj(vae_obj) -> int:
     return LATENT_CHANNELS
 
 def is_nunchaku_model(model: Any) -> bool:
-    """Check if a model is a Nunchaku FLUX model by detecting ComfyFluxWrapper."""
+    """Check if a model is a Nunchaku model (FLUX or Qwen) by detecting wrapper class."""
     try:
         model_wrapper = model.model.diffusion_model
         
         if hasattr(model_wrapper, '_orig_mod'):
             actual_wrapper = model_wrapper._orig_mod
             wrapper_class_name = type(actual_wrapper).__name__
-            return wrapper_class_name == 'ComfyFluxWrapper'
+            return wrapper_class_name in ('ComfyFluxWrapper', 'ComfyQwenImageWrapper')
         else:
             wrapper_class_name = type(model_wrapper).__name__
-            return wrapper_class_name == 'ComfyFluxWrapper'
+            return wrapper_class_name in ('ComfyFluxWrapper', 'ComfyQwenImageWrapper')
     except Exception:
         return False
 
@@ -271,21 +271,60 @@ def _apply_loras_standard(model: Any, clip: Any, lora_params: list) -> tuple:
     return (model_lora, clip_lora)
 
 def _apply_loras_nunchaku(model: Any, clip: Any, lora_params: list) -> tuple:
-    """Apply LoRAs to Nunchaku FLUX models via ComfyFluxWrapper."""
+    """Apply LoRAs to Nunchaku models (FLUX or Qwen) via wrapper."""
     try:
-        from nunchaku.lora.flux import to_diffusers
-        from .wrappers.nunchaku_wrapper import ComfyFluxWrapper
+        from .wrappers.nunchaku_wrapper import ComfyFluxWrapper, ComfyQwenImageWrapper
     except ImportError as e:
-        cstr(f"[LoRA] Nunchaku not available for LoRA application: {e}").warning.print()
+        cstr(f"[LoRA] Nunchaku wrappers not available for LoRA application: {e}").warning.print()
         cstr("[LoRA] Returning model unchanged").msg.print()
-        return (model, clip)
-    
-    if ComfyFluxWrapper is None:
-        cstr("[LoRA] ComfyFluxWrapper not available - returning model unchanged").warning.print()
         return (model, clip)
     
     # Get the model wrapper
     model_wrapper = model.model.diffusion_model
+    
+    # Detect wrapper type
+    if hasattr(model_wrapper, '_orig_mod'):
+        actual_wrapper = model_wrapper._orig_mod
+        wrapper_class_name = type(actual_wrapper).__name__
+    else:
+        actual_wrapper = model_wrapper
+        wrapper_class_name = type(model_wrapper).__name__
+    
+    is_qwen = (wrapper_class_name == 'ComfyQwenImageWrapper')
+    is_flux = (wrapper_class_name == 'ComfyFluxWrapper')
+    
+    if not (is_qwen or is_flux):
+        cstr(f"[LoRA] Unknown wrapper type: {wrapper_class_name}").warning.print()
+        return (model, clip)
+    
+    # For Qwen models, simply update the loras list on the wrapper
+    if is_qwen:
+        cstr("[LoRA] Applying LoRAs to Qwen model via ComfyQwenImageWrapper").msg.print()
+        
+        # Get the wrapper (handle OptimizedModule case)
+        if hasattr(model_wrapper, '_orig_mod'):
+            wrapper = model_wrapper._orig_mod
+        else:
+            wrapper = model_wrapper
+        
+        # Clear existing LoRAs and add new ones
+        wrapper.loras = []
+        for lora_name, model_weight in lora_params:
+            lora_path = folder_paths.get_full_path_or_raise("loras", lora_name)
+            wrapper.loras.append((lora_path, model_weight))
+            cstr(f"[LoRA] Applied Qwen LoRA {lora_name} with weight {model_weight}").msg.print()
+        
+        return (model, clip)
+    
+    # For Flux models, use the original implementation with ComfyFluxWrapper
+    cstr("[LoRA] Applying LoRAs to Flux model via ComfyFluxWrapper").msg.print()
+    
+    try:
+        from nunchaku.lora.flux import to_diffusers
+    except ImportError as e:
+        cstr(f"[LoRA] nunchaku.lora.flux not available: {e}").warning.print()
+        cstr("[LoRA] Returning model unchanged").msg.print()
+        return (model, clip)
     
     # Handle OptimizedModule case
     if hasattr(model_wrapper, '_orig_mod'):
