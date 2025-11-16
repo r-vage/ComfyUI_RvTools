@@ -28,7 +28,22 @@ from typing import Optional, Any, Callable
 from pathlib import Path
 import torch
 
-#print("[GGUF Wrapper] Module loading started...")
+# Import cstr for consistent logging
+try:
+    from ...core import cstr
+except ImportError:
+    # Fallback if core module not available
+    class cstr:
+        def __init__(self, msg): self.msg_text = msg
+        @property
+        def msg(self): return self
+        @property
+        def warning(self): return self
+        @property
+        def error(self): return self
+        def print(self): print(self.msg_text)
+
+#cstr("[GGUF Wrapper] Module loading started...").msg.print()
 
 # Try to import GGUF - graceful fallback if not available
 GGUF_AVAILABLE = False
@@ -36,7 +51,7 @@ GGMLOps: Optional[Any] = None
 gguf_sd_loader: Optional[Callable[[str], dict]] = None
 GGUFModelPatcher: Optional[Any] = None
 
-#print("[GGUF Wrapper] Starting GGUF imports...")
+#cstr("[GGUF Wrapper] Starting GGUF imports...").msg.print()
 
 try:
     # Check if ComfyUI-GGUF extension exists
@@ -44,12 +59,12 @@ try:
     custom_nodes_path = Path(__file__).parent.parent.parent.parent
     gguf_path = custom_nodes_path / "ComfyUI-GGUF"
     
-    #print(f"[GGUF Wrapper] Looking for ComfyUI-GGUF at: {gguf_path}")
-    #print(f"[GGUF Wrapper] Path exists: {gguf_path.exists()}")
+    #cstr(f"[GGUF Wrapper] Looking for ComfyUI-GGUF at: {gguf_path}").msg.print()
+    #cstr(f"[GGUF Wrapper] Path exists: {gguf_path.exists()}").msg.print()
     
     if gguf_path.exists():
         # Import GGUF components using importlib (proper package import)
-        print("[GGUF Wrapper] Attempting to import GGUF classes...")
+        cstr("[GGUF Wrapper] Attempting to import GGUF classes...").msg.print()
         
         import importlib
         gguf_parent = str(gguf_path.parent)
@@ -66,18 +81,18 @@ try:
             nodes_module = importlib.import_module("ComfyUI-GGUF.nodes")
             GGUFModelPatcher = nodes_module.GGUFModelPatcher
             
-            print(f"[GGUF Wrapper] ✓ GGUF components imported successfully")
+            cstr("[GGUF Wrapper] ✓ GGUF components imported successfully").msg.print()
             GGUF_AVAILABLE = True
         finally:
             sys.path.remove(gguf_parent)
     else:
-        print("[GGUF Wrapper] ComfyUI-GGUF extension not found")
+        cstr("[GGUF Wrapper] ComfyUI-GGUF extension not found").warning.print()
         
 except Exception as e:
     import traceback
-    print(f"[GGUF Wrapper] ERROR: Could not import GGUF components:")
-    print(f"[GGUF Wrapper] Exception type: {type(e).__name__}")
-    print(f"[GGUF Wrapper] Exception message: {e}")
+    cstr(f"[GGUF Wrapper] ERROR: Could not import GGUF components:").error.print()
+    cstr(f"[GGUF Wrapper] Exception type: {type(e).__name__}").error.print()
+    cstr(f"[GGUF Wrapper] Exception message: {e}").error.print()
     traceback.print_exc()
     GGMLOps = None
     gguf_sd_loader = None
@@ -163,10 +178,10 @@ def load_gguf_model(
     if not detect_gguf_model(model_path):
         raise ValueError(f"Not a GGUF model file (expected .gguf extension): {model_path}")
     
-    print(f"[GGUF] Loading quantized model: {os.path.basename(model_path)}")
-    print(f"[GGUF]   Dequant dtype: {dequant_dtype}")
-    print(f"[GGUF]   Patch dtype: {patch_dtype}")
-    print(f"[GGUF]   Patch on device: {patch_on_device}")
+    cstr(f"[GGUF] Loading quantized model: {os.path.basename(model_path)}").msg.print()
+    cstr(f"[GGUF]   Dequant dtype: {dequant_dtype}").msg.print()
+    cstr(f"[GGUF]   Patch dtype: {patch_dtype}").msg.print()
+    cstr(f"[GGUF]   Patch on device: {patch_on_device}").msg.print()
     
     # Type guards for mypy
     if GGMLOps is None or gguf_sd_loader is None or GGUFModelPatcher is None:
@@ -193,11 +208,11 @@ def load_gguf_model(
             ops.Linear.patch_dtype = getattr(torch, patch_dtype)  # type: ignore
         
         # Load state dict from GGUF file
-        print("[GGUF] Loading state dict from GGUF file...")
+        cstr("[GGUF] Loading state dict from GGUF file...").msg.print()
         sd = gguf_sd_loader(model_path)
         
         # Load diffusion model with custom operations
-        print("[GGUF] Loading diffusion model...")
+        cstr("[GGUF] Loading diffusion model...").msg.print()
         model = comfy.sd.load_diffusion_model_state_dict(
             sd, 
             model_options={"custom_operations": ops}
@@ -207,11 +222,11 @@ def load_gguf_model(
             raise RuntimeError(f"Could not detect model type of: {model_path}")
         
         # Wrap in GGUF model patcher
-        print("[GGUF] Wrapping in GGUFModelPatcher...")
+        cstr("[GGUF] Wrapping in GGUFModelPatcher...").msg.print()
         model = GGUFModelPatcher.clone(model)  # type: ignore
         model.patch_on_device = patch_on_device  # type: ignore
         
-        print(f"[GGUF] ✓ Model loaded successfully: {os.path.basename(model_path)}")
+        cstr(f"[GGUF] ✓ Model loaded successfully: {os.path.basename(model_path)}").msg.print()
         
         return model
         
@@ -234,4 +249,4 @@ __all__ = [
     'GGUF_AVAILABLE',
 ]
 
-print(f"[GGUF Wrapper] Module loaded. GGUF available: {GGUF_AVAILABLE}")
+cstr(f"[GGUF Wrapper] Module loaded. GGUF available: {GGUF_AVAILABLE}").msg.print()
