@@ -175,7 +175,74 @@ Integrated sampler configuration:
 - Enable to use built-in sampler settings
 - Disable to use separate KSampler node
 
-#### 6. LoRA Configuration (Model-Only)
+#### 6. Model Sampling Configuration
+
+Advanced sampling method selection for different model architectures:
+
+**Sampling Method:**
+- **None (Default):** Standard sampling without modifications
+- **SD3:** Stable Diffusion 3 models (flow-based)
+- **AuraFlow:** AuraFlow models (flow-based)
+- **Flux:** Flux models (flow-based with dimension-aware shift)
+- **Stable Cascade:** Stable Cascade models
+- **LCM:** Latent Consistency Models (distilled)
+- **ContinuousEDM:** Continuous EDM sampling with subtypes
+- **ContinuousV:** Continuous V-prediction sampling
+- **LTXV:** Video models (token-based)
+
+**Method-Specific Parameters:**
+
+**Flow-Based (SD3, AuraFlow, Stable Cascade):**
+- `shift`: Controls sampling schedule (default varies by method)
+- `multiplier`: Timestep scaling (SD3/AuraFlow only, default 1000.0 for SD3, 1.0 for AuraFlow)
+
+**Flux:**
+- `max_shift`: Maximum shift value (default 1.15)
+- `base_shift`: Base shift value (default 0.5)
+- `sampling_width/height`: Image dimensions for shift calculation (auto-filled in Smart Loader Plus)
+- Shift calculated from: `((width * height / 1024) * slope) + intercept`
+
+**Stable Cascade:**
+- `shift`: Sampling schedule control (default 2.0)
+
+**LCM (Latent Consistency Models):**
+- `original_timesteps`: Number of timesteps in original model (1-1000, default 50)
+- `zsnr`: Zero-terminal SNR mode for better quality
+
+**ContinuousEDM:**
+- `sampling_subtype`: EDM variant (eps, v_prediction, edm, edm_playground_v2.5, cosmos_rflow)
+- `sigma_max`: Maximum noise level (default 120.0)
+- `sigma_min`: Minimum noise level (default 0.002)
+
+**ContinuousV:**
+- `sigma_max`: Maximum noise level (default 500.0)
+- `sigma_min`: Minimum noise level (default 0.03)
+
+**LTXV (Video Models):**
+- `max_shift`: Maximum shift value (default 2.05)
+- `base_shift`: Base shift value (default 0.95)
+- Uses token count for shift calculation instead of dimensions
+
+**When to Use Each Method:**
+- **SD3:** Stable Diffusion 3 and SD3.5 models
+- **AuraFlow:** AuraFlow architecture models
+- **Flux:** Flux Dev, Flux Schnell, and Flux variants
+- **Stable Cascade:** Stable Cascade models specifically
+- **LCM:** Distilled models designed for few-step generation
+- **ContinuousEDM:** Models with continuous noise schedules (EDM-based)
+- **ContinuousV:** Models using V-prediction parameterization
+- **LTXV:** Lightricks video generation models
+
+**Toggle:**
+- Enable `configure_model_sampling` to show sampling options
+- Disable to use standard sampling (no modifications)
+
+**Template Integration:**
+- Sampling method and parameters saved in templates
+- Only active method's parameters are saved (snapshot approach)
+- Templates preserve sampling configuration across sessions
+
+#### 7. LoRA Configuration (Model-Only)
 
 Integrated LoRA support with model-only weights:
 
@@ -201,7 +268,7 @@ Integrated LoRA support with model-only weights:
 - Enable `configure_model_only_lora` to show LoRA options
 - Disable to hide LoRA section entirely
 
-#### 7. Quantization Settings
+#### 8. Quantization Settings
 
 Model-specific options for reduced VRAM:
 
@@ -258,7 +325,16 @@ Model-specific options for reduced VRAM:
    - Set `cfg` (e.g., 7.0)
    - Set `flux_guidance` if using Flux models (e.g., 3.5)
 
-8. **Connect Output:**
+8. **Configure Model Sampling (Optional):**
+   - Enable `configure_model_sampling` if needed
+   - Select appropriate `sampling_method` for your model:
+     - SD3 for Stable Diffusion 3 models
+     - Flux for Flux models (auto-fills dimensions from latent)
+     - None for standard models
+   - Adjust method-specific parameters if needed
+   - Most users can leave this disabled (uses standard sampling)
+
+9. **Connect Output:**
    - Connect `pipe` to downstream nodes
    - Use Pipe Out nodes to extract components
 
@@ -283,7 +359,14 @@ Model-specific options for reduced VRAM:
    - Select CLIP files for each slot
    - Set `clip_type` to "flux_text_encoders"
 
-4. **Complete Configuration:**
+4. **Model Sampling:**
+   - Enable `configure_model_sampling`
+   - Set `sampling_method` to "Flux"
+   - `max_shift` and `base_shift` default to 1.15 and 0.5 (recommended)
+   - Width/height auto-fill from latent configuration
+   - Shift calculated automatically from dimensions
+
+5. **Complete Configuration:**
    - Configure VAE (external recommended)
    - Set resolution for Flux (1024x1024 or similar)
    - Configure sampler with Flux-appropriate settings
@@ -344,6 +427,7 @@ The node outputs a comprehensive **pipe** containing:
 - `clip_skip` - CLIP layer setting
 - `is_nunchaku` - Quantization flag
 - `lora_names` - List of active LoRA names (if configure_model_only_lora enabled)
+- `sampling_method` - Selected sampling method (if configure_model_sampling enabled)
 
 ---
 
@@ -370,6 +454,12 @@ Streamlined loader focused on model/CLIP/VAE loading without latent or sampler c
 - Simpler, more focused interface
 - Lighter pipe output
 
+**What's Included (Same as Plus):**
+- Model sampling configuration (all 8 sampling methods)
+- LoRA configuration (model-only weights)
+- All quantization options
+- Template system with full feature support
+
 ### When to Use Smart Loader
 
 Choose Smart Loader when:
@@ -393,8 +483,14 @@ Configuration is identical to Smart Loader Plus except:
    - No sampler_name, scheduler, steps, cfg settings
    - Use KSampler node separately
 
-3. **Simpler Output:**
-   - Pipe contains: model, clip, vae, model_name, vae_name, clip_skip, is_nunchaku
+3. **Model Sampling Available:**
+   - `configure_model_sampling` toggle present (same as Plus)
+   - All 8 sampling methods supported
+   - Method-specific parameters available
+   - Template system includes sampling configuration
+
+4. **Simpler Output:**
+   - Pipe contains: model, clip, vae, model_name, vae_name, clip_skip, is_nunchaku, sampling_method
    - No latent, dimensions, or sampler data
 
 ### Example Workflow
@@ -577,6 +673,17 @@ The template system intelligently saves only relevant configuration for your set
 - Steps
 - CFG scale
 - Flux guidance
+
+**Model Sampling Settings (only if configure_model_sampling is enabled):**
+- Sampling method selection
+- Method-specific parameters (only for active method):
+  - SD3/AuraFlow: shift, multiplier
+  - Flux: max_shift, base_shift, sampling_width, sampling_height
+  - Stable Cascade: shift
+  - LCM: original_timesteps, zsnr
+  - ContinuousEDM: sampling_subtype, sigma_max, sigma_min
+  - ContinuousV: sigma_max, sigma_min
+  - LTXV: max_shift, base_shift
 
 **LoRA Settings (only if configure_model_only_lora is enabled, Smart Loader Plus only):**
 - LoRA count (1-3)
@@ -1042,6 +1149,37 @@ Smart Loader uses a dual-location template system similar to SmartPrompt's wildc
 3. Connecting pipe to correct node
 4. Not overriding with separate KSampler
 
+### Model Sampling Not Working
+
+**Problem:** Sampling method selected but not taking effect
+
+**Solutions:**
+1. **Verify Configuration:**
+   - `configure_model_sampling` is enabled
+   - Selected method matches model architecture
+   - Method-specific parameters in valid ranges
+
+2. **Check Model Compatibility:**
+   - SD3: Use with Stable Diffusion 3 models only
+   - Flux: Use with Flux models (Dev, Schnell, variants)
+   - LCM: Use with distilled/LCM models only
+   - Method must match model architecture
+
+3. **Flux Specific:**
+   - Dimensions auto-fill from latent (Smart Loader Plus)
+   - Verify width/height set if auto-fill fails
+   - Check console for shift calculation messages
+
+4. **LCM Specific:**
+   - Reduce steps significantly (4-8 typical)
+   - original_timesteps should match training (usually 50)
+   - Try enabling zsnr for better quality
+
+5. **Continuous Methods:**
+   - Verify sigma_max > sigma_min
+   - Use recommended defaults initially
+   - ContinuousEDM: Select appropriate subtype for model
+
 ### Quantization Quality Issues
 
 **Problem:** Generated images lower quality with quantized models
@@ -1088,6 +1226,116 @@ Smart Loader uses a dual-location template system similar to SmartPrompt's wildc
 ---
 
 ## Advanced Topics
+
+### Model Sampling Configuration
+
+**Understanding Sampling Methods:**
+
+Different model architectures require specific sampling approaches for optimal quality. The Smart Loaders support 8 major sampling methods:
+
+**Flow-Based Methods** (SD3, AuraFlow, Flux):
+- Use flow-matching sampling for smooth generation
+- Require `shift` parameter to control sampling schedule
+- Higher shift = more refinement early in generation
+
+**Discrete Methods** (Stable Cascade, LCM):
+- Use discrete timestep schedules
+- LCM designed for few-step generation (4-8 steps)
+- Stable Cascade has unique architecture requirements
+
+**Continuous Methods** (ContinuousEDM, ContinuousV):
+- Use continuous noise schedules
+- Control via sigma_max and sigma_min
+- More flexible than discrete schedules
+
+**Video Methods** (LTXV):
+- Specialized for video generation
+- Uses token-based calculations
+- Handles temporal consistency
+
+**Choosing the Right Method:**
+
+1. **Check Model Type:**
+   - Read model card/documentation
+   - Look for architecture mentions (SD3, Flux, etc.)
+   - Test with "None" first to see if special sampling needed
+
+2. **SD3 Models:**
+   - Use "SD3" method
+   - Default shift (3.0) works for most
+   - Increase for more detail, decrease for faster generation
+
+3. **Flux Models:**
+   - Use "Flux" method
+   - max_shift=1.15, base_shift=0.5 (defaults)
+   - Dimensions auto-filled in Smart Loader Plus
+   - Lower max_shift for more creative results
+
+4. **AuraFlow Models:**
+   - Use "AuraFlow" method
+   - shift=1.73 (default) is optimal
+   - multiplier=1.0 (lower than SD3)
+
+5. **LCM/Distilled Models:**
+   - Use "LCM" method
+   - Reduce steps to 4-8 (critical for LCM)
+   - original_timesteps=50 (match training)
+   - Enable zsnr for better quality
+
+6. **Stable Cascade:**
+   - Use "Stable Cascade" method
+   - shift=2.0 (default)
+   - Requires Stable Cascade architecture
+
+7. **EDM-Based Models:**
+   - Use "ContinuousEDM" method
+   - Select appropriate subtype:
+     - `eps`: Epsilon prediction (most common)
+     - `v_prediction`: V-prediction parameterization
+     - `edm`: Standard EDM
+     - `edm_playground_v2.5`: Playground 2.5 models
+     - `cosmos_rflow`: Cosmos models
+   - Adjust sigma_max/min if needed
+
+8. **V-Prediction Models:**
+   - Use "ContinuousV" method
+   - Higher sigma values than EDM
+   - sigma_max=500.0, sigma_min=0.03
+
+**Flux Dimension Calculation:**
+
+Flux uses image dimensions to calculate shift dynamically:
+```
+x1 = 256, x2 = 4096
+slope = (max_shift - base_shift) / (x2 - x1)
+intercept = base_shift - slope * x1
+shift = ((width * height / 1024) * slope) + intercept
+```
+
+**Smart Loader Plus** auto-fills dimensions from latent configuration.
+**Smart Loader** requires manual width/height input if using Flux.
+
+**Parameter Tuning:**
+
+**shift (Flow methods):**
+- Lower (1.0-2.0): Faster, more creative, less refined
+- Medium (2.0-3.0): Balanced quality
+- Higher (3.0-5.0): More refinement, slower, more detail
+
+**sigma_max/sigma_min (Continuous methods):**
+- Wider range (high max, low min): More noise schedule steps
+- Narrower range: Fewer steps, faster
+- Match to model training for best results
+
+**original_timesteps (LCM):**
+- Must match distillation training
+- Usually 50 for standard LCM
+- Check model documentation
+
+**zsnr (LCM):**
+- Enables zero-terminal SNR
+- Often improves quality
+- May affect color/brightness slightly
 
 ### CLIP Ensemble Configuration
 

@@ -132,11 +132,13 @@ The Smart Loader series provides modern, flexible model loading with support for
 The full-featured loader for complex workflows:
 
 - **Multi-Format Support:** Standard Checkpoints, UNet models, Nunchaku quantized Flux/Qwen (SVDQuant INT4/FP4/FP8), and GGUF quantized models.
-- **Template System:** Save and load complete configurations including model selections, CLIP/VAE settings, and sampler parameters.
+- **Template System:** Save and load complete configurations including model selections, CLIP/VAE settings, sampler parameters, and sampling methods.
 - **CLIP Ensemble:** Support for up to 4 CLIP modules with multiple architecture types (Flux, SD3, SDXL, Qwen, HiDream, Hunyuan, Wan, etc.).
+- **Model Sampling:** Advanced sampling method support for different architectures (SD3, AuraFlow, Flux, Stable Cascade, LCM, ContinuousEDM, ContinuousV, LTXV) with automatic parameter management.
 - **Advanced Configuration:** 
   - Latent configuration with resolution presets or custom dimensions
   - Sampler settings (sampler, scheduler, steps, CFG, flux_guidance)
+  - Model sampling configuration (method-specific parameters, auto-defaults)
   - CLIP layer trimming for memory optimization
   - Weight dtype control (fp8 variants)
 - **Quantization Options:**
@@ -187,8 +189,9 @@ Basic usage:
 2. Select model type (Standard Checkpoint, UNet, Nunchaku Flux, Nunchaku Qwen, or GGUF).
 3. Choose the appropriate model file from the dropdown.
 4. Configure CLIP (baked or external) and VAE (baked or external).
-5. For Smart Loader Plus: Set resolution, batch size, and sampler settings.
-6. Use templates to save/load configurations for quick workflow iteration.
+5. Optionally enable model sampling and select appropriate method (SD3, Flux, etc.) for your model architecture.
+6. For Smart Loader Plus: Set resolution, batch size, and sampler settings.
+7. Use templates to save/load configurations for quick workflow iteration.
 7. Connect the pipe output to downstream nodes or use Pipe Out nodes to extract components.
 
 The Smart Loaders include comprehensive error handling, automatic VRAM cleanup, and graceful fallbacks when optional extensions (Nunchaku, GGUF) are not installed.
