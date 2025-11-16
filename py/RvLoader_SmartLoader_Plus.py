@@ -41,6 +41,7 @@ import torch
 import comfy
 import comfy.sd
 import comfy.utils
+import comfy.model_sampling
 import folder_paths
 import comfy.model_management as mm
 import nodes
@@ -375,6 +376,268 @@ def _apply_loras_nunchaku(model: Any, clip: Any, lora_params: list) -> tuple:
     
     return (ret_model, clip)
 
+def apply_model_sampling(model, sampling_method: str, shift: float, base_shift: float = 0.5, 
+                         width: int = 1024, height: int = 1024, original_timesteps: int = 50,
+                         zsnr: bool = False, sampling_subtype: str = "eps", 
+                         sigma_max: float = 120.0, sigma_min: float = 0.002):
+    """
+    Apply model sampling configuration based on method.
+    
+    Parameters:
+        model: The model to patch
+        sampling_method: Sampling method (SD3, AuraFlow, Flux, Stable Cascade, LCM, ContinuousEDM, ContinuousV, LTXV, or None)
+        shift: Universal shift parameter (used as shift for SD3/AuraFlow/Stable Cascade, max_shift for Flux/LTXV)
+        base_shift: Base shift for Flux/LTXV sampling (default: 0.5)
+        width: Width for Flux sampling shift calculation (default: 1024)
+        height: Height for Flux sampling shift calculation (default: 1024)
+        original_timesteps: Original timesteps for LCM sampling (default: 50)
+        zsnr: Enable zero-terminal SNR for LCM sampling (default: False)
+        sampling_subtype: Subtype for ContinuousEDM (eps, v_prediction, edm, edm_playground_v2.5, cosmos_rflow)
+        sigma_max: Maximum sigma for ContinuousEDM/V (default: 120.0)
+        sigma_min: Minimum sigma for ContinuousEDM/V (default: 0.002)
+    
+    Returns:
+        Patched model or original model if method is "None"
+    """
+    if sampling_method == "None" or not sampling_method:
+        return model
+    
+    if sampling_method == "SD3":
+        return _apply_sd3_sampling(model, shift=shift, multiplier=1000.0)
+    elif sampling_method == "AuraFlow":
+        return _apply_auraflow_sampling(model, shift=shift, multiplier=1.0)
+    elif sampling_method == "Flux":
+        return _apply_flux_sampling(model, max_shift=shift, base_shift=base_shift, width=width, height=height)
+    elif sampling_method == "Stable Cascade":
+        return _apply_stable_cascade_sampling(model, shift=shift)
+    elif sampling_method == "LCM":
+        return _apply_lcm_sampling(model, original_timesteps=original_timesteps, zsnr=zsnr)
+    elif sampling_method == "ContinuousEDM":
+        return _apply_continuous_edm_sampling(model, sampling_subtype=sampling_subtype, sigma_max=sigma_max, sigma_min=sigma_min)
+    elif sampling_method == "ContinuousV":
+        return _apply_continuous_v_sampling(model, sigma_max=sigma_max, sigma_min=sigma_min)
+    elif sampling_method == "LTXV":
+        return _apply_ltxv_sampling(model, max_shift=shift, base_shift=base_shift)
+    else:
+        cstr(f"[Model Sampling] Unknown sampling method '{sampling_method}', skipping").warning.print()
+        return model
+
+def _apply_sd3_sampling(model, shift: float, multiplier: float = 1000.0):
+    """Apply SD3 sampling (ModelSamplingDiscreteFlow + CONST)"""
+    m = model.clone()
+    
+    sampling_base = comfy.model_sampling.ModelSamplingDiscreteFlow
+    sampling_type = comfy.model_sampling.CONST
+    
+    class ModelSamplingAdvanced(sampling_base, sampling_type):
+        pass
+    
+    model_sampling = ModelSamplingAdvanced(model.model.model_config)
+    model_sampling.set_parameters(shift=shift, multiplier=multiplier)
+    m.add_object_patch("model_sampling", model_sampling)
+    
+    cstr(f"[Model Sampling] Applied SD3 sampling: shift={shift}, multiplier={multiplier}").msg.print()
+    return m
+
+def _apply_auraflow_sampling(model, shift: float, multiplier: float = 1.0):
+    """Apply AuraFlow sampling (ModelSamplingDiscreteFlow + CONST with multiplier=1.0)"""
+    m = model.clone()
+    
+    sampling_base = comfy.model_sampling.ModelSamplingDiscreteFlow
+    sampling_type = comfy.model_sampling.CONST
+    
+    class ModelSamplingAdvanced(sampling_base, sampling_type):
+        pass
+    
+    model_sampling = ModelSamplingAdvanced(model.model.model_config)
+    model_sampling.set_parameters(shift=shift, multiplier=multiplier)
+    m.add_object_patch("model_sampling", model_sampling)
+    
+    cstr(f"[Model Sampling] Applied AuraFlow sampling: shift={shift}, multiplier={multiplier}").msg.print()
+    return m
+
+def _apply_flux_sampling(model, max_shift: float, base_shift: float, width: int, height: int):
+    """Apply Flux sampling (ModelSamplingFlux + CONST with calculated shift)"""
+    m = model.clone()
+    
+    # Calculate shift using linear interpolation formula based on image dimensions
+    # Formula: shift = ((width * height / 1024) * slope) + intercept
+    # where slope = (max_shift - base_shift) / (4096 - 256)
+    # and intercept = base_shift - slope * 256
+    x1 = 256
+    x2 = 4096
+    mm = (max_shift - base_shift) / (x2 - x1)
+    b = base_shift - mm * x1
+    shift = (width * height / (8 * 8 * 2 * 2)) * mm + b
+    
+    sampling_base = comfy.model_sampling.ModelSamplingFlux
+    sampling_type = comfy.model_sampling.CONST
+    
+    class ModelSamplingAdvanced(sampling_base, sampling_type):
+        pass
+    
+    model_sampling = ModelSamplingAdvanced(model.model.model_config)
+    model_sampling.set_parameters(shift=shift)
+    m.add_object_patch("model_sampling", model_sampling)
+    
+    cstr(f"[Model Sampling] Applied Flux sampling: max_shift={max_shift}, base_shift={base_shift}, width={width}, height={height}, calculated_shift={shift:.4f}").msg.print()
+    return m
+
+def _apply_stable_cascade_sampling(model, shift: float):
+    """Apply Stable Cascade sampling (StableCascadeSampling + EPS)"""
+    m = model.clone()
+    
+    sampling_base = comfy.model_sampling.StableCascadeSampling
+    sampling_type = comfy.model_sampling.EPS
+    
+    class ModelSamplingAdvanced(sampling_base, sampling_type):
+        pass
+    
+    model_sampling = ModelSamplingAdvanced(model.model.model_config)
+    model_sampling.set_parameters(shift=shift)
+    m.add_object_patch("model_sampling", model_sampling)
+    
+    cstr(f"[Model Sampling] Applied Stable Cascade sampling: shift={shift}").msg.print()
+    return m
+
+def _apply_lcm_sampling(model, original_timesteps: int = 50, zsnr: bool = False):
+    """Apply LCM sampling (ModelSamplingDiscreteDistilled + LCM)"""
+    m = model.clone()
+    
+    # Define LCM sampling type
+    class LCM(comfy.model_sampling.EPS):
+        def calculate_denoised(self, sigma, model_output, model_input):
+            timestep = self.timestep(sigma).view(sigma.shape[:1] + (1,) * (model_output.ndim - 1))
+            sigma = sigma.view(sigma.shape[:1] + (1,) * (model_output.ndim - 1))
+            x0 = model_input - model_output * sigma
+
+            sigma_data = 0.5
+            scaled_timestep = timestep * 10.0  # timestep_scaling
+
+            c_skip = sigma_data**2 / (scaled_timestep**2 + sigma_data**2)
+            c_out = scaled_timestep / (scaled_timestep**2 + sigma_data**2) ** 0.5
+
+            return c_out * x0 + c_skip * model_input
+    
+    # Define distilled sampling base
+    class ModelSamplingDiscreteDistilled(comfy.model_sampling.ModelSamplingDiscrete):
+        def __init__(self, model_config=None):
+            super().__init__(model_config, zsnr=zsnr)
+            self.original_timesteps = original_timesteps
+            self.skip_steps = self.num_timesteps // self.original_timesteps
+
+            sigmas_valid = torch.zeros((self.original_timesteps), dtype=torch.float32)
+            for x in range(self.original_timesteps):
+                sigmas_valid[self.original_timesteps - 1 - x] = self.sigmas[self.num_timesteps - 1 - x * self.skip_steps]
+
+            self.set_sigmas(sigmas_valid)
+
+        def timestep(self, sigma):
+            log_sigma = sigma.log()
+            dists = log_sigma.to(self.log_sigmas.device) - self.log_sigmas[:, None]
+            return (dists.abs().argmin(dim=0).view(sigma.shape) * self.skip_steps + (self.skip_steps - 1)).to(sigma.device)
+
+        def sigma(self, timestep):
+            t = torch.clamp(((timestep.float().to(self.log_sigmas.device) - (self.skip_steps - 1)) / self.skip_steps).float(), min=0, max=(len(self.sigmas) - 1))
+            low_idx = t.floor().long()
+            high_idx = t.ceil().long()
+            w = t.frac()
+            log_sigma = (1 - w) * self.log_sigmas[low_idx] + w * self.log_sigmas[high_idx]
+            return log_sigma.exp().to(timestep.device)
+    
+    sampling_base = ModelSamplingDiscreteDistilled
+    sampling_type = LCM
+    
+    class ModelSamplingAdvanced(sampling_base, sampling_type):
+        pass
+    
+    model_sampling = ModelSamplingAdvanced(model.model.model_config)
+    m.add_object_patch("model_sampling", model_sampling)
+    
+    cstr(f"[Model Sampling] Applied LCM sampling: original_timesteps={original_timesteps}, zsnr={zsnr}").msg.print()
+    return m
+
+def _apply_continuous_edm_sampling(model, sampling_subtype: str = "eps", sigma_max: float = 120.0, sigma_min: float = 0.002):
+    """Apply ContinuousEDM sampling"""
+    m = model.clone()
+    
+    sampling_base = comfy.model_sampling.ModelSamplingContinuousEDM
+    latent_format = None
+    sigma_data = 1.0
+    
+    if sampling_subtype == "eps":
+        sampling_type = comfy.model_sampling.EPS
+    elif sampling_subtype == "edm" or sampling_subtype == "edm_playground_v2.5":
+        sampling_type = comfy.model_sampling.EDM
+        sigma_data = 0.5
+        if sampling_subtype == "edm_playground_v2.5":
+            latent_format = comfy.latent_formats.SDXL_Playground_2_5()
+    elif sampling_subtype == "v_prediction":
+        sampling_type = comfy.model_sampling.V_PREDICTION
+    elif sampling_subtype == "cosmos_rflow":
+        sampling_type = comfy.model_sampling.COSMOS_RFLOW
+        sampling_base = comfy.model_sampling.ModelSamplingCosmosRFlow
+    else:
+        cstr(f"[Model Sampling] Unknown ContinuousEDM subtype '{sampling_subtype}', using eps").warning.print()
+        sampling_type = comfy.model_sampling.EPS
+    
+    class ModelSamplingAdvanced(sampling_base, sampling_type):
+        pass
+    
+    model_sampling = ModelSamplingAdvanced(model.model.model_config)
+    model_sampling.set_parameters(sigma_min, sigma_max, sigma_data)
+    m.add_object_patch("model_sampling", model_sampling)
+    if latent_format is not None:
+        m.add_object_patch("latent_format", latent_format)
+    
+    cstr(f"[Model Sampling] Applied ContinuousEDM sampling: subtype={sampling_subtype}, sigma_max={sigma_max}, sigma_min={sigma_min}, sigma_data={sigma_data}").msg.print()
+    return m
+
+def _apply_continuous_v_sampling(model, sigma_max: float = 500.0, sigma_min: float = 0.03):
+    """Apply ContinuousV sampling (v_prediction only)"""
+    m = model.clone()
+    
+    sampling_type = comfy.model_sampling.V_PREDICTION
+    sigma_data = 1.0
+    
+    class ModelSamplingAdvanced(comfy.model_sampling.ModelSamplingContinuousV, sampling_type):
+        pass
+    
+    model_sampling = ModelSamplingAdvanced(model.model.model_config)
+    model_sampling.set_parameters(sigma_min, sigma_max, sigma_data)
+    m.add_object_patch("model_sampling", model_sampling)
+    
+    cstr(f"[Model Sampling] Applied ContinuousV sampling: sigma_max={sigma_max}, sigma_min={sigma_min}").msg.print()
+    return m
+
+def _apply_ltxv_sampling(model, max_shift: float = 2.05, base_shift: float = 0.95):
+    """Apply LTXV sampling (for video models, uses token-based shift calculation)"""
+    m = model.clone()
+    
+    # LTXV uses token count instead of width/height
+    # Default to 4096 tokens if we can't determine from latent
+    tokens = 4096
+    
+    # Calculate shift using linear interpolation formula based on token count
+    x1 = 1024
+    x2 = 4096
+    mm = (max_shift - base_shift) / (x2 - x1)
+    b = base_shift - mm * x1
+    shift = tokens * mm + b
+    
+    sampling_base = comfy.model_sampling.ModelSamplingFlux
+    sampling_type = comfy.model_sampling.CONST
+    
+    class ModelSamplingAdvanced(sampling_base, sampling_type):
+        pass
+    
+    model_sampling = ModelSamplingAdvanced(model.model.model_config)
+    model_sampling.set_parameters(shift=shift)
+    m.add_object_patch("model_sampling", model_sampling)
+    
+    cstr(f"[Model Sampling] Applied LTXV sampling: max_shift={max_shift}, base_shift={base_shift}, tokens={tokens}, calculated_shift={shift:.4f}").msg.print()
+    return m
+
 _support_messages_printed = False
 
 class RvLoader_SmartLoader_Plus:
@@ -527,6 +790,75 @@ class RvLoader_SmartLoader_Plus:
                 "configure_model_only_lora": ("BOOLEAN", {
                     "default": False, "label_on": "yes", "label_off": "no",
                     "tooltip": "Enable model-only LoRA configuration"
+                }),
+                "configure_model_sampling": ("BOOLEAN", {
+                    "default": False, "label_on": "yes", "label_off": "no",
+                    "tooltip": "Enable advanced model sampling configuration"
+                }),
+                
+                # Model Sampling Configuration
+                "sampling_method": (["None", "SD3", "AuraFlow", "Flux", "Stable Cascade", "LCM", "ContinuousEDM", "ContinuousV", "LTXV"], {
+                    "default": "None",
+                    "tooltip": "Sampling method: SD3 (shift=3.0), AuraFlow (shift=1.73), Flux (max_shift=1.15), Stable Cascade (shift=2.0), LCM (distilled), ContinuousEDM/V (continuous sampling), LTXV (video)"
+                }),
+                "sampling_subtype": (["eps", "v_prediction", "edm", "edm_playground_v2.5", "cosmos_rflow"], {
+                    "default": "eps",
+                    "tooltip": "Subtype for ContinuousEDM sampling (eps, v_prediction, edm, edm_playground_v2.5, cosmos_rflow)"
+                }),
+                "shift": ("FLOAT", {
+                    "default": 3.0,
+                    "min": 0.0,
+                    "max": 100.0,
+                    "step": 0.01,
+                    "tooltip": "Universal shift parameter (SD3: 3.0, AuraFlow: 1.73, Flux max_shift: 1.15, Stable Cascade: 2.0)"
+                }),
+                "base_shift": ("FLOAT", {
+                    "default": 0.5,
+                    "min": 0.0,
+                    "max": 100.0,
+                    "step": 0.01,
+                    "tooltip": "Base shift for Flux/LTXV sampling (default: 0.5)"
+                }),
+                "sampling_width": ("INT", {
+                    "default": 1024,
+                    "min": 16,
+                    "max": MAX_RESOLUTION,
+                    "step": 8,
+                    "tooltip": "Width for Flux sampling shift calculation"
+                }),
+                "sampling_height": ("INT", {
+                    "default": 1024,
+                    "min": 16,
+                    "max": MAX_RESOLUTION,
+                    "step": 8,
+                    "tooltip": "Height for Flux sampling shift calculation"
+                }),
+                "original_timesteps": ("INT", {
+                    "default": 50,
+                    "min": 1,
+                    "max": 1000,
+                    "step": 1,
+                    "tooltip": "Original timesteps for LCM sampling (default: 50)"
+                }),
+                "zsnr": ("BOOLEAN", {
+                    "default": False,
+                    "label_on": "yes",
+                    "label_off": "no",
+                    "tooltip": "Enable zero-terminal SNR for LCM sampling"
+                }),
+                "sigma_max": ("FLOAT", {
+                    "default": 120.0,
+                    "min": 0.0,
+                    "max": 1000.0,
+                    "step": 0.001,
+                    "tooltip": "Maximum sigma for ContinuousEDM/V sampling (EDM: 120.0, V: 500.0)"
+                }),
+                "sigma_min": ("FLOAT", {
+                    "default": 0.002,
+                    "min": 0.0,
+                    "max": 1000.0,
+                    "step": 0.001,
+                    "tooltip": "Minimum sigma for ContinuousEDM/V sampling (EDM: 0.002, V: 0.03)"
                 }),
                 
                 # CLIP Configuration Section
@@ -745,6 +1077,18 @@ class RvLoader_SmartLoader_Plus:
         configure_latent = kwargs.get('configure_latent', True)
         configure_sampler = kwargs.get('configure_sampler', True)
         configure_model_only_lora = kwargs.get('configure_model_only_lora', False)
+        configure_model_sampling = kwargs.get('configure_model_sampling', False)
+        
+        sampling_method = kwargs.get('sampling_method', 'None')
+        sampling_subtype = kwargs.get('sampling_subtype', 'eps')
+        shift = kwargs.get('shift', 3.0)
+        base_shift = kwargs.get('base_shift', 0.5)
+        sampling_width = kwargs.get('sampling_width', 1024)
+        sampling_height = kwargs.get('sampling_height', 1024)
+        original_timesteps = kwargs.get('original_timesteps', 50)
+        zsnr = kwargs.get('zsnr', False)
+        sigma_max = kwargs.get('sigma_max', 120.0)
+        sigma_min = kwargs.get('sigma_min', 0.002)
         
         clip_source = kwargs.get('clip_source', 'Baked')
         clip_count = kwargs.get('clip_count', '1')
@@ -784,6 +1128,7 @@ class RvLoader_SmartLoader_Plus:
                     "configure_latent": configure_latent,
                     "configure_sampler": configure_sampler,
                     "configure_model_only_lora": configure_model_only_lora,
+                    "configure_model_sampling": configure_model_sampling,
                 }
                 
                 # Only save the model field that matches the model_type
@@ -874,6 +1219,30 @@ class RvLoader_SmartLoader_Plus:
                         config[f"lora_name_{i}"] = kwargs.get(f'lora_name_{i}', 'None')
                         config[f"lora_weight_{i}"] = kwargs.get(f'lora_weight_{i}', 1.0)
                 
+                # Only save Model Sampling settings if configure_model_sampling is enabled (snapshot approach)
+                if configure_model_sampling:
+                    config["sampling_method"] = sampling_method
+                    
+                    # Always save shift (universal parameter)
+                    config["shift"] = shift
+                    
+                    # Save method-specific parameters based on active sampling method
+                    if sampling_method == "Flux" or sampling_method == "LTXV":
+                        config["base_shift"] = base_shift
+                    if sampling_method == "Flux":
+                        config["sampling_width"] = sampling_width
+                        config["sampling_height"] = sampling_height
+                    elif sampling_method == "LCM":
+                        config["original_timesteps"] = original_timesteps
+                        config["zsnr"] = zsnr
+                    elif sampling_method == "ContinuousEDM":
+                        config["sampling_subtype"] = sampling_subtype
+                        config["sigma_max"] = sigma_max
+                        config["sigma_min"] = sigma_min
+                    elif sampling_method == "ContinuousV":
+                        config["sigma_max"] = sigma_max
+                        config["sigma_min"] = sigma_min
+                
                 # Only add width/height if using Custom resolution
                 if configure_latent and resolution == "Custom":
                     config["width"] = width
@@ -905,6 +1274,7 @@ class RvLoader_SmartLoader_Plus:
         configure_latent = bool(configure_latent)
         configure_sampler = bool(configure_sampler)
         configure_model_only_lora = bool(configure_model_only_lora)
+        configure_model_sampling = bool(configure_model_sampling)
         enable_clip_layer = bool(enable_clip_layer)
         clip_count_int = int(clip_count)
         lora_count_int = int(lora_count)
@@ -1298,6 +1668,42 @@ class RvLoader_SmartLoader_Plus:
             if lora_params:
                 cstr(f"[LoRA] Applying {len(lora_params)} LoRA(s)...").msg.print()
                 loaded_model, loaded_clip = apply_loras_to_model(loaded_model, loaded_clip, lora_params)
+        
+        # ============================================================
+        # STEP 4.5: Apply Model Sampling (if configured)
+        # ============================================================
+        
+        if configure_model_sampling and loaded_model is not None:
+            # Auto-fill Flux dimensions from latent config if available
+            flux_width = sampling_width
+            flux_height = sampling_height
+            
+            if configure_latent and sampling_method == "Flux":
+                # Map preset resolution to width/height
+                if resolution != "Custom" and resolution in self.resolution_map:
+                    auto_width, auto_height = self.resolution_map[resolution]
+                    flux_width = auto_width
+                    flux_height = auto_height
+                else:
+                    # Use custom dimensions
+                    flux_width = width
+                    flux_height = height
+                
+                cstr(f"[Model Sampling] Auto-filled Flux dimensions from latent: {flux_width}x{flux_height}").msg.print()
+            
+            loaded_model = apply_model_sampling(
+                loaded_model, 
+                sampling_method=sampling_method,
+                shift=shift,
+                base_shift=base_shift,
+                width=flux_width,
+                height=flux_height,
+                original_timesteps=original_timesteps,
+                zsnr=zsnr,
+                sampling_subtype=sampling_subtype,
+                sigma_max=sigma_max,
+                sigma_min=sigma_min
+            )
         
         # ============================================================
         # STEP 5: Create Latent Tensor (if configured)

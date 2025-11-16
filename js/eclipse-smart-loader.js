@@ -181,6 +181,14 @@ app.registerExtension({
                 setWidgetValue("configure_clip", true);
                 setWidgetValue("configure_vae", true);
                 setWidgetValue("configure_model_only_lora", false);
+                setWidgetValue("configure_model_sampling", false);
+                
+                // Model Sampling settings - reset to defaults
+                setWidgetValue("sampling_method", "None");
+                setWidgetValue("shift", 3.0);
+                setWidgetValue("base_shift", 0.5);
+                setWidgetValue("sampling_width", 1024);
+                setWidgetValue("sampling_height", 1024);
                 
                 // CLIP settings - reset to defaults
                 setWidgetValue("clip_source", "Baked");
@@ -216,6 +224,19 @@ app.registerExtension({
                 if (config.configure_clip !== undefined) setWidgetValue("configure_clip", config.configure_clip);
                 if (config.configure_vae !== undefined) setWidgetValue("configure_vae", config.configure_vae);
                 if (config.configure_model_only_lora !== undefined) setWidgetValue("configure_model_only_lora", config.configure_model_only_lora);
+                if (config.configure_model_sampling !== undefined) setWidgetValue("configure_model_sampling", config.configure_model_sampling);
+                
+                // Model Sampling settings
+                if (config.sampling_method !== undefined) setWidgetValue("sampling_method", config.sampling_method);
+                if (config.sampling_subtype !== undefined) setWidgetValue("sampling_subtype", config.sampling_subtype);
+                if (config.shift !== undefined) setWidgetValue("shift", config.shift);
+                if (config.base_shift !== undefined) setWidgetValue("base_shift", config.base_shift);
+                if (config.sampling_width !== undefined) setWidgetValue("sampling_width", config.sampling_width);
+                if (config.sampling_height !== undefined) setWidgetValue("sampling_height", config.sampling_height);
+                if (config.original_timesteps !== undefined) setWidgetValue("original_timesteps", config.original_timesteps);
+                if (config.zsnr !== undefined) setWidgetValue("zsnr", config.zsnr);
+                if (config.sigma_max !== undefined) setWidgetValue("sigma_max", config.sigma_max);
+                if (config.sigma_min !== undefined) setWidgetValue("sigma_min", config.sigma_min);
                 
                 // Nunchaku settings
                 if (config.data_type !== undefined) setWidgetValue("data_type", config.data_type);
@@ -389,6 +410,8 @@ app.registerExtension({
                 const configureClip = getWidgetValue("configure_clip");
                 const configureVae = getWidgetValue("configure_vae");
                 const configureLora = getWidgetValue("configure_model_only_lora");
+                const configureModelSampling = getWidgetValue("configure_model_sampling");
+                const samplingMethod = getWidgetValue("sampling_method");
                 const clipSource = getWidgetValue("clip_source");
                 const clipCount = parseInt(getWidgetValue("clip_count")) || 1;
                 const vaeSource = getWidgetValue("vae_source");
@@ -463,6 +486,40 @@ app.registerExtension({
                     setWidgetVisible(`lora_weight_${i}`, showSlot);
                 }
                 
+                // Model Sampling Configuration
+                setWidgetVisible("sampling_method", configureModelSampling);
+                
+                // Method-specific visibility
+                const hasMethod = samplingMethod !== "None";
+                const isFluxSampling = (samplingMethod === "Flux");
+                const isLTXVSampling = (samplingMethod === "LTXV");
+                const isLCMSampling = (samplingMethod === "LCM");
+                const isContinuousEDM = (samplingMethod === "ContinuousEDM");
+                const isContinuousV = (samplingMethod === "ContinuousV");
+                const needsContinuousParams = isContinuousEDM || isContinuousV;
+                
+                // Universal shift (all methods except None, LCM, and Continuous*)
+                const needsShift = hasMethod && !isLCMSampling && !needsContinuousParams;
+                setWidgetVisible("shift", configureModelSampling && needsShift);
+                
+                // Flux/LTXV base_shift parameter
+                setWidgetVisible("base_shift", configureModelSampling && (isFluxSampling || isLTXVSampling));
+                
+                // Flux width/height parameters (only Flux, not LTXV)
+                setWidgetVisible("sampling_width", configureModelSampling && isFluxSampling);
+                setWidgetVisible("sampling_height", configureModelSampling && isFluxSampling);
+                
+                // LCM-specific parameters
+                setWidgetVisible("original_timesteps", configureModelSampling && isLCMSampling);
+                setWidgetVisible("zsnr", configureModelSampling && isLCMSampling);
+                
+                // ContinuousEDM subtype
+                setWidgetVisible("sampling_subtype", configureModelSampling && isContinuousEDM);
+                
+                // Continuous sigma parameters (EDM and V)
+                setWidgetVisible("sigma_max", configureModelSampling && needsContinuousParams);
+                setWidgetVisible("sigma_min", configureModelSampling && needsContinuousParams);
+                
                 // Smart resize
                 setTimeout(() => {
                     node.setDirtyCanvas(true, false);
@@ -497,6 +554,8 @@ app.registerExtension({
                 "configure_clip",
                 "configure_vae",
                 "configure_model_only_lora",
+                "configure_model_sampling",
+                "sampling_method",
                 "clip_source",
                 "clip_count",
                 "vae_source",
@@ -530,6 +589,43 @@ app.registerExtension({
                                     lastTemplateName = templateName;
                                     lastTemplateAction = templateAction;
                                 }
+                            }
+                        }
+                        
+                        // Auto-default shift when sampling_method changes (only if shift is still at default)
+                        if (widgetName === "sampling_method") {
+                            const samplingMethod = getWidgetValue("sampling_method");
+                            const currentShift = getWidgetValue("shift");
+                            
+                            // Default shift values for each method
+                            const defaultShifts = {
+                                "SD3": 3.0,
+                                "AuraFlow": 1.73,
+                                "Flux": 1.15,
+                                "Stable Cascade": 2.0,
+                                "LTXV": 2.05
+                            };
+                            
+                            // Check if current shift is close to any default (within 0.01 tolerance)
+                            const isDefaultShift = Object.values(defaultShifts).some(
+                                defShift => Math.abs(currentShift - defShift) < 0.01
+                            ) || currentShift === 3.0; // Also check against initial default
+                            
+                            // If shift is still at a default value and method has a specific default, update it
+                            if (isDefaultShift && defaultShifts[samplingMethod]) {
+                                setWidgetValue("shift", defaultShifts[samplingMethod]);
+                                console.log(`[Model Sampling] Auto-set shift to ${defaultShifts[samplingMethod]} for ${samplingMethod}`);
+                            }
+                            
+                            // Auto-set sigma defaults for Continuous methods
+                            if (samplingMethod === "ContinuousEDM") {
+                                setWidgetValue("sigma_max", 120.0);
+                                setWidgetValue("sigma_min", 0.002);
+                                console.log(`[Model Sampling] Auto-set sigma_max=120.0, sigma_min=0.002 for ContinuousEDM`);
+                            } else if (samplingMethod === "ContinuousV") {
+                                setWidgetValue("sigma_max", 500.0);
+                                setWidgetValue("sigma_min", 0.03);
+                                console.log(`[Model Sampling] Auto-set sigma_max=500.0, sigma_min=0.03 for ContinuousV`);
                             }
                         }
                         
