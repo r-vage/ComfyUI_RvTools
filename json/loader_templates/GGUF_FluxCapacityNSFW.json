@@ -5,6 +5,7 @@
   "configure_latent": true,
   "configure_sampler": true,
   "configure_model_only_lora": false,
+  "configure_model_sampling": true,
   "gguf_name": "flux\\fuxCapacityNSFWPornFlux_40Q4KS.gguf",
   "gguf_dequant_dtype": "default",
   "gguf_patch_dtype": "default",
@@ -21,5 +22,10 @@
   "scheduler": "beta",
   "steps": 24,
   "cfg": 1.0,
-  "flux_guidance": 3.5
+  "flux_guidance": 3.5,
+  "sampling_method": "Flux",
+  "shift": 1.15,
+  "base_shift": 0.5,
+  "sampling_width": 1024,
+  "sampling_height": 1024
 }

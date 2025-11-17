@@ -5,6 +5,7 @@
   "configure_latent": true,
   "configure_sampler": true,
   "configure_model_only_lora": false,
+  "configure_model_sampling": false,
   "unet_name": "flux\\Fluxmania_Kreamania_fp8.safetensors",
   "weight_dtype": "fp8_e4m3fn",
   "clip_source": "External",

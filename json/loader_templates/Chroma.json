@@ -5,17 +5,17 @@
   "configure_latent": true,
   "configure_sampler": true,
   "configure_model_only_lora": false,
-  "unet_name": "chroma_v10HD.safetensors",
+  "unet_name": "chroma-unlocked-v35-detail-calibrated_float8_e4m3fn_scaled_stochastic.safetensors",
   "weight_dtype": "default",
   "clip_source": "External",
   "clip_count": "1",
   "clip_type": "chroma",
   "clip_name1": "t5xxl_fp8_e4m3fn.safetensors",
   "vae_source": "External",
-  "vae_name": "flux_vae.safetensors",
+  "vae_name": "chroma_vae.safetensors",
   "resolution": "832x1216 (2:3 Flux, SDXL)",
   "sampler_name": "dpmpp_2m",
   "scheduler": "sgm_uniform",
-  "steps": 20,
-  "cfg": 1.0
+  "steps": 25,
+  "cfg": 3.0
 }

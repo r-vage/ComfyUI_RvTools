@@ -5,6 +5,7 @@
   "configure_latent": true,
   "configure_sampler": true,
   "configure_model_only_lora": false,
+  "configure_model_sampling": true,
   "nunchaku_name": "nunchaku\\svdq-int4_r32-flux.1-dev.safetensors",
   "data_type": "bfloat16",
   "cache_threshold": 0.0,
@@ -23,5 +24,10 @@
   "scheduler": "beta",
   "steps": 20,
   "cfg": 1.0,
-  "flux_guidance": 3.5
+  "flux_guidance": 3.5,
+  "sampling_method": "Flux",
+  "shift": 1.15,
+  "base_shift": 0.5,
+  "sampling_width": 1024,
+  "sampling_height": 1024
 }

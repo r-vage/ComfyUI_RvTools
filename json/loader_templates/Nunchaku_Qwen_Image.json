@@ -5,6 +5,7 @@
   "configure_latent": true,
   "configure_sampler": true,
   "configure_model_only_lora": true,
+  "configure_model_sampling": true,
   "qwen_name": "nunchaku\\svdq-int4_r32-qwen-image.safetensors",
   "cpu_offload": "auto",
   "num_blocks_on_gpu": 1,
@@ -29,5 +30,7 @@
   "lora_weight_2": 1.0,
   "lora_switch_3": false,
   "lora_name_3": "None",
-  "lora_weight_3": 1.0
+  "lora_weight_3": 1.0,
+  "sampling_method": "AuraFlow",
+  "shift": 3.1
 }

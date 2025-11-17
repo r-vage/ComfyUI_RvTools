@@ -5,6 +5,7 @@
   "configure_latent": true,
   "configure_sampler": true,
   "configure_model_only_lora": false,
+  "configure_model_sampling": false,
   "nunchaku_name": "nunchaku\\svdq-int4_r32-fluxmania-legacy.safetensors",
   "data_type": "bfloat16",
   "cache_threshold": 0.0,

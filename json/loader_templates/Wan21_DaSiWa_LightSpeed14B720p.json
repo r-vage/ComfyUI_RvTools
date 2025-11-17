@@ -5,6 +5,7 @@
   "configure_latent": false,
   "configure_sampler": true,
   "configure_model_only_lora": false,
+  "configure_model_sampling": true,
   "unet_name": "wan\\dasiwaWan21_lightspeedI2v14B720p.safetensors",
   "weight_dtype": "default",
   "clip_source": "External",
@@ -16,5 +17,7 @@
   "sampler_name": "euler",
   "scheduler": "simple",
   "steps": 4,
-  "cfg": 1.0
+  "cfg": 1.0,
+  "sampling_method": "SD3",
+  "shift": 5.0
 }

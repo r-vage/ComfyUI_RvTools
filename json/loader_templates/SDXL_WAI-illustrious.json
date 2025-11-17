@@ -5,6 +5,7 @@
   "configure_latent": true,
   "configure_sampler": true,
   "configure_model_only_lora": false,
+  "configure_model_sampling": false,
   "ckpt_name": "illustrious\\waiIllustriousSDXL_v150.safetensors",
   "clip_source": "Baked",
   "enable_clip_layer": true,
