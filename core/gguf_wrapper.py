@@ -56,7 +56,8 @@ GGUFModelPatcher: Optional[Any] = None
 try:
     # Check if ComfyUI-GGUF extension exists
     import sys
-    custom_nodes_path = Path(__file__).parent.parent.parent.parent
+    # Path: core/gguf_wrapper.py -> ComfyUI_Eclipse -> custom_nodes
+    custom_nodes_path = Path(__file__).parent.parent.parent
     gguf_path = custom_nodes_path / "ComfyUI-GGUF"
     
     #cstr(f"[GGUF Wrapper] Looking for ComfyUI-GGUF at: {gguf_path}").msg.print()

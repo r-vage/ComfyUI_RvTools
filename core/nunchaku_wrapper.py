@@ -36,7 +36,7 @@ from torch import nn
 
 # Import cstr for Eclipse-style logging
 try:
-    from ...core import cstr
+    from . import cstr
 except ImportError:
     # Fallback if core module not available
     class cstr:
@@ -87,7 +87,8 @@ try:
         from pathlib import Path
         
         # Look for ComfyUI-nunchaku in custom_nodes
-        custom_nodes_path = Path(__file__).parent.parent.parent.parent
+        # Path: core/nunchaku_wrapper.py -> ComfyUI_Eclipse -> custom_nodes
+        custom_nodes_path = Path(__file__).parent.parent.parent
         nunchaku_path = custom_nodes_path / "ComfyUI-nunchaku"
         
         #cstr(f"[Nunchaku Wrapper] Looking for ComfyUI-nunchaku at: {nunchaku_path}").msg.print()

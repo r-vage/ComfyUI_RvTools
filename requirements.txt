@@ -9,3 +9,9 @@ psutil
 requests
 PyYAML
 aiohttp
+
+# QwenVL Vision-Language Models
+transformers>=4.57.0
+huggingface-hub>=0.23.0
+accelerate>=0.33.0
+bitsandbytes>=0.43.0
