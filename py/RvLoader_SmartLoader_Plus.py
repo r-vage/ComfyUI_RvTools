@@ -50,7 +50,7 @@ from ..core import CATEGORY, cstr, RESOLUTION_PRESETS, RESOLUTION_MAP
 from comfy.comfy_types import IO
 
 # Import Nunchaku wrapper
-from .wrappers.nunchaku_wrapper import (
+from ..core.nunchaku_wrapper import (
     NUNCHAKU_AVAILABLE,
     detect_nunchaku_model,
     load_nunchaku_model,
@@ -58,7 +58,7 @@ from .wrappers.nunchaku_wrapper import (
 )
 
 # Import GGUF wrapper
-from .wrappers.gguf_wrapper import (
+from ..core.gguf_wrapper import (
     GGUF_AVAILABLE,
     detect_gguf_model,
     load_gguf_model
@@ -274,7 +274,7 @@ def _apply_loras_standard(model: Any, clip: Any, lora_params: list) -> tuple:
 def _apply_loras_nunchaku(model: Any, clip: Any, lora_params: list) -> tuple:
     """Apply LoRAs to Nunchaku models (FLUX or Qwen) via wrapper."""
     try:
-        from .wrappers.nunchaku_wrapper import ComfyFluxWrapper, ComfyQwenImageWrapper
+        from ..core.nunchaku_wrapper import ComfyFluxWrapper, ComfyQwenImageWrapper
     except ImportError as e:
         cstr(f"[LoRA] Nunchaku wrappers not available for LoRA application: {e}").warning.print()
         cstr("[LoRA] Returning model unchanged").msg.print()

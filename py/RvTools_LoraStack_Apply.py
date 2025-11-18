@@ -154,7 +154,7 @@ class Eclipse_LoraStack_Apply:
         try:
             # Import required Nunchaku components
             from nunchaku.lora.flux import to_diffusers  # type: ignore
-            from .wrappers.nunchaku_wrapper import ComfyFluxWrapper  # type: ignore
+            from ..core.nunchaku_wrapper import ComfyFluxWrapper  # type: ignore
         except ImportError as e:
             raise RuntimeError(
                 f"Nunchaku not available for LoRA application: {e}\n"
@@ -276,7 +276,7 @@ class Eclipse_LoraStack_Apply:
         """Apply LoRAs to Nunchaku Qwen models via ComfyQwenImageWrapper."""
         try:
             # Import required Qwen wrapper
-            from .wrappers.nunchaku_wrapper import ComfyQwenImageWrapper  # type: ignore
+            from ..core.nunchaku_wrapper import ComfyQwenImageWrapper  # type: ignore
         except ImportError as e:
             raise RuntimeError(
                 f"Nunchaku Qwen wrapper not available for LoRA application: {e}\n"

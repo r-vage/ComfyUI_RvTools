@@ -30,7 +30,7 @@ import torch
 
 # Import cstr for consistent logging
 try:
-    from ...core import cstr
+    from . import cstr
 except ImportError:
     # Fallback if core module not available
     class cstr:
