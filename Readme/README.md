@@ -35,6 +35,15 @@ Welcome to the user documentation for ComfyUI_Eclipse! This guide is designed fo
 - Nested wildcards
 - Creating wildcard files
 
+### Image Processing
+
+**[Save Images Guide](Save_Images.md)**
+- Advanced image saving with metadata
+- Placeholder system for dynamic organization
+- Generation data preservation
+- Civitai-compatible hash embedding
+- Multi-format output options
+
 ### Installation & Setup
 
 **[Nunchaku Installation Guide](Nunchaku_Installation.md)**
@@ -83,6 +92,8 @@ If you're new to ComfyUI_Eclipse loaders:
 - **Work with pipes** → [Checkpoint Loader Small (Pipe)](Checkpoint_Loaders.md#checkpoint-loader-small-pipe)
 - **Build prompts from files** → [Smart Prompt Guide](Smart_Prompt.md)
 - **Create prompt templates** → [Wildcard Processor Guide](Wildcard_Processor.md)
+- **Save images with metadata** → [Save Images Guide](Save_Images.md)
+- **Organize outputs with placeholders** → [Save Images Guide](Save_Images.md#placeholder-system)
 - **Install Nunchaku support** → [Nunchaku Installation](Nunchaku_Installation.md)
 - **Reduce VRAM with quantization** → [Nunchaku Installation](Nunchaku_Installation.md)
 
@@ -179,11 +190,9 @@ Always prefer `.safetensors` when available for safety and speed.
 
 ### What's Not Covered Here
 
-This user documentation focuses on model loaders. For other Eclipse features:
+This user documentation focuses on model loaders, text processing, and image saving. For other Eclipse features:
 
 - **Pipe System** - See main [README](../README.md#the-pipe-ecosystem-of-eclipse)
-- **Text Processing** - See [Smart Prompt](../README.md#node-spotlight-smart-prompt-eclipse) and [Wildcard Processor](../README.md#node-spotlight-wildcard-processor-eclipse)
-- **Image Saving** - See [Save Images](../README.md#node-spotlight-save-images-eclipse)
 - **Other Nodes** - See [Files by Category](../README.md#files-by-category)
 
 ---
