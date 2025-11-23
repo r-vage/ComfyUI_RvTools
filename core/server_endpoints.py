@@ -10,14 +10,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Eclipse Wildcard Processor - Server Endpoints
-
-Provides REST API endpoints for wildcard management:
-- GET /eclipse/wildcards/list - Get list of available wildcards
-- GET /eclipse/wildcards/refresh - Reload wildcards from disk
-- POST /eclipse/wildcards - Process text with wildcards
-"""
+# Eclipse Wildcard Processor - Server Endpoints
+#
+# Provides REST API endpoints for wildcard management:
+# - GET /eclipse/wildcards/list - Get list of available wildcards
+# - GET /eclipse/wildcards/refresh - Reload wildcards from disk
+# - POST /eclipse/wildcards - Process text with wildcards
 
 import json
 import os
@@ -32,15 +30,13 @@ from .wildcard_engine import (get_wildcard_list, wildcard_load, process)
 
 
 class WildcardEndpoints:
-    """Manages wildcard server endpoints."""
+    # Manages wildcard server endpoints.
 
     def __init__(self, wildcard_path: Optional[str] = None):
-        """
-        Initialize endpoints.
-        
-        Args:
-            wildcard_path: Path to wildcard directory. If None, uses default.
-        """
+        #nitialize endpoints.
+        # 
+        # Args:
+        #     wildcard_path: Path to wildcard directory. If None, uses default.
         if wildcard_path is None:
             wildcard_path = self._get_default_wildcard_path()
         
@@ -53,16 +49,14 @@ class WildcardEndpoints:
         self._register_endpoints()
     
     def _get_default_wildcard_path(self) -> str:
-        """
-        Determine the default wildcard path.
-        
-        Priority:
-        1. ComfyUI/models/wildcards (create if doesn't exist and copy examples)
-        2. Extension's wildcards/ folder (fallback)
-        
-        Returns:
-            Path to wildcard directory
-        """
+        # Determine the default wildcard path.
+        # 
+        # Priority:
+        # 1. ComfyUI/models/wildcards (create if doesn't exist and copy examples)
+        # 2. Extension's wildcards/ folder (fallback)
+        # 
+        # Returns:
+        #     Path to wildcard directory
         # Extension's wildcard folder (fallback)
         extension_root = os.path.dirname(os.path.dirname(__file__))
         extension_wildcard_path = os.path.join(extension_root, "wildcards")
@@ -93,13 +87,11 @@ class WildcardEndpoints:
             return extension_wildcard_path
     
     def _copy_example_wildcards(self, source_dir: str, dest_dir: str) -> None:
-        """
-        Copy example wildcard files from source to destination.
-        
-        Args:
-            source_dir: Source directory with example wildcards
-            dest_dir: Destination directory
-        """
+        # Copy example wildcard files from source to destination.
+        # 
+        # Args:
+        #     source_dir: Source directory with example wildcards
+        #     dest_dir: Destination directory
         import shutil
         
         try:
@@ -120,16 +112,14 @@ class WildcardEndpoints:
             cstr(f"[Wildcard] Error copying example wildcards: {e}").error.print()
 
     def _register_endpoints(self):
-        """Register all endpoints with PromptServer."""
+        # Register all endpoints with PromptServer.
         
         @PromptServer.instance.routes.get("/eclipse/wildcards/list")
         async def handle_get_wildcard_list(request):
-            """
-            GET /eclipse/wildcards/list
-            
-            Returns:
-                JSON list of available wildcards in format: ['__keyword1__', '__keyword2__', ...]
-            """
+            # GET /eclipse/wildcards/list
+            # 
+            # Returns:
+            #     JSON list of available wildcards in format: ['__keyword1__', '__keyword2__', ...]
             try:
                 wildcard_list = get_wildcard_list()
                 return web.json_response(wildcard_list)
@@ -139,14 +129,12 @@ class WildcardEndpoints:
 
         @PromptServer.instance.routes.get("/eclipse/wildcards/refresh")
         async def handle_refresh_wildcards(request):
-            """
-            GET /eclipse/wildcards/refresh
-            
-            Reloads wildcards from disk. Useful for discovering newly added wildcard files.
-            
-            Returns:
-                JSON with success status and count of loaded wildcards
-            """
+            # GET /eclipse/wildcards/refresh
+            # 
+            # Reloads wildcards from disk. Useful for discovering newly added wildcard files.
+            # 
+            # Returns:
+            #     JSON with success status and count of loaded wildcards
             try:
                 wildcard_load(self.wildcard_path)
                 wildcard_list = get_wildcard_list()
@@ -166,20 +154,18 @@ class WildcardEndpoints:
 
         @PromptServer.instance.routes.post("/eclipse/wildcards/process")
         async def handle_process_wildcards(request):
-            """
-            POST /eclipse/wildcards/process
-            
-            Process text with wildcard expansion.
-            
-            Request JSON:
-            {
-                "text": "Text with __wildcards__ and {options|go|here}",
-                "seed": 12345 (optional)
-            }
-            
-            Returns:
-                JSON with processed text
-            """
+            # POST /eclipse/wildcards/process
+            # 
+            # Process text with wildcard expansion.
+            # 
+            # Request JSON:
+            # {
+            #     "text": "Text with __wildcards__ and {options|go|here}",
+            #     "seed": 12345 (optional)
+            # }
+            # 
+            # Returns:
+            #     JSON with processed text
             try:
                 # Parse request body
                 if request.content_length:
@@ -213,20 +199,72 @@ class WildcardEndpoints:
                     "error": str(e)
                 })
 
+        @PromptServer.instance.routes.get("/eclipse/smartlml_advanced_defaults")
+        async def handle_get_smartlm_defaults(request):
+            # GET /eclipse/smartlml_advanced_defaults
+            # 
+            # Returns Smart LML advanced parameter defaults from config file.
+            # 
+            # Returns:
+            #     JSON with default parameters for each model type
+            try:
+                import folder_paths
+                # Check Eclipse folder first, fallback to repo
+                eclipse_config = os.path.join(folder_paths.models_dir, "Eclipse", "config", "smartlm_advanced_defaults.json")
+                extension_root = os.path.dirname(os.path.dirname(__file__))
+                repo_config = os.path.join(extension_root, "templates", "config", "smartlm_advanced_defaults.json")
+                config_path = eclipse_config if os.path.exists(eclipse_config) else repo_config
+                
+                if os.path.exists(config_path):
+                    with open(config_path, 'r', encoding='utf-8') as f:
+                        defaults = json.load(f)
+                    return web.json_response(defaults)
+                else:
+                    # Return built-in defaults if config doesn't exist
+                    return web.json_response({
+                        "QwenVL": {
+                            "device": "cuda",
+                            "use_torch_compile": False,
+                            "temperature": 0.7,
+                            "top_p": 0.9,
+                            "top_k": 50,
+                            "num_beams": 3,
+                            "do_sample": True,
+                            "repetition_penalty": 1.0,
+                            "frame_count": 8
+                        },
+                        "Florence2": {
+                            "device": "cuda",
+                            "use_torch_compile": False,
+                            "num_beams": 3,
+                            "do_sample": True
+                        },
+                        "LLM": {
+                            "temperature": 1.0,
+                            "top_p": 0.9,
+                            "top_k": 50,
+                            "repetition_penalty": 1.2
+                        }
+                    })
+            except Exception as e:
+                cstr(f"[SmartLM] Error loading advanced defaults: {e}").error.print()
+                return web.json_response({
+                    "success": False,
+                    "error": str(e)
+                })
+
         cstr("[Wildcard] Registered server endpoints").msg.print()
 
 
 def onprompt_populate_wildcards(json_data):
-    """
-    Preprocess wildcard nodes before execution.
-    
-    This runs BEFORE ComfyUI's execution engine, allowing us to:
-    1. Detect seed connections in the prompt
-    2. Extract actual seed values from connected nodes
-    3. Process wildcards with the correct seed
-    4. Update the prompt with processed text
-    5. Does NOT switch mode or send UI feedback (for realtime preview support)
-    """
+    # Preprocess wildcard nodes before execution.
+    # 
+    # This runs BEFORE ComfyUI's execution engine, allowing us to:
+    # 1. Detect seed connections in the prompt
+    # 2. Extract actual seed values from connected nodes
+    # 3. Process wildcards with the correct seed
+    # 4. Update the prompt with processed text
+    # 5. Does NOT switch mode or send UI feedback (for realtime preview support)
     prompt = json_data.get('prompt', {})
     
     for node_id, node_data in prompt.items():
@@ -317,12 +355,10 @@ def onprompt_populate_wildcards(json_data):
 
 # Initialize endpoints when module is imported
 def initialize_endpoints(wildcard_path: Optional[str] = None):
-    """
-    Initialize wildcard server endpoints.
-    
-    Args:
-        wildcard_path: Path to wildcard directory. If None, uses default.
-    """
+    # Initialize wildcard server endpoints.
+    # 
+    # Args:
+    #     wildcard_path: Path to wildcard directory. If None, uses default.
     try:
         WildcardEndpoints(wildcard_path)
         

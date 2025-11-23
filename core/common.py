@@ -121,17 +121,16 @@ class cstr(str):
 
 
 def purge_vram() -> None:
-    """Central helper to purge VRAM and unload models safely.
-
-    Use this from nodes instead of duplicating the try/except import and
-    GC/CUDA/model unload sequence. Any exception is reported via the
-    project's cstr warning helper so callers don't need to duplicate
-    error handling.
-    
-    This function unloads all models and clears allocator caches to free
-    maximum VRAM. This will require models to be reloaded on next use.
-    Based on comfyui-multigpu's soft_empty_cache_multigpu approach.
-    """
+    # Central helper to purge VRAM and unload models safely.
+    #
+    # Use this from nodes instead of duplicating the try/except import and
+    # GC/CUDA/model unload sequence. Any exception is reported via the
+    # project's cstr warning helper so callers don't need to duplicate
+    # error handling.
+    #
+    # This function unloads all models and clears allocator caches to free
+    # maximum VRAM. This will require models to be reloaded on next use.
+    # Based on comfyui-multigpu's soft_empty_cache_multigpu approach.
     try:
         import gc
         torch: Optional[ModuleType]
@@ -280,17 +279,15 @@ SCHEDULERS_ANY = comfy.samplers.KSampler.SCHEDULERS #+ ['AYS SDXL', 'AYS SD1', '
 
 
 def copy_prompt_files_once(source_dir: str, target_dir: str) -> bool:
-    """
-    Copy Smart Prompt files from source to target directory if target doesn't exist.
-    This is a one-time operation to enable wildcard integration.
-    
-    Args:
-        source_dir: Source directory path (ComfyUI_Eclipse/prompt/)
-        target_dir: Target directory path (ComfyUI/models/wildcards/smartprompt/)
-    
-    Returns:
-        True if copy was successful or target already exists, False on error
-    """
+    # Copy Smart Prompt files from source to target directory if target doesn't exist.
+    # This is a one-time operation to enable wildcard integration.
+    #
+    # Args:
+    #     source_dir: Source directory path (ComfyUI_Eclipse/templates/prompt/)
+    #     target_dir: Target directory path (ComfyUI/models/wildcards/smartprompt/)
+    #
+    # Returns:
+    #     True if copy was successful or target already exists, False on error
     import os
     import shutil
     
@@ -323,3 +320,134 @@ def copy_prompt_files_once(source_dir: str, target_dir: str) -> bool:
     except Exception as e:
         cstr(f"Failed to copy Smart Prompt files to wildcards: {e}").warning.print()
         return False
+
+
+def create_junction(source_dir: str, link_dir: str) -> bool:
+    # Create a junction (Windows) or symlink (Linux/macOS) from link_dir to source_dir.
+    # This enables wildcards integration without file duplication.
+    #
+    # Args:
+    #     source_dir: Target directory path (models/Eclipse/smart_prompt/)
+    #     link_dir: Junction/symlink path (models/wildcards/smart_prompt/)
+    #
+    # Returns:
+    #     True if junction created successfully or already exists, False on error
+    import os
+    import platform
+    import subprocess
+    
+    # If link already exists, skip creation
+    if os.path.exists(link_dir):
+        return True
+    
+    # If source doesn't exist, can't create junction
+    if not os.path.exists(source_dir):
+        cstr(f"Junction source directory not found: {source_dir}").warning.print()
+        return False
+    
+    try:
+        # Create parent directory if needed
+        parent_dir = os.path.dirname(link_dir)
+        os.makedirs(parent_dir, exist_ok=True)
+        
+        system = platform.system()
+        
+        if system == "Windows":
+            # Use mklink /J for directory junction on Windows
+            subprocess.run(
+                ["cmd", "/c", "mklink", "/J", link_dir, source_dir],
+                check=True,
+                capture_output=True
+            )
+            cstr(f"Created junction: wildcards/smart_prompt → Eclipse/smart_prompt").msg.print()
+        else:
+            # Use ln -s for symbolic link on Linux/macOS
+            os.symlink(source_dir, link_dir, target_is_directory=True)
+            cstr(f"Created symlink: wildcards/smart_prompt → Eclipse/smart_prompt").msg.print()
+        
+        return True
+        
+    except Exception as e:
+        # Silent failure - junction is optional for wildcards integration
+        cstr(f"Could not create junction for wildcards integration (optional): {e}").warning.print()
+        return False
+
+
+def migrate_old_folders(comfyui_root: str) -> None:
+    # Migrate user files from old folder structure to new Eclipse structure.
+    # This is a one-time migration to preserve user customizations.
+    #
+    # Old locations:
+    #   - models/smart_loader_templates → models/Eclipse/loader_templates
+    #   - models/wildcards/smartprompt → models/Eclipse/smart_prompt
+    #
+    # Args:
+    #     comfyui_root: ComfyUI root directory path
+    import os
+    import shutil
+    
+    migrations = [
+        {
+            'old': os.path.join(comfyui_root, 'models', 'smart_loader_templates'),
+            'new': os.path.join(comfyui_root, 'models', 'Eclipse', 'loader_templates'),
+            'name': 'Smart Loader templates'
+        },
+        {
+            'old': os.path.join(comfyui_root, 'models', 'wildcards', 'smartprompt'),
+            'new': os.path.join(comfyui_root, 'models', 'Eclipse', 'smart_prompt'),
+            'name': 'Smart Prompt files'
+        }
+    ]
+    
+    for migration in migrations:
+        old_path = migration['old']
+        new_path = migration['new']
+        name = migration['name']
+        
+        # Skip if old location doesn't exist
+        if not os.path.exists(old_path):
+            continue
+        
+        # Skip if new location already has content (already migrated or fresh install)
+        if os.path.exists(new_path) and os.listdir(new_path):
+            try:
+                # Clean up old location if new location exists
+                shutil.rmtree(old_path)
+                cstr(f"Removed old {name} folder (migrated previously)").msg.print()
+            except Exception as e:
+                cstr(f"Could not remove old {name} folder: {e}").warning.print()
+            continue
+        
+        try:
+            # Create parent directory if needed
+            os.makedirs(os.path.dirname(new_path), exist_ok=True)
+            
+            # Move the entire directory to new location
+            if os.path.exists(new_path):
+                # New path exists but is empty, remove it first
+                shutil.rmtree(new_path)
+            
+            shutil.move(old_path, new_path)
+            cstr(f"Migrated {name} to Eclipse folder").msg.print()
+            
+        except Exception as e:
+            # If move fails, try copy and delete
+            try:
+                os.makedirs(new_path, exist_ok=True)
+                
+                # Copy directory tree
+                for item in os.listdir(old_path):
+                    source_item = os.path.join(old_path, item)
+                    target_item = os.path.join(new_path, item)
+                    
+                    if os.path.isdir(source_item):
+                        shutil.copytree(source_item, target_item, dirs_exist_ok=True)
+                    else:
+                        shutil.copy2(source_item, target_item)
+                
+                # Remove old directory after successful copy
+                shutil.rmtree(old_path)
+                cstr(f"Migrated {name} to Eclipse folder (via copy)").msg.print()
+                
+            except Exception as copy_error:
+                cstr(f"Failed to migrate {name}: {copy_error}").warning.print()

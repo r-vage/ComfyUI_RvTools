@@ -11,24 +11,22 @@
 # limitations under the License.
 from __future__ import annotations
 
-"""
-Smart Loader Plus - Advanced Model Loader with Integrated LoRA Support
-
-Comprehensive model loader supporting multiple model formats and quantization methods:
-- Standard Checkpoints (.safetensors, .ckpt)
-- UNet-only models
-- Nunchaku quantized models (Flux and Qwen-Image with SVDQuant INT4/FP4/FP8)
-- GGUF quantized models (INT4/INT8 quantization)
-
-Features:
-- Automatic model type detection
-- Format-specific loading options (cache, attention, offload)
-- Template system for saving/loading configurations with intelligent field filtering
-- Model-only LoRA support with up to 3 slots
-- Graceful fallback when extensions are not installed
-- Comprehensive VRAM management and cleanup
-- Auto-fill template names for easy updates
-"""
+# Smart Loader Plus - Advanced Model Loader with Integrated LoRA Support
+#
+# Comprehensive model loader supporting multiple model formats and quantization methods:
+# - Standard Checkpoints (.safetensors, .ckpt)
+# - UNet-only models
+# - Nunchaku quantized models (Flux and Qwen-Image with SVDQuant INT4/FP4/FP8)
+# - GGUF quantized models (INT4/INT8 quantization)
+#
+# Features:
+# - Automatic model type detection
+# - Format-specific loading options (cache, attention, offload)
+# - Template system for saving/loading configurations with intelligent field filtering
+# - Model-only LoRA support with up to 3 slots
+# - Graceful fallback when extensions are not installed
+# - Comprehensive VRAM management and cleanup
+# - Auto-fill template names for easy updates
 
 from typing import Any
 import os
@@ -118,10 +116,10 @@ LATENT_CHANNELS = 4
 UNET_DOWNSAMPLE = 8
 
 # Template system - use ComfyUI models folder as primary location
-TEMPLATE_DIR = os.path.join(folder_paths.models_dir, "smart_loader_templates")
+TEMPLATE_DIR = os.path.join(folder_paths.models_dir, "Eclipse", "loader_templates")
 
 def cleanup_memory_before_load():
-    """Clean up memory before loading a new model."""
+    # Clean up memory before loading a new model
     cstr("[Memory Cleanup] Starting pre-load memory cleanup...").msg.print()
     gc.collect()
     
@@ -146,11 +144,11 @@ def cleanup_memory_before_load():
     cstr("[Memory Cleanup] ✓ Memory cleanup complete").msg.print()
 
 def ensure_template_dir():
-    """Ensure template directory exists"""
+    # Ensure template directory exists
     os.makedirs(TEMPLATE_DIR, exist_ok=True)
 
 def get_template_list():
-    """Get list of available templates"""
+    # Get list of available templates
     ensure_template_dir()
     templates = ["None"]
     try:
@@ -162,7 +160,7 @@ def get_template_list():
     return templates
 
 def save_template(name: str, config: dict):
-    """Save a configuration template"""
+    # Save a configuration template
     ensure_template_dir()
     template_path = os.path.join(TEMPLATE_DIR, f"{name}.json")
     try:
@@ -174,7 +172,7 @@ def save_template(name: str, config: dict):
         return False
 
 def load_template(name: str) -> dict:
-    """Load a configuration template"""
+    # Load a configuration template
     if name == "None" or not name:
         return {}
     
@@ -188,7 +186,7 @@ def load_template(name: str) -> dict:
     return {}
 
 def delete_template(name: str):
-    """Delete a configuration template"""
+    # Delete a configuration template
     if name == "None" or not name:
         return False
     
@@ -202,7 +200,7 @@ def delete_template(name: str):
     return False
 
 def _detect_latent_channels_from_vae_obj(vae_obj) -> int:
-    """Infer latent channel count from a VAE-like object."""
+    # Infer latent channel count from a VAE-like object
     try:
         if hasattr(vae_obj, 'channels') and isinstance(getattr(vae_obj, 'channels'), int):
             return getattr(vae_obj, 'channels')
@@ -217,7 +215,7 @@ def _detect_latent_channels_from_vae_obj(vae_obj) -> int:
     return LATENT_CHANNELS
 
 def is_nunchaku_model(model: Any) -> bool:
-    """Check if a model is a Nunchaku model (FLUX or Qwen) by detecting wrapper class."""
+    # Check if a model is a Nunchaku model (FLUX or Qwen) by detecting wrapper class
     try:
         model_wrapper = model.model.diffusion_model
         
@@ -232,17 +230,15 @@ def is_nunchaku_model(model: Any) -> bool:
         return False
 
 def apply_loras_to_model(model: Any, clip: Any, lora_params: list) -> tuple:
-    """
-    Apply LoRAs to model (standard or Nunchaku).
-    
-    Parameters:
-        model: The model to apply LoRAs to
-        clip: The CLIP model (for standard models only)
-        lora_params: List of tuples (lora_name, model_weight)
-    
-    Returns:
-        (modified_model, modified_clip)
-    """
+    # Apply LoRAs to model (standard or Nunchaku).
+    #
+    # Parameters:
+    #     model: The model to apply LoRAs to
+    #     clip: The CLIP model (for standard models only)
+    #     lora_params: List of tuples (lora_name, model_weight)
+    #
+    # Returns:
+    #     (modified_model, modified_clip)
     if not lora_params:
         return (model, clip)
     
@@ -255,7 +251,7 @@ def apply_loras_to_model(model: Any, clip: Any, lora_params: list) -> tuple:
         return _apply_loras_standard(model, clip, lora_params)
 
 def _apply_loras_standard(model: Any, clip: Any, lora_params: list) -> tuple:
-    """Apply LoRAs to standard (non-Nunchaku) models using ComfyUI's loader."""
+    # Apply LoRAs to standard (non-Nunchaku) models using ComfyUI's loader
     model_lora = model
     clip_lora = clip
     
@@ -272,7 +268,7 @@ def _apply_loras_standard(model: Any, clip: Any, lora_params: list) -> tuple:
     return (model_lora, clip_lora)
 
 def _apply_loras_nunchaku(model: Any, clip: Any, lora_params: list) -> tuple:
-    """Apply LoRAs to Nunchaku models (FLUX or Qwen) via wrapper."""
+    # Apply LoRAs to Nunchaku models (FLUX or Qwen) via wrapper
     try:
         from ..core.nunchaku_wrapper import ComfyFluxWrapper, ComfyQwenImageWrapper
     except ImportError as e:
@@ -419,25 +415,23 @@ def apply_model_sampling(model, sampling_method: str, shift: float, base_shift: 
                          width: int = 1024, height: int = 1024, original_timesteps: int = 50,
                          zsnr: bool = False, sampling_subtype: str = "eps", 
                          sigma_max: float = 120.0, sigma_min: float = 0.002):
-    """
-    Apply model sampling configuration based on method.
-    
-    Parameters:
-        model: The model to patch
-        sampling_method: Sampling method (SD3, AuraFlow, Flux, Stable Cascade, LCM, ContinuousEDM, ContinuousV, LTXV, or None)
-        shift: Universal shift parameter (used as shift for SD3/AuraFlow/Stable Cascade, max_shift for Flux/LTXV)
-        base_shift: Base shift for Flux/LTXV sampling (default: 0.5)
-        width: Width for Flux sampling shift calculation (default: 1024)
-        height: Height for Flux sampling shift calculation (default: 1024)
-        original_timesteps: Original timesteps for LCM sampling (default: 50)
-        zsnr: Enable zero-terminal SNR for LCM sampling (default: False)
-        sampling_subtype: Subtype for ContinuousEDM (eps, v_prediction, edm, edm_playground_v2.5, cosmos_rflow)
-        sigma_max: Maximum sigma for ContinuousEDM/V (default: 120.0)
-        sigma_min: Minimum sigma for ContinuousEDM/V (default: 0.002)
-    
-    Returns:
-        Patched model or original model if method is "None"
-    """
+    # Apply model sampling configuration based on method.
+    #
+    # Parameters:
+    #     model: The model to patch
+    #     sampling_method: Sampling method (SD3, AuraFlow, Flux, Stable Cascade, LCM, ContinuousEDM, ContinuousV, LTXV, or None)
+    #     shift: Universal shift parameter (used as shift for SD3/AuraFlow/Stable Cascade, max_shift for Flux/LTXV)
+    #     base_shift: Base shift for Flux/LTXV sampling (default: 0.5)
+    #     width: Width for Flux sampling shift calculation (default: 1024)
+    #     height: Height for Flux sampling shift calculation (default: 1024)
+    #     original_timesteps: Original timesteps for LCM sampling (default: 50)
+    #     zsnr: Enable zero-terminal SNR for LCM sampling (default: False)
+    #     sampling_subtype: Subtype for ContinuousEDM (eps, v_prediction, edm, edm_playground_v2.5, cosmos_rflow)
+    #     sigma_max: Maximum sigma for ContinuousEDM/V (default: 120.0)
+    #     sigma_min: Minimum sigma for ContinuousEDM/V (default: 0.002)
+    #
+    # Returns:
+    #     Patched model or original model if method is "None"
     if sampling_method == "None" or not sampling_method:
         return model
     
@@ -462,13 +456,13 @@ def apply_model_sampling(model, sampling_method: str, shift: float, base_shift: 
         return model
 
 def _apply_sd3_sampling(model, shift: float, multiplier: float = 1000.0):
-    """Apply SD3 sampling (ModelSamplingDiscreteFlow + CONST)"""
+    # Apply SD3 sampling (ModelSamplingDiscreteFlow + CONST)
     m = model.clone()
     
     sampling_base = comfy.model_sampling.ModelSamplingDiscreteFlow
     sampling_type = comfy.model_sampling.CONST
     
-    class ModelSamplingAdvanced(sampling_base, sampling_type):
+    class ModelSamplingAdvanced(sampling_base, sampling_type):  # type: ignore[misc,valid-type]
         pass
     
     model_sampling = ModelSamplingAdvanced(model.model.model_config)
@@ -479,13 +473,13 @@ def _apply_sd3_sampling(model, shift: float, multiplier: float = 1000.0):
     return m
 
 def _apply_auraflow_sampling(model, shift: float, multiplier: float = 1.0):
-    """Apply AuraFlow sampling (ModelSamplingDiscreteFlow + CONST with multiplier=1.0)"""
+    # Apply AuraFlow sampling (ModelSamplingDiscreteFlow + CONST with multiplier=1.0)
     m = model.clone()
     
     sampling_base = comfy.model_sampling.ModelSamplingDiscreteFlow
     sampling_type = comfy.model_sampling.CONST
     
-    class ModelSamplingAdvanced(sampling_base, sampling_type):
+    class ModelSamplingAdvanced(sampling_base, sampling_type):  # type: ignore[misc,valid-type]
         pass
     
     model_sampling = ModelSamplingAdvanced(model.model.model_config)
@@ -496,7 +490,7 @@ def _apply_auraflow_sampling(model, shift: float, multiplier: float = 1.0):
     return m
 
 def _apply_flux_sampling(model, max_shift: float, base_shift: float, width: int, height: int):
-    """Apply Flux sampling (ModelSamplingFlux + CONST with calculated shift)"""
+    # Apply Flux sampling (ModelSamplingFlux + CONST with calculated shift)
     m = model.clone()
     
     # Calculate shift using linear interpolation formula based on image dimensions
@@ -512,7 +506,7 @@ def _apply_flux_sampling(model, max_shift: float, base_shift: float, width: int,
     sampling_base = comfy.model_sampling.ModelSamplingFlux
     sampling_type = comfy.model_sampling.CONST
     
-    class ModelSamplingAdvanced(sampling_base, sampling_type):
+    class ModelSamplingAdvanced(sampling_base, sampling_type):  # type: ignore[misc,valid-type]
         pass
     
     model_sampling = ModelSamplingAdvanced(model.model.model_config)
@@ -523,13 +517,13 @@ def _apply_flux_sampling(model, max_shift: float, base_shift: float, width: int,
     return m
 
 def _apply_stable_cascade_sampling(model, shift: float):
-    """Apply Stable Cascade sampling (StableCascadeSampling + EPS)"""
+    # Apply Stable Cascade sampling (StableCascadeSampling + EPS)
     m = model.clone()
     
     sampling_base = comfy.model_sampling.StableCascadeSampling
     sampling_type = comfy.model_sampling.EPS
     
-    class ModelSamplingAdvanced(sampling_base, sampling_type):
+    class ModelSamplingAdvanced(sampling_base, sampling_type):  # type: ignore[misc,valid-type]
         pass
     
     model_sampling = ModelSamplingAdvanced(model.model.model_config)
@@ -540,7 +534,7 @@ def _apply_stable_cascade_sampling(model, shift: float):
     return m
 
 def _apply_lcm_sampling(model, original_timesteps: int = 50, zsnr: bool = False):
-    """Apply LCM sampling (ModelSamplingDiscreteDistilled + LCM)"""
+    # Apply LCM sampling (ModelSamplingDiscreteDistilled + LCM)
     m = model.clone()
     
     # Define LCM sampling type
@@ -587,7 +581,7 @@ def _apply_lcm_sampling(model, original_timesteps: int = 50, zsnr: bool = False)
     sampling_base = ModelSamplingDiscreteDistilled
     sampling_type = LCM
     
-    class ModelSamplingAdvanced(sampling_base, sampling_type):
+    class ModelSamplingAdvanced(sampling_base, sampling_type):  # type: ignore[misc,valid-type]
         pass
     
     model_sampling = ModelSamplingAdvanced(model.model.model_config)
@@ -597,7 +591,7 @@ def _apply_lcm_sampling(model, original_timesteps: int = 50, zsnr: bool = False)
     return m
 
 def _apply_continuous_edm_sampling(model, sampling_subtype: str = "eps", sigma_max: float = 120.0, sigma_min: float = 0.002):
-    """Apply ContinuousEDM sampling"""
+    # Apply ContinuousEDM sampling
     m = model.clone()
     
     sampling_base = comfy.model_sampling.ModelSamplingContinuousEDM
@@ -620,7 +614,7 @@ def _apply_continuous_edm_sampling(model, sampling_subtype: str = "eps", sigma_m
         cstr(f"[Model Sampling] Unknown ContinuousEDM subtype '{sampling_subtype}', using eps").warning.print()
         sampling_type = comfy.model_sampling.EPS
     
-    class ModelSamplingAdvanced(sampling_base, sampling_type):
+    class ModelSamplingAdvanced(sampling_base, sampling_type):  # type: ignore[misc,valid-type]
         pass
     
     model_sampling = ModelSamplingAdvanced(model.model.model_config)
@@ -633,13 +627,13 @@ def _apply_continuous_edm_sampling(model, sampling_subtype: str = "eps", sigma_m
     return m
 
 def _apply_continuous_v_sampling(model, sigma_max: float = 500.0, sigma_min: float = 0.03):
-    """Apply ContinuousV sampling (v_prediction only)"""
+    # Apply ContinuousV sampling (v_prediction only)
     m = model.clone()
     
     sampling_type = comfy.model_sampling.V_PREDICTION
     sigma_data = 1.0
     
-    class ModelSamplingAdvanced(comfy.model_sampling.ModelSamplingContinuousV, sampling_type):
+    class ModelSamplingAdvanced(comfy.model_sampling.ModelSamplingContinuousV, sampling_type):  # type: ignore[misc,valid-type]
         pass
     
     model_sampling = ModelSamplingAdvanced(model.model.model_config)
@@ -650,7 +644,7 @@ def _apply_continuous_v_sampling(model, sigma_max: float = 500.0, sigma_min: flo
     return m
 
 def _apply_ltxv_sampling(model, max_shift: float = 2.05, base_shift: float = 0.95):
-    """Apply LTXV sampling (for video models, uses token-based shift calculation)"""
+    # Apply LTXV sampling (for video models, uses token-based shift calculation)
     m = model.clone()
     
     # LTXV uses token count instead of width/height
@@ -667,7 +661,7 @@ def _apply_ltxv_sampling(model, max_shift: float = 2.05, base_shift: float = 0.9
     sampling_base = comfy.model_sampling.ModelSamplingFlux
     sampling_type = comfy.model_sampling.CONST
     
-    class ModelSamplingAdvanced(sampling_base, sampling_type):
+    class ModelSamplingAdvanced(sampling_base, sampling_type):  # type: ignore[misc,valid-type]
         pass
     
     model_sampling = ModelSamplingAdvanced(model.model.model_config)
@@ -713,362 +707,77 @@ class RvLoader_SmartLoader_Plus:
             clip_files.extend(folder_paths.get_filename_list("text_encoders"))
         clips = ["None"] + clip_files
         
-        inputs = {
+        return {
             "required": {
-                # Template management
-                "template_action": (["None", "Load", "Save", "Delete"], {
-                    "default": "None",
-                    "tooltip": "Load/Save/Delete configuration templates"
-                }),
-                "template_name": (get_template_list(), {
-                    "default": "None",
-                    "tooltip": "Select template to load/delete"
-                }),
-                "new_template_name": ("STRING", {
-                    "default": "",
-                    "tooltip": "Name for new template (when saving)"
-                }),
-                
-                # Model selection
-                "model_type": (["Standard Checkpoint", "UNet Model", "Nunchaku Flux", "Nunchaku Qwen", "GGUF Model"], {
-                    "default": "Standard Checkpoint",
-                    "tooltip": "Select model type"
-                }),
-                "ckpt_name": (["None"] + folder_paths.get_filename_list("checkpoints"), {
-                    "default": "None",
-                    "tooltip": "Select checkpoint file"
-                }),
-                "unet_name": (["None"] + folder_paths.get_filename_list("diffusion_models"), {
-                    "default": "None",
-                    "tooltip": "Select UNet diffusion model"
-                }),
-                "nunchaku_name": (["None"] + folder_paths.get_filename_list("diffusion_models"), {
-                    "default": "None",
-                    "tooltip": "Select Nunchaku Flux model"
-                }),
-                "qwen_name": (["None"] + folder_paths.get_filename_list("diffusion_models"), {
-                    "default": "None",
-                    "tooltip": "Select Nunchaku Qwen model"
-                }),
-                "gguf_name": (["None"] + (folder_paths.get_filename_list("diffusion_models_gguf") if "diffusion_models_gguf" in folder_paths.folder_names_and_paths else []), {
-                    "default": "None",
-                    "tooltip": "Select GGUF model"
-                }),
-                "weight_dtype": (weight_dtype_options, {
-                    "default": "default",
-                    "tooltip": "Weight dtype for UNet model"
-                }),
-                
-                # Nunchaku settings
-                "data_type": (["bfloat16", "float16"], {
-                    "default": "bfloat16",
-                    "tooltip": "Model data type for Nunchaku"
-                }),
-                "cache_threshold": ("FLOAT", {
-                    "default": 0.0,
-                    "min": 0.0,
-                    "max": 1.0,
-                    "step": 0.001,
-                    "tooltip": "Cache threshold for Nunchaku"
-                }),
-                "attention": (["flash-attention2", "nunchaku-fp16"], {
-                    "default": "flash-attention2",
-                    "tooltip": "Attention implementation"
-                }),
-                "i2f_mode": (["enabled", "always"], {
-                    "default": "enabled",
-                    "tooltip": "GEMM implementation"
-                }),
-                "cpu_offload": (["auto", "enable", "disable"], {
-                    "default": "auto",
-                    "tooltip": "CPU offload"
-                }),
-                "num_blocks_on_gpu": ("INT", {
-                    "default": 30,
-                    "min": 1,
-                    "max": 60,
-                    "step": 1,
-                    "tooltip": "Blocks on GPU (Nunchaku Qwen)"
-                }),
-                "use_pin_memory": (["enable", "disable"], {
-                    "default": "enable",
-                    "tooltip": "Use pinned memory"
-                }),
-                
-                # GGUF settings
-                "gguf_dequant_dtype": (["default", "target", "float32", "float16", "bfloat16"], {
-                    "default": "default",
-                    "tooltip": "Dequantization dtype"
-                }),
-                "gguf_patch_dtype": (["default", "target", "float32", "float16", "bfloat16"], {
-                    "default": "default",
-                    "tooltip": "LoRA patch dtype"
-                }),
-                "gguf_patch_on_device": ("BOOLEAN", {
-                    "default": False, "label_on": "yes", "label_off": "no",
-                    "tooltip": "Apply patches on GPU"
-                }),
-                
-                # Configuration toggles
-                "configure_clip": ("BOOLEAN", {
-                    "default": True, "label_on": "yes", "label_off": "no",
-                    "tooltip": "Enable CLIP configuration"
-                }),
-                "configure_vae": ("BOOLEAN", {
-                    "default": True, "label_on": "yes", "label_off": "no",
-                    "tooltip": "Enable VAE configuration"
-                }),
-                "configure_latent": ("BOOLEAN", {
-                    "default": True, "label_on": "yes", "label_off": "no",
-                    "tooltip": "Enable latent configuration"
-                }),
-                "configure_sampler": ("BOOLEAN", {
-                    "default": True, "label_on": "yes", "label_off": "no",
-                    "tooltip": "Enable sampler configuration"
-                }),
-                "configure_model_only_lora": ("BOOLEAN", {
-                    "default": False, "label_on": "yes", "label_off": "no",
-                    "tooltip": "Enable model-only LoRA configuration"
-                }),
-                "configure_model_sampling": ("BOOLEAN", {
-                    "default": False, "label_on": "yes", "label_off": "no",
-                    "tooltip": "Enable advanced model sampling configuration"
-                }),
-                
-                # Model Sampling Configuration
-                "sampling_method": (["None", "SD3", "AuraFlow", "Flux", "Stable Cascade", "LCM", "ContinuousEDM", "ContinuousV", "LTXV"], {
-                    "default": "None",
-                    "tooltip": "Sampling method: SD3 (shift=3.0), AuraFlow (shift=1.73), Flux (max_shift=1.15), Stable Cascade (shift=2.0), LCM (distilled), ContinuousEDM/V (continuous sampling), LTXV (video)"
-                }),
-                "sampling_subtype": (["eps", "v_prediction", "edm", "edm_playground_v2.5", "cosmos_rflow"], {
-                    "default": "eps",
-                    "tooltip": "Subtype for ContinuousEDM sampling (eps, v_prediction, edm, edm_playground_v2.5, cosmos_rflow)"
-                }),
-                "shift": ("FLOAT", {
-                    "default": 3.0,
-                    "min": 0.0,
-                    "max": 100.0,
-                    "step": 0.01,
-                    "tooltip": "Universal shift parameter (SD3: 3.0, AuraFlow: 1.73, Flux max_shift: 1.15, Stable Cascade: 2.0)"
-                }),
-                "base_shift": ("FLOAT", {
-                    "default": 0.5,
-                    "min": 0.0,
-                    "max": 100.0,
-                    "step": 0.01,
-                    "tooltip": "Base shift for Flux/LTXV sampling (default: 0.5)"
-                }),
-                "sampling_width": ("INT", {
-                    "default": 1024,
-                    "min": 16,
-                    "max": MAX_RESOLUTION,
-                    "step": 8,
-                    "tooltip": "Width for Flux sampling shift calculation"
-                }),
-                "sampling_height": ("INT", {
-                    "default": 1024,
-                    "min": 16,
-                    "max": MAX_RESOLUTION,
-                    "step": 8,
-                    "tooltip": "Height for Flux sampling shift calculation"
-                }),
-                "original_timesteps": ("INT", {
-                    "default": 50,
-                    "min": 1,
-                    "max": 1000,
-                    "step": 1,
-                    "tooltip": "Original timesteps for LCM sampling (default: 50)"
-                }),
-                "zsnr": ("BOOLEAN", {
-                    "default": False,
-                    "label_on": "yes",
-                    "label_off": "no",
-                    "tooltip": "Enable zero-terminal SNR for LCM sampling"
-                }),
-                "sigma_max": ("FLOAT", {
-                    "default": 120.0,
-                    "min": 0.0,
-                    "max": 1000.0,
-                    "step": 0.001,
-                    "tooltip": "Maximum sigma for ContinuousEDM/V sampling (EDM: 120.0, V: 500.0)"
-                }),
-                "sigma_min": ("FLOAT", {
-                    "default": 0.002,
-                    "min": 0.0,
-                    "max": 1000.0,
-                    "step": 0.001,
-                    "tooltip": "Minimum sigma for ContinuousEDM/V sampling (EDM: 0.002, V: 0.03)"
-                }),
-                
-                # CLIP Configuration Section
-                "clip_source": (["Baked", "External"], {
-                    "default": "Baked",
-                    "tooltip": "CLIP source"
-                }),
-                "clip_count": (["1", "2", "3", "4"], {
-                    "default": "1",
-                    "tooltip": "Number of CLIP models"
-                }),
-                "clip_name1": (clips, {
-                    "default": "None",
-                    "tooltip": "Primary CLIP model"
-                }),
-                "clip_name2": (clips, {
-                    "default": "None",
-                    "tooltip": "Secondary CLIP model"
-                }),
-                "clip_name3": (clips, {
-                    "default": "None",
-                    "tooltip": "Third CLIP model"
-                }),
-                "clip_name4": (clips, {
-                    "default": "None",
-                    "tooltip": "Fourth CLIP model"
-                }),
-                "clip_type": (["flux", "sd3", "sdxl", "stable_cascade", "stable_audio", "hunyuan_dit", "mochi", "ltxv", "hunyuan_video", "pixart", "cosmos", "lumina2", "wan", "hidream", "chroma", "ace", "omnigen2", "qwen_image", "hunyuan_image"], {
-                    "default": "flux",
-                    "tooltip": "CLIP architecture type"
-                }),
-                "enable_clip_layer": ("BOOLEAN", {
-                    "default": True,
-                    "label_on": "yes",
-                    "label_off": "no",
-                    "tooltip": "Trim CLIP to specific layer"
-                }),
-                "stop_at_clip_layer": ("INT", {
-                    "default": -2,
-                    "min": -24,
-                    "max": -1,
-                    "step": 1,
-                    "tooltip": "CLIP layer to stop at"
-                }),
-                
-                # VAE settings
-                "vae_source": (["Baked", "External"], {
-                    "default": "Baked",
-                    "tooltip": "VAE source"
-                }),
-                "vae_name": (["None"] + folder_paths.get_filename_list("vae"), {
-                    "default": "None",
-                    "tooltip": "External VAE file"
-                }),
-                
-                # Latent settings
-                "resolution": (cls.resolution, {
-                    "default": "1024x1024 (1:1)",
-                    "tooltip": "Preset resolution or Custom"
-                }),
-                "width": ("INT", {
-                    "default": 1024,
-                    "min": 16,
-                    "max": MAX_RESOLUTION,
-                    "step": 8,
-                    "tooltip": "Custom width"
-                }),
-                "height": ("INT", {
-                    "default": 1024,
-                    "min": 16,
-                    "max": MAX_RESOLUTION,
-                    "step": 8,
-                    "tooltip": "Custom height"
-                }),
-                
-                # LoRA configuration
-                "lora_count": (["1", "2", "3"], {
-                    "default": "1",
-                    "tooltip": "Number of LoRA slots to configure"
-                }),
-                
-                # LoRA slot 1
-                "lora_switch_1": ("BOOLEAN", {
-                    "default": False, "label_on": "ON", "label_off": "OFF",
-                    "tooltip": "Enable LoRA 1"
-                }),
-                "lora_name_1": (loras, {
-                    "default": "None",
-                    "tooltip": "LoRA 1 file"
-                }),
-                "lora_weight_1": ("FLOAT", {
-                    "default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01,
-                    "tooltip": "LoRA 1 model weight"
-                }),
-                
-                # LoRA slot 2
-                "lora_switch_2": ("BOOLEAN", {
-                    "default": False, "label_on": "ON", "label_off": "OFF",
-                    "tooltip": "Enable LoRA 2"
-                }),
-                "lora_name_2": (loras, {
-                    "default": "None",
-                    "tooltip": "LoRA 2 file"
-                }),
-                "lora_weight_2": ("FLOAT", {
-                    "default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01,
-                    "tooltip": "LoRA 2 model weight"
-                }),
-                
-                # LoRA slot 3
-                "lora_switch_3": ("BOOLEAN", {
-                    "default": False, "label_on": "ON", "label_off": "OFF",
-                    "tooltip": "Enable LoRA 3"
-                }),
-                "lora_name_3": (loras, {
-                    "default": "None",
-                    "tooltip": "LoRA 3 file"
-                }),
-                "lora_weight_3": ("FLOAT", {
-                    "default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01,
-                    "tooltip": "LoRA 3 model weight"
-                }),
-                
-                # Sampler settings
-                "sampler_name": (comfy.samplers.KSampler.SAMPLERS, {
-                    "default": "euler",
-                    "tooltip": "Sampling algorithm"
-                }),
-                "scheduler": (comfy.samplers.KSampler.SCHEDULERS, {
-                    "default": "normal",
-                    "tooltip": "Scheduler"
-                }),
-                "steps": ("INT", {
-                    "default": 20,
-                    "min": 1,
-                    "max": 10000,
-                    "tooltip": "Sampling steps"
-                }),
-                "cfg": ("FLOAT", {
-                    "default": 8.0,
-                    "min": 0.0,
-                    "max": 100.0,
-                    "step": 0.1,
-                    "round": 0.01,
-                    "tooltip": "CFG scale"
-                }),
-                "flux_guidance": ("FLOAT", {
-                    "default": 3.5,
-                    "min": 0.0,
-                    "max": 100.0,
-                    "step": 0.1,
-                    "tooltip": "Flux guidance scale"
-                }),
-                
-                # Latent batch size
-                "batch_size": ("INT", {
-                    "default": 1,
-                    "min": 1,
-                    "max": 4096,
-                    "tooltip": "Batch size"
-                }),
-                
-                # Memory management
-                "memory_cleanup": ("BOOLEAN", {
-                    "default": True, "label_on": "yes", "label_off": "no",
-                    "tooltip": "Perform memory cleanup before loading"
-                }),
+                "template_action": (["None", "Load", "Save", "Delete"], {"default": "None", "tooltip": "Load/Save/Delete configuration templates"}),
+                "template_name": (get_template_list(), {"default": "None", "tooltip": "Select template to load/delete"}),
+                "new_template_name": ("STRING", {"default": "", "tooltip": "Name for new template (when saving)"}),
+                "model_type": (["Standard Checkpoint", "UNet Model", "Nunchaku Flux", "Nunchaku Qwen", "GGUF Model"], {"default": "Standard Checkpoint", "tooltip": "Select model type"}),
+                "ckpt_name": (["None"] + folder_paths.get_filename_list("checkpoints"), {"default": "None", "tooltip": "Select checkpoint file"}),
+                "unet_name": (["None"] + folder_paths.get_filename_list("diffusion_models"), {"default": "None", "tooltip": "Select UNet diffusion model"}),
+                "nunchaku_name": (["None"] + folder_paths.get_filename_list("diffusion_models"), {"default": "None", "tooltip": "Select Nunchaku Flux model"}),
+                "qwen_name": (["None"] + folder_paths.get_filename_list("diffusion_models"), {"default": "None", "tooltip": "Select Nunchaku Qwen model"}),
+                "gguf_name": (["None"] + (folder_paths.get_filename_list("diffusion_models_gguf") if "diffusion_models_gguf" in folder_paths.folder_names_and_paths else []), {"default": "None", "tooltip": "Select GGUF model"}),
+                "weight_dtype": (weight_dtype_options, {"default": "default", "tooltip": "Weight dtype for UNet model"}),
+                "data_type": (["bfloat16", "float16"], {"default": "bfloat16", "tooltip": "Model data type for Nunchaku"}),
+                "cache_threshold": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 1.0, "step": 0.001, "tooltip": "Cache threshold for Nunchaku"}),
+                "attention": (["flash-attention2", "nunchaku-fp16"], {"default": "flash-attention2", "tooltip": "Attention implementation"}),
+                "i2f_mode": (["enabled", "always"], {"default": "enabled", "tooltip": "GEMM implementation"}),
+                "cpu_offload": (["auto", "enable", "disable"], {"default": "auto", "tooltip": "CPU offload"}),
+                "num_blocks_on_gpu": ("INT", {"default": 30, "min": 1, "max": 60, "step": 1, "tooltip": "Blocks on GPU (Nunchaku Qwen)"}),
+                "use_pin_memory": (["enable", "disable"], {"default": "enable", "tooltip": "Use pinned memory"}),
+                "gguf_dequant_dtype": (["default", "target", "float32", "float16", "bfloat16"], {"default": "default", "tooltip": "Dequantization dtype"}),
+                "gguf_patch_dtype": (["default", "target", "float32", "float16", "bfloat16"], {"default": "default", "tooltip": "LoRA patch dtype"}),
+                "gguf_patch_on_device": ("BOOLEAN", {"default": False, "label_on": "yes", "label_off": "no", "tooltip": "Apply patches on GPU"}),
+                "configure_clip": ("BOOLEAN", {"default": True, "label_on": "yes", "label_off": "no", "tooltip": "Enable CLIP configuration"}),
+                "configure_vae": ("BOOLEAN", {"default": True, "label_on": "yes", "label_off": "no", "tooltip": "Enable VAE configuration"}),
+                "configure_latent": ("BOOLEAN", {"default": True, "label_on": "yes", "label_off": "no", "tooltip": "Enable latent configuration"}),
+                "configure_sampler": ("BOOLEAN", {"default": True, "label_on": "yes", "label_off": "no", "tooltip": "Enable sampler configuration"}),
+                "configure_model_only_lora": ("BOOLEAN", {"default": False, "label_on": "yes", "label_off": "no", "tooltip": "Enable model-only LoRA configuration"}),
+                "configure_model_sampling": ("BOOLEAN", {"default": False, "label_on": "yes", "label_off": "no", "tooltip": "Enable advanced model sampling configuration"}),
+                "sampling_method": (["None", "SD3", "AuraFlow", "Flux", "Stable Cascade", "LCM", "ContinuousEDM", "ContinuousV", "LTXV"], {"default": "None", "tooltip": "Sampling method: SD3 (shift=3.0), AuraFlow (shift=1.73), Flux (max_shift=1.15), Stable Cascade (shift=2.0), LCM (distilled), ContinuousEDM/V (continuous sampling), LTXV (video)"}),
+                "sampling_subtype": (["eps", "v_prediction", "edm", "edm_playground_v2.5", "cosmos_rflow"], {"default": "eps", "tooltip": "Subtype for ContinuousEDM sampling (eps, v_prediction, edm, edm_playground_v2.5, cosmos_rflow)"}),
+                "shift": ("FLOAT", {"default": 3.0, "min": 0.0, "max": 100.0, "step": 0.01, "tooltip": "Universal shift parameter (SD3: 3.0, AuraFlow: 1.73, Flux max_shift: 1.15, Stable Cascade: 2.0)"}),
+                "base_shift": ("FLOAT", {"default": 0.5, "min": 0.0, "max": 100.0, "step": 0.01, "tooltip": "Base shift for Flux/LTXV sampling (default: 0.5)"}),
+                "sampling_width": ("INT", {"default": 1024, "min": 16, "max": MAX_RESOLUTION, "step": 8, "tooltip": "Width for Flux sampling shift calculation"}),
+                "sampling_height": ("INT", {"default": 1024, "min": 16, "max": MAX_RESOLUTION, "step": 8, "tooltip": "Height for Flux sampling shift calculation"}),
+                "original_timesteps": ("INT", {"default": 50, "min": 1, "max": 1000, "step": 1, "tooltip": "Original timesteps for LCM sampling (default: 50)"}),
+                "zsnr": ("BOOLEAN", {"default": False, "label_on": "yes", "label_off": "no", "tooltip": "Enable zero-terminal SNR for LCM sampling"}),
+                "sigma_max": ("FLOAT", {"default": 120.0, "min": 0.0, "max": 1000.0, "step": 0.001, "tooltip": "Maximum sigma for ContinuousEDM/V sampling (EDM: 120.0, V: 500.0)"}),
+                "sigma_min": ("FLOAT", {"default": 0.002, "min": 0.0, "max": 1000.0, "step": 0.001, "tooltip": "Minimum sigma for ContinuousEDM/V sampling (EDM: 0.002, V: 0.03)"}),
+                "clip_source": (["Baked", "External"], {"default": "Baked", "tooltip": "CLIP source"}),
+                "clip_count": (["1", "2", "3", "4"], {"default": "1", "tooltip": "Number of CLIP models"}),
+                "clip_name1": (clips, {"default": "None", "tooltip": "Primary CLIP model"}),
+                "clip_name2": (clips, {"default": "None", "tooltip": "Secondary CLIP model"}),
+                "clip_name3": (clips, {"default": "None", "tooltip": "Third CLIP model"}),
+                "clip_name4": (clips, {"default": "None", "tooltip": "Fourth CLIP model"}),
+                "clip_type": (["flux", "sd3", "sdxl", "stable_cascade", "stable_audio", "hunyuan_dit", "mochi", "ltxv", "hunyuan_video", "pixart", "cosmos", "lumina2", "wan", "hidream", "chroma", "ace", "omnigen2", "qwen_image", "hunyuan_image"], {"default": "flux", "tooltip": "CLIP architecture type"}),
+                "enable_clip_layer": ("BOOLEAN", {"default": True, "label_on": "yes", "label_off": "no", "tooltip": "Trim CLIP to specific layer"}),
+                "stop_at_clip_layer": ("INT", {"default": -2, "min": -24, "max": -1, "step": 1, "tooltip": "CLIP layer to stop at"}),
+                "vae_source": (["Baked", "External"], {"default": "Baked", "tooltip": "VAE source"}),
+                "vae_name": (["None"] + folder_paths.get_filename_list("vae"), {"default": "None", "tooltip": "External VAE file"}),
+                "resolution": (cls.resolution, {"default": "1024x1024 (1:1)", "tooltip": "Preset resolution or Custom"}),
+                "width": ("INT", {"default": 1024, "min": 16, "max": MAX_RESOLUTION, "step": 8, "tooltip": "Custom width"}),
+                "height": ("INT", {"default": 1024, "min": 16, "max": MAX_RESOLUTION, "step": 8, "tooltip": "Custom height"}),
+                "lora_count": (["1", "2", "3"], {"default": "1", "tooltip": "Number of LoRA slots to configure"}),
+                "lora_switch_1": ("BOOLEAN", {"default": False, "label_on": "ON", "label_off": "OFF", "tooltip": "Enable LoRA 1"}),
+                "lora_name_1": (loras, {"default": "None", "tooltip": "LoRA 1 file"}),
+                "lora_weight_1": ("FLOAT", {"default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01, "tooltip": "LoRA 1 model weight"}),
+                "lora_switch_2": ("BOOLEAN", {"default": False, "label_on": "ON", "label_off": "OFF", "tooltip": "Enable LoRA 2"}),
+                "lora_name_2": (loras, {"default": "None", "tooltip": "LoRA 2 file"}),
+                "lora_weight_2": ("FLOAT", {"default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01, "tooltip": "LoRA 2 model weight"}),
+                "lora_switch_3": ("BOOLEAN", {"default": False, "label_on": "ON", "label_off": "OFF", "tooltip": "Enable LoRA 3"}),
+                "lora_name_3": (loras, {"default": "None", "tooltip": "LoRA 3 file"}),
+                "lora_weight_3": ("FLOAT", {"default": 1.0, "min": -10.0, "max": 10.0, "step": 0.01, "tooltip": "LoRA 3 model weight"}),
+                "sampler_name": (comfy.samplers.KSampler.SAMPLERS, {"default": "euler", "tooltip": "Sampling algorithm"}),
+                "scheduler": (comfy.samplers.KSampler.SCHEDULERS, {"default": "normal", "tooltip": "Scheduler"}),
+                "steps": ("INT", {"default": 20, "min": 1, "max": 10000, "tooltip": "Sampling steps"}),
+                "cfg": ("FLOAT", {"default": 8.0, "min": 0.0, "max": 100.0, "step": 0.1, "round": 0.01, "tooltip": "CFG scale"}),
+                "flux_guidance": ("FLOAT", {"default": 3.5, "min": 0.0, "max": 100.0, "step": 0.1, "tooltip": "Flux guidance scale"}),
+                "batch_size": ("INT", {"default": 1, "min": 1, "max": 4096, "tooltip": "Batch size"}),
+                "memory_cleanup": ("BOOLEAN", {"default": True, "label_on": "yes", "label_off": "no", "tooltip": "Perform memory cleanup before loading"}),
             },
         }
-        
-        return inputs
 
     CATEGORY = CATEGORY.MAIN.value + CATEGORY.LOADER.value
     RETURN_TYPES = ("pipe",)

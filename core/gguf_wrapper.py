@@ -10,18 +10,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-GGUF Model Wrapper for Smart Loader Plus
-
-This module provides detection and loading support for GGUF quantized models.
-GGUF models are quantized diffusion models (INT4/INT8) that require special loading.
-
-Key Features:
-- Automatic detection via .gguf file extension
-- Graceful fallback when ComfyUI-GGUF is not installed
-- Support for dequantization and patch dtype control
-- Compatible with ComfyUI ModelPatcher interface via GGUFModelPatcher
-"""
+# GGUF Model Wrapper for Smart Loader Plus
+#
+# This module provides detection and loading support for GGUF quantized models.
+# GGUF models are quantized diffusion models (INT4/INT8) that require special loading.
+#
+# Key Features:
+# - Automatic detection via .gguf file extension
+# - Graceful fallback when ComfyUI-GGUF is not installed
+# - Support for dequantization and patch dtype control
+# - Compatible with ComfyUI ModelPatcher interface via GGUFModelPatcher
 
 import os
 from typing import Optional, Any, Callable
@@ -29,19 +27,7 @@ from pathlib import Path
 import torch
 
 # Import cstr for consistent logging
-try:
-    from . import cstr
-except ImportError:
-    # Fallback if core module not available
-    class cstr:
-        def __init__(self, msg): self.msg_text = msg
-        @property
-        def msg(self): return self
-        @property
-        def warning(self): return self
-        @property
-        def error(self): return self
-        def print(self): print(self.msg_text)
+from . import cstr
 
 #cstr("[GGUF Wrapper] Module loading started...").msg.print()
 
@@ -65,7 +51,7 @@ try:
     
     if gguf_path.exists():
         # Import GGUF components using importlib (proper package import)
-        cstr("[GGUF Wrapper] Attempting to import GGUF classes...").msg.print()
+        # cstr("[GGUF Wrapper] Attempting to import GGUF classes...").msg.print()
         
         import importlib
         gguf_parent = str(gguf_path.parent)
@@ -109,25 +95,21 @@ except ImportError:
 
 
 def is_gguf_available() -> bool:
-    """
-    Check if GGUF support is available.
-    
-    Returns:
-        True if ComfyUI-GGUF is installed and imported successfully
-    """
+    # Check if GGUF support is available.
+    #
+    # Returns:
+    #     True if ComfyUI-GGUF is installed and imported successfully
     return GGUF_AVAILABLE
 
 
 def detect_gguf_model(model_path: str) -> bool:
-    """
-    Detect if a model file is in GGUF format.
-    
-    Args:
-        model_path: Path to model file
-        
-    Returns:
-        True if file has .gguf extension
-    """
+    # Detect if a model file is in GGUF format.
+    #
+    # Args:
+    #     model_path: Path to model file
+    #
+    # Returns:
+    #     True if file has .gguf extension
     if not model_path:
         return False
     
@@ -140,23 +122,21 @@ def load_gguf_model(
     patch_dtype: str = "default",
     patch_on_device: bool = False,
 ) -> object:
-    """
-    Load a GGUF quantized model.
-    
-    Args:
-        model_path: Path to .gguf model file
-        dequant_dtype: Dequantization dtype (default/target/float32/float16/bfloat16)
-        patch_dtype: LoRA patch dtype (default/target/float32/float16/bfloat16)
-        patch_on_device: Apply LoRA patches on GPU (faster but uses more VRAM)
-        
-    Returns:
-        GGUFModelPatcher object
-        
-    Raises:
-        ImportError: If GGUF support is not available
-        ValueError: If model file not found or invalid parameters
-        RuntimeError: If model loading fails
-    """
+    # Load a GGUF quantized model.
+    #
+    # Args:
+    #     model_path: Path to .gguf model file
+    #     dequant_dtype: Dequantization dtype (default/target/float32/float16/bfloat16)
+    #     patch_dtype: LoRA patch dtype (default/target/float32/float16/bfloat16)
+    #     patch_on_device: Apply LoRA patches on GPU (faster but uses more VRAM)
+    #
+    # Returns:
+    #     GGUFModelPatcher object
+    #
+    # Raises:
+    #     ImportError: If GGUF support is not available
+    #     ValueError: If model file not found or invalid parameters
+    #     RuntimeError: If model loading fails
     
     # Check if GGUF is available
     if not GGUF_AVAILABLE:

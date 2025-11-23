@@ -82,7 +82,7 @@ class RvConversion_Join:
         return (first_input,)
     
     def _join_images(self, inputs):
-        """Join IMAGE tensors into a batch, resizing to match first image dimensions"""
+        # Join IMAGE tensors into a batch, resizing to match first image dimensions
         tensors = []
         for img in inputs:
             if isinstance(img, torch.Tensor) and img.ndim == 4:
@@ -122,7 +122,7 @@ class RvConversion_Join:
         return (result,)
     
     def _join_masks(self, inputs):
-        """Join MASK tensors into a batch, resizing to match first mask dimensions"""
+        # Join MASK tensors into a batch, resizing to match first mask dimensions
         tensors = []
         for mask in inputs:
             if isinstance(mask, torch.Tensor):
@@ -166,7 +166,7 @@ class RvConversion_Join:
         return (result,)
     
     def _join_strings(self, inputs, delimiter: str):
-        """Join STRING values with delimiter"""
+        # Join STRING values with delimiter
         # Handle special case for literal newlines
         if delimiter in ("\n", "\\n"):
             delimiter = "\n"
@@ -189,7 +189,7 @@ class RvConversion_Join:
         return (merged_text,)
     
     def _join_primitives(self, inputs, delimiter: str):
-        """Join INT/FLOAT/LIST values as comma-separated string"""
+        # Join INT/FLOAT/LIST values as comma-separated string
         # Handle special case for literal newlines
         if delimiter in ("\n", "\\n"):
             delimiter = "\n"

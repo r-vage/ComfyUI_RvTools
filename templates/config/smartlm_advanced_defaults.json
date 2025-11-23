@@ -1,0 +1,25 @@
+{
+  "QwenVL": {
+    "device": "cuda",
+    "use_torch_compile": true,
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "top_k": 50,
+    "num_beams": 3,
+    "do_sample": true,
+    "repetition_penalty": 1.0,
+    "frame_count": 16
+  },
+  "Florence2": {
+    "device": "cuda",
+    "use_torch_compile": true,
+    "num_beams": 3,
+    "do_sample": false
+  },
+  "LLM": {
+    "temperature": 1.0,
+    "top_p": 0.9,
+    "top_k": 50,
+    "repetition_penalty": 1.2
+  }
+}

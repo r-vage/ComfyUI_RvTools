@@ -777,7 +777,9 @@ if (!LGraphCanvas.prototype.eclipseSetNodeDimension) {
 
       handleLinks();
       newNode.setSize(options.size);
-      newNode.onResize([0, 0]);
+      if (typeof newNode.onResize === 'function') {
+        newNode.onResize([0, 0]);
+      }
       newNode.setDirtyCanvas(true, true);
     } catch (e) {
       console.debug('eclipse: eclipseReloadNode exception', e);

@@ -11,6 +11,8 @@ Detailed documentation for specific features:
 - **[Smart Loaders Guide](Readme/Smart_Loaders.md)** - Complete guide to Smart Loader and Smart Loader Plus with multi-format support
 - **[Smart Prompt Guide](Readme/Smart_Prompt.md)** - How to use and customize the Smart Prompt system
 - **[Wildcard Processor Guide](Readme/Wildcard_Processor.md)** - Advanced wildcard syntax and usage examples
+- **[Smart Language Model Loader Guide](Readme/Smart_Language_Model_Loader_Guide.md)** ⭐ NEW - Complete guide for the unified vision-language and LLM loader. Analyze images/videos with QwenVL, generate fast tags with Florence-2, or process text with LLM models. Includes template management, model comparison, and practical use cases.
+- **[Model Repository Reference](Readme/Model_Repos_Reference.md)** - Quick reference with HuggingFace repository URLs for all supported models (Qwen, Florence-2) for easy copy-paste when creating templates
 - **[Save Images Guide](Readme/Save_Images.md)** - Advanced image saving with metadata, placeholders, and generation data
 - **[Checkpoint Loaders Guide](Readme/Checkpoint_Loaders.md)** - Legacy checkpoint loader documentation
 - **[Nunchaku Installation](Readme/Nunchaku_Installation.md)** - Step-by-step guide for installing Nunchaku quantization support
@@ -21,8 +23,9 @@ Detailed documentation for specific features:
 - **Smart Loader Series:** Next-generation model loaders with multi-format support (Standard Checkpoints, UNet, Nunchaku quantized Flux/Qwen, GGUF quantized models), featuring template management, automatic memory cleanup, and graceful extension fallbacks. [→ Documentation](Readme/Smart_Loaders.md)
   - **Smart Loader Plus:** Full-featured loader with latent/sampler configuration, resolution presets, CLIP ensemble (up to 4 modules), and comprehensive quantization support.
   - **Smart Loader:** Streamlined variant for minimal workflows - loads model/CLIP/VAE without latent or sampler configuration.
-- **Smart Prompt System:** Quick prompt building with dropdown selectors loaded from organized text files. Pre-configured with subjects, settings, and environments. Users can create custom prompt files by adding numbered `.txt` files (e.g., `1_my_prompts.txt`) - each line becomes a selectable option. Supports folder filtering and random selection with seed control for reproducible prompt generation. Files are automatically copied to `ComfyUI/models/wildcards/smartprompt/` for wildcard integration on first run. [→ Documentation](Readme/Smart_Prompt.md)
+- **Smart Prompt System:** Quick prompt building with dropdown selectors loaded from organized text files. Pre-configured with subjects, settings, and environments. Users can create custom prompt files by adding numbered `.txt` files (e.g., `1_my_prompts.txt`) - each line becomes a selectable option. Supports folder filtering and random selection with seed control for reproducible prompt generation. Files are automatically copied to `ComfyUI/models/Eclipse/smart_prompt/` on first run, with wildcard integration via junction to `wildcards/smart_prompt/`. [→ Documentation](Readme/Smart_Prompt.md)
 - **Wildcard Processor:** Advanced wildcard system for dynamic prompt generation. Create custom wildcard files in the `ComfyUI/models/wildcards/` directory using `.txt` files with one option per line. Supports weighted options (`option:weight` format), nested wildcards, and dynamic seed integration for complex prompt variations. Example wildcards are automatically copied on first launch. [→ Documentation](Readme/Wildcard_Processor.md)
+- **Smart Language Model Loader:** Single node for vision-language and text-only AI models. Analyze images with QwenVL (2B-32B parameters, video support, detailed descriptions), generate fast tags with Florence-2 (<1s, SD/Flux optimized), or process text with LLM models (prompt refinement, tags-to-description). Pre-configured templates for all supported models with auto-documented available tasks, auto-downloading from HuggingFace, supports both transformers (quality) and GGUF (low VRAM) formats. Template management includes New/Delete operations with automatic widget reset. Perfect for auto-tagging generations, creating training captions, video analysis, OCR, and object detection. [→ Documentation](Readme/Smart_Language_Model_Loader_Guide.md)
 - **Legacy Checkpoint Loaders:** Traditional loaders including Checkpoint Loader Small and Small (Pipe) variants for basic checkpoint loading workflows.
 - **Sophisticated Pipe Ecosystem:** Standardized data interchange system with context pipes, generation data pipes, concatenation, and extraction nodes to eliminate spaghetti connections in complex workflows. (More detailed documentation can be found below.)
 - **Comprehensive Switching System:** Extensive switch and multi-switch nodes for all ComfyUI data types, enabling dynamic workflow branching and conditional execution.
@@ -85,6 +88,42 @@ python_embeded\python.exe -m pip install -r custom_nodes/ComfyUI_Eclipse/require
 Common dependencies referenced by nodes include: torch, numpy, Pillow, opencv-python, piexif and others. ComfyUI itself usually provides the main ML stack (torch, torchvision, safetensors), but if you see errors you may need to install missing packages.
 
 5. Restart ComfyUI. The new nodes should appear in the node list under categories provided by the package.
+
+### Eclipse Folder Structure (First Launch)
+
+On first launch, ComfyUI_Eclipse automatically creates a folder structure in your ComfyUI models directory for user-editable templates and prompts:
+
+```
+ComfyUI/
+  models/
+    Eclipse/                          # Eclipse user files (edit freely!)
+      smart_prompt/                   # Smart Prompt template files
+        environment/                  # Environment descriptions
+        settings/                     # Style and quality settings
+        subjects/                     # Subject categories
+        ...
+      loader_templates/               # Smart Loader templates (checkpoint configurations)
+        Qwen2.5-VL-3B-Instruct.json
+        Florence-2-large-ft.json
+        ...
+      smartlm_templates/              # Smart Language Model Loader templates
+        Qwen2.5-VL-3B-Instruct.json
+        Florence-2-large-ft.json
+        ...
+      config/                         # Configuration files (user-editable)
+        smartlm_prompt_defaults.json  # QwenVL/Florence-2 task definitions
+        llm_few_shot_training.json    # LLM instruction mode examples
+        smartlm_advanced_defaults.json # Advanced model parameters
+    wildcards/
+      smart_prompt/                   # Junction/symlink → Eclipse/smart_prompt/
+```
+
+**Important Notes:**
+- **Edit files in `models/Eclipse/`** - This is your personal workspace. Changes persist across updates.
+- **Git updates won't overwrite** - Files in `models/Eclipse/` are independent from the repository.
+- **Wildcard integration** - The `wildcards/smart_prompt/` is a junction (Windows) or symlink (Unix) pointing to `Eclipse/smart_prompt/` for seamless wildcard processor integration.
+- **One-time copy** - Templates are copied from the repository to `Eclipse/` only on first run. To get new templates from updates, manually copy from `custom_nodes/ComfyUI_Eclipse/templates/` or delete the Eclipse folder and restart.
+- **Automatic migration** - If you're upgrading from a previous version, your existing files from `models/smart_loader_templates/` and `models/wildcards/smartprompt/` will be automatically moved to the new `Eclipse/` structure on first launch. Old folders are removed after successful migration.
 
 ### Opening a console / terminal in the ComfyUI folder (beginner)
 
@@ -259,9 +298,10 @@ Image utilities for loading, previewing, saving, and manipulating images in work
 - Save Images - Advanced image saving with metadata and placeholders
 
 ### Loader
-Nodes for loading model checkpoints with support for Standard, UNet, Nunchaku quantized, and GGUF formats.
+Nodes for loading model checkpoints with support for Standard, UNet, Nunchaku quantized, and GGUF formats, plus vision-language and text-only LLM models.
 - Smart Loader - Streamlined loader (model/CLIP/VAE only)
 - Smart Loader Plus - Full-featured loader with latent/sampler configuration
+- Smart Language Model Loader - Unified vision-language and LLM loader supporting QwenVL (image/video analysis), Florence-2 (fast tagging/OCR), and text-only LLM models with pre-configured templates and auto-download
 - Checkpoint Loader Small - Basic checkpoint loader
 - Checkpoint Loader Small (Pipe) - Basic checkpoint loader with pipe output
 

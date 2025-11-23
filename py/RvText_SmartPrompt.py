@@ -28,31 +28,31 @@ random.setstate(initial_random_state)
 
 
 def new_random_seed():
-    """ Gets a new random seed from the eclipse_seed_random_state and resetting the previous state."""
+    # Gets a new random seed from the eclipse_seed_random_state and resetting the previous state.
     global eclipse_seed_random_state
     prev_random_state = random.getstate()
     random.setstate(eclipse_seed_random_state)
-    seed = random.randint(1, 1125899906842624)
+    seed = random.randint(0, 2**64 - 1)
     eclipse_seed_random_state = random.getstate()
     random.setstate(prev_random_state)
     return seed
 
 
 def get_prompt_folders():
-    """Get all folders in prompt/ directory. Primary location: wildcards/smartprompt, fallback: repo/prompt."""
+    # Get all folders in smart_prompt/ directory. Primary location: models/Eclipse/smart_prompt, fallback: repo/templates/prompt.
     # Get paths
     comfyui_root = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
-    repo_prompt_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'prompt')
-    models_smartprompt_dir = os.path.join(comfyui_root, 'models', 'wildcards', 'smartprompt')
+    eclipse_prompt_dir = os.path.join(comfyui_root, 'models', 'Eclipse', 'smart_prompt')
+    repo_prompt_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'templates', 'prompt')
     
-    # Primary: check ComfyUI models/wildcards/smartprompt
+    # Primary: check models/Eclipse/smart_prompt (user-editable location)
     folders = []
-    if os.path.isdir(models_smartprompt_dir):
-        for item in os.listdir(models_smartprompt_dir):
-            item_path = os.path.join(models_smartprompt_dir, item)
+    if os.path.isdir(eclipse_prompt_dir):
+        for item in os.listdir(eclipse_prompt_dir):
+            item_path = os.path.join(eclipse_prompt_dir, item)
             if os.path.isdir(item_path):
                 folders.append(item_path)
-        if folders:  # If we found folders in wildcards, use them
+        if folders:  # If we found folders in Eclipse, use them
             return folders
     
     # Fallback: use repo's prompt directory
@@ -142,7 +142,7 @@ class RvText_SmartPrompt_All:
             required[display] = (combo_options, tooltip_dict)
         
         # Add seed as the last parameter
-        required["seed"] = ("INT", {"default": 0, "min": -1125899906842624, "max": 1125899906842624, "tooltip": "Random seed for prompt selection."})
+        required["seed"] = ("INT", {"default": 0, "min": -3, "max": 2**64 - 1, "tooltip": "Random seed for prompt selection."})
         
         return {
             "required": required,
@@ -158,7 +158,7 @@ class RvText_SmartPrompt_All:
 
     @classmethod
     def IS_CHANGED(cls, seed, prompt=None, extra_pnginfo=None, unique_id=None, **kwargs):
-        """Forces a changed state if we happen to get a special seed, as if from the API directly."""
+        # Forces a changed state if we happen to get a special seed, as if from the API directly.
         if seed in (-1, -2, -3):
             # This isn't used, but a different value than previous will force it to be "changed"
             return new_random_seed()

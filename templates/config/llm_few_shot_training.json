@@ -1,0 +1,97 @@
+{
+  "_description": "Few-shot training examples for text-only LLM. Each mode has its own system prompt, examples, and default instruction template.",
+  
+  "tags_to_natural_language": {
+    "display_name": "Tags to Natural Language",
+    "instruction_template": "Convert these tags into a natural language prompt: \"{prompt}\"",
+    "system_prompt": "You are an expert at converting comma-separated tags into natural, flowing sentences. Output ONLY the converted prompt without any introductory text, explanations, numbered lists, labels, or meta-commentary. Never start with phrases like 'Here is' or 'This describes'. Just provide the direct description.",
+    "examples": [
+      {
+        "role": "user",
+        "content": "Convert these tags into a natural language prompt: \"1girl, long_hair, blue_eyes, white_dress, standing, garden, flowers, sunlight, smile\""
+      },
+      {
+        "role": "assistant",
+        "content": "A girl with long flowing hair and captivating blue eyes stands gracefully in a lush garden surrounded by vibrant flowers. She wears an elegant white dress that catches the warm sunlight filtering through the foliage. A gentle smile illuminates her face as she enjoys the peaceful beauty of the blooming garden."
+      },
+      {
+        "role": "user",
+        "content": "Convert these tags into a natural language prompt: \"cyberpunk, neon_lights, rain, night, city_street, reflections, futuristic, wet_pavement\""
+      },
+      {
+        "role": "assistant",
+        "content": "A futuristic cyberpunk city street at night, illuminated by vibrant neon lights that cast colorful reflections across the rain-soaked pavement. The wet surfaces create a mirror-like effect, amplifying the glow of the neon signs in this atmospheric nocturnal scene."
+      },
+      {
+        "role": "user",
+        "content": "Convert these tags into a natural language prompt: \"dragon, mountain_peak, flying, clouds, sunset, epic, fantasy, scales_glittering\""
+      },
+      {
+        "role": "assistant",
+        "content": "An epic fantasy scene featuring a majestic dragon soaring through the clouds near a towering mountain peak. The dragon's scales glitter magnificently in the warm light of the setting sun, creating a breathtaking and awe-inspiring vision against the dramatic sky."
+      }
+    ]
+  },
+  
+  "expand_description": {
+    "display_name": "Expand Description",
+    "instruction_template": "Expand this description into a detailed, comprehensive prompt: \"{prompt}\"",
+    "system_prompt": "You are an expert at taking brief descriptions and expanding them into rich, detailed prompts with visual details, atmosphere, lighting, and composition. Output ONLY the expanded description as a single flowing paragraph without introductory phrases, numbered lists, category labels (like 'Lighting:', 'Composition:', etc.), or explanations. Never use phrases like 'Here is' or 'This prompt describes'. Just provide the direct, detailed description.",
+    "examples": [
+      {
+        "role": "user",
+        "content": "Expand this description into a detailed, comprehensive prompt: \"a cozy cabin in the woods\""
+      },
+      {
+        "role": "assistant",
+        "content": "A charming rustic cabin nestled deep within a dense forest of towering pine trees. Warm golden light glows through the windows, creating a welcoming contrast against the cool blue twilight filtering through the surrounding woods. Smoke curls lazily from a stone chimney, suggesting a crackling fireplace inside. The cabin features weathered wooden planks, a moss-covered roof, and a small covered porch with a rocking chair. Fallen leaves carpet the forest floor, and a narrow dirt path winds toward the cabin door. The atmosphere is peaceful and inviting, with rays of soft evening light breaking through the canopy above, illuminating particles of dust and creating a magical, ethereal quality to the scene."
+      },
+      {
+        "role": "user",
+        "content": "Expand this description into a detailed, comprehensive prompt: \"futuristic city\""
+      },
+      {
+        "role": "assistant",
+        "content": "A sprawling futuristic metropolis stretching toward the horizon, characterized by towering skyscrapers with sleek glass and metal facades that reach into the clouds. Flying vehicles navigate between buildings on designated air lanes, leaving trails of light in their wake. Massive holographic advertisements project colorful displays across building surfaces, while suspended walkways connect structures at various heights. The streets below pulse with neon underglow from automated transit systems. Advanced architecture features organic curves and geometric patterns, with some buildings incorporating vertical gardens and transparent solar panels. The sky transitions from deep purple to electric blue, with multiple moons or planets visible in the distance. The overall atmosphere blends high-tech sophistication with hints of both utopian promise and cyberpunk aesthetic."
+      }
+    ]
+  },
+  
+  "refine_prompt": {
+    "display_name": "Refine Prompt",
+    "instruction_template": "Refine and improve this prompt with more visual details and better structure: \"{prompt}\"",
+    "system_prompt": "You are an expert at refining prompts by enhancing visual descriptions, improving word choice, adding atmospheric details, and structuring information more effectively. Output ONLY the refined prompt as a single cohesive description without introductory text, numbered points, category labels (like 'Subject:', 'Lighting:', 'Style:', etc.), or meta-commentary. Never begin with phrases like 'Here's a refined version' or 'This improved prompt features'. Just provide the enhanced description directly.",
+    "examples": [
+      {
+        "role": "user",
+        "content": "Refine and improve this prompt with more visual details and better structure: \"a woman with red hair sitting in a cafe\""
+      },
+      {
+        "role": "assistant",
+        "content": "An elegant woman with vibrant, flowing red hair sits gracefully at a small round table near the window of a charming European-style cafe. Warm afternoon sunlight streams through the glass, casting soft highlights across her features and creating a gentle glow in her auburn locks. She cradles a steaming cup of cappuccino, wisps of steam rising delicately into the air. The cafe's interior features exposed brick walls, vintage wooden furniture, and ambient pendant lighting. Through the window behind her, a bustling cobblestone street adds depth and context to the scene. The overall mood is relaxed and contemplative, with a warm color palette dominated by earth tones, golden light, and the striking contrast of her red hair."
+      },
+      {
+        "role": "user",
+        "content": "Refine and improve this prompt with more visual details and better structure: \"fantasy warrior in armor with sword, dark background\""
+      },
+      {
+        "role": "assistant",
+        "content": "A formidable fantasy warrior stands in a powerful, battle-ready stance, clad in intricately detailed plate armor that bears the marks of countless battles. The armor features ornate engravings and a weathered, battle-worn finish with scratches and dents that tell stories of past conflicts. In their grip, a magnificent longsword with ancient runes etched along the blade catches the sparse light, creating subtle reflections. The background is dramatically dark, filled with swirling shadows and hints of mysterious fog, with a single shaft of divine light breaking through from above to illuminate the warrior's silhouette. Particles of dust and ash float through the air, adding atmosphere and depth. The composition emphasizes the warrior's imposing presence through dramatic lighting and strong contrast between light and shadow. The color palette is dominated by deep blacks, cool metallic silvers, and warm golden highlights."
+      }
+    ]
+  },
+  
+  "custom_instruction": {
+    "display_name": "Custom Instruction",
+    "instruction_template": "Generate a detailed prompt from \"{prompt}\"",
+    "system_prompt": "You are a helpful assistant. Always output clean, direct responses without introductory phrases, numbered lists, category labels (like 'Lighting:', 'Composition:', etc.), explanations, or meta-commentary. Never use phrases like 'Here is', 'This describes', or format your response as a list. Provide only the requested content as natural flowing text.",
+    "examples": []
+  },
+  
+  "direct_chat": {
+    "display_name": "Direct Chat",
+    "instruction_template": "",
+    "system_prompt": "You are a helpful assistant. Provide clear, concise responses without unnecessary formatting. Avoid numbered lists, category labels, or explanatory preambles unless specifically requested by the user.",
+    "examples": []
+  }
+}

@@ -10,19 +10,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Nunchaku Model Wrapper for Smart Loader Plus
-
-This module provides detection and loading support for Nunchaku quantized models.
-Nunchaku models are quantized FLUX and Qwen models (INT4/FP4/FP8) that require special loading.
-
-Key Features:
-- Automatic detection via filename patterns and metadata inspection
-- Graceful fallback when ComfyUI-nunchaku is not installed
-- Hybrid detection: filename patterns + metadata checks
-- Compatible with ComfyUI ModelPatcher interface
-- LoRA support for both Flux and Qwen models
-"""
+# Nunchaku Model Wrapper for Smart Loader Plus
+#
+# This module provides detection and loading support for Nunchaku quantized models.
+# Nunchaku models are quantized FLUX and Qwen models (INT4/FP4/FP8) that require special loading.
+#
+# Key Features:
+# - Automatic detection via filename patterns and metadata inspection
+# - Graceful fallback when ComfyUI-nunchaku is not installed
+# - Hybrid detection: filename patterns + metadata checks
+# - Compatible with ComfyUI ModelPatcher interface
+# - LoRA support for both Flux and Qwen models
 
 import os
 import json
@@ -35,19 +33,7 @@ import torch
 from torch import nn
 
 # Import cstr for Eclipse-style logging
-try:
-    from . import cstr
-except ImportError:
-    # Fallback if core module not available
-    class cstr:
-        def __init__(self, msg): self.msg_text = msg
-        @property
-        def msg(self): return self
-        @property
-        def warning(self): return self
-        @property
-        def error(self): return self
-        def print(self): print(self.msg_text)
+from . import cstr
 
 #cstr("[Nunchaku Wrapper] Module loading started...").msg.print()
 
@@ -98,7 +84,7 @@ try:
             # Import classes using the EXACT same module path that PuLID uses
             # PuLID's relative imports create entries like 'D:\...\ComfyUI-nunchaku.wrappers.flux' in sys.modules
             # We need to check sys.modules to find the actual module name and reuse it
-            cstr("[Nunchaku Wrapper] Attempting to import Nunchaku classes...").msg.print()
+            # cstr("[Nunchaku Wrapper] Attempting to import Nunchaku classes...").msg.print()
             
             import importlib
             
@@ -215,32 +201,30 @@ except ImportError:
 
 
 def is_nunchaku_model_by_name(filename: str) -> bool:
-    """
-    Detect Nunchaku models by filename patterns.
-    
-    Nunchaku quantized models typically follow naming conventions:
-    - svdq-fp4_* (SVDQuant FP4 quantization)
-    - svdq-int4_* (SVDQuant INT4 quantization)
-    - nunchaku-* (Generic Nunchaku prefix)
-    - *-quant-* (Generic quantization marker)
-    
-    Parameters
-    ----------
-    filename : str
-        The model filename to check
-        
-    Returns
-    -------
-    bool
-        True if filename matches Nunchaku patterns
-        
-    Examples
-    --------
-    >>> is_nunchaku_model_by_name("svdq-fp4_r32-flux-dev.safetensors")
-    True
-    >>> is_nunchaku_model_by_name("flux1-dev.safetensors")
-    False
-    """
+    # Detect Nunchaku models by filename patterns.
+    #
+    # Nunchaku quantized models typically follow naming conventions:
+    # - svdq-fp4_* (SVDQuant FP4 quantization)
+    # - svdq-int4_* (SVDQuant INT4 quantization)
+    # - nunchaku-* (Generic Nunchaku prefix)
+    # - *-quant-* (Generic quantization marker)
+    #
+    # Parameters
+    # ----------
+    # filename : str
+    #     The model filename to check
+    #
+    # Returns
+    # -------
+    # bool
+    #     True if filename matches Nunchaku patterns
+    #
+    # Examples
+    # --------
+    # >>> is_nunchaku_model_by_name("svdq-fp4_r32-flux-dev.safetensors")
+    # True
+    # >>> is_nunchaku_model_by_name("flux1-dev.safetensors")
+    # False
     filename_lower = filename.lower()
     
     nunchaku_patterns = [
@@ -255,22 +239,20 @@ def is_nunchaku_model_by_name(filename: str) -> bool:
 
 
 def is_nunchaku_model_by_metadata(model_path: str) -> bool:
-    """
-    Check if model is Nunchaku format by inspecting safetensors metadata.
-    
-    This reads only the metadata header, not the full weights, making it fast.
-    Nunchaku models store special metadata like 'comfy_config', 'quantization', etc.
-    
-    Parameters
-    ----------
-    model_path : str
-        Full path to the model file
-        
-    Returns
-    -------
-    bool
-        True if metadata indicates Nunchaku format
-    """
+    # Check if model is Nunchaku format by inspecting safetensors metadata.
+    #
+    # This reads only the metadata header, not the full weights, making it fast.
+    # Nunchaku models store special metadata like 'comfy_config', 'quantization', etc.
+    #
+    # Parameters
+    # ----------
+    # model_path : str
+    #     Full path to the model file
+    #
+    # Returns
+    # -------
+    # bool
+    #     True if metadata indicates Nunchaku format
     if not os.path.exists(model_path):
         return False
     
@@ -310,25 +292,23 @@ def is_nunchaku_model_by_metadata(model_path: str) -> bool:
 
 
 def detect_nunchaku_model(model_path: str, model_name: str) -> bool:
-    """
-    Hybrid detection: Combine filename patterns and metadata checks.
-    
-    Uses a two-stage approach:
-    1. Fast filename pattern matching (no I/O)
-    2. Metadata inspection if filename check fails (minimal I/O)
-    
-    Parameters
-    ----------
-    model_path : str
-        Full path to the model file
-    model_name : str
-        Model filename (for pattern matching)
-        
-    Returns
-    -------
-    bool
-        True if model is detected as Nunchaku format
-    """
+    # Hybrid detection: Combine filename patterns and metadata checks.
+    #
+    # Uses a two-stage approach:
+    # 1. Fast filename pattern matching (no I/O)
+    # 2. Metadata inspection if filename check fails (minimal I/O)
+    #
+    # Parameters
+    # ----------
+    # model_path : str
+    #     Full path to the model file
+    # model_name : str
+    #     Model filename (for pattern matching)
+    #
+    # Returns
+    # -------
+    # bool
+    #     True if model is detected as Nunchaku format
     # Stage 1: Fast filename check
     if is_nunchaku_model_by_name(model_name):
         return True
@@ -353,69 +333,67 @@ def load_nunchaku_model(
     use_pin_memory: bool = False,
     model_type: str = "flux"
 ) -> object:
-    """
-    Load a Nunchaku quantized model and wrap it for ComfyUI compatibility.
-    
-    Supports both Flux and Qwen-Image Nunchaku quantized models.
-    
-    Parameters
-    ----------
-    model_path : str
-        Full path to the Nunchaku model file
-    device : torch.device, optional
-        Device to load model on (default: auto-detect CUDA)
-    dtype : torch.dtype, optional
-        Data type for model (default: based on data_type parameter)
-    cpu_offload : bool, default=False
-        Enable CPU offload for low VRAM (<14GB)
-    cache_threshold : float, default=0.0
-        First-block caching threshold (0=disabled, 0.12=typical)
-        Higher values = faster but lower quality
-    attention : str, default="flash-attention2"
-        Attention implementation: "flash-attention2" or "nunchaku-fp16"
-    data_type : str, default="bfloat16"
-        Model data type: "bfloat16" (30/40-series) or "float16" (20-series GPUs)
-    i2f_mode : str, default="enabled"
-        GEMM implementation for 20-series GPUs: "enabled" or "always"
-        (ignored on other GPU architectures, Flux models only)
-    num_blocks_on_gpu : int, default=1
-        Number of transformer blocks to keep on GPU when CPU offload is enabled
-        (Qwen models only)
-    use_pin_memory : bool, default=False
-        Use pinned memory for faster CPU-GPU transfer when CPU offload is enabled
-        (Qwen models only)
-    model_type : str, default="flux"
-        Model architecture type: "flux" for Flux models or "qwen" for Qwen-Image models
-        
-    Returns
-    -------
-    ModelPatcher
-        ComfyUI ModelPatcher object (NunchakuModelPatcher for Qwen, standard for Flux)
-        
-    Raises
-    ------
-    RuntimeError
-        If Nunchaku is not available or loading fails
-    ValueError
-        If model file not found or invalid
-        
-    Examples
-    --------
-    >>> # Load Flux model
-    >>> model, name = load_nunchaku_model(
-    ...     "models/svdq-fp4_r32-flux.safetensors",
-    ...     cpu_offload=True,
-    ...     cache_threshold=0.12,
-    ...     model_type="flux"
-    ... )
-    >>> 
-    >>> # Load Qwen model
-    >>> model, name = load_nunchaku_model(
-    ...     "models/qwen-image-quant.safetensors",
-    ...     cpu_offload=True,
-    ...     model_type="qwen"
-    ... )
-    """
+    # Load a Nunchaku quantized model and wrap it for ComfyUI compatibility.
+    #
+    # Supports both Flux and Qwen-Image Nunchaku quantized models.
+    #
+    # Parameters
+    # ----------
+    # model_path : str
+    #     Full path to the Nunchaku model file
+    # device : torch.device, optional
+    #     Device to load model on (default: auto-detect CUDA)
+    # dtype : torch.dtype, optional
+    #     Data type for model (default: based on data_type parameter)
+    # cpu_offload : bool, default=False
+    #     Enable CPU offload for low VRAM (<14GB)
+    # cache_threshold : float, default=0.0
+    #     First-block caching threshold (0=disabled, 0.12=typical)
+    #     Higher values = faster but lower quality
+    # attention : str, default="flash-attention2"
+    #     Attention implementation: "flash-attention2" or "nunchaku-fp16"
+    # data_type : str, default="bfloat16"
+    #     Model data type: "bfloat16" (30/40-series) or "float16" (20-series GPUs)
+    # i2f_mode : str, default="enabled"
+    #     GEMM implementation for 20-series GPUs: "enabled" or "always"
+    #     (ignored on other GPU architectures, Flux models only)
+    # num_blocks_on_gpu : int, default=1
+    #     Number of transformer blocks to keep on GPU when CPU offload is enabled
+    #     (Qwen models only)
+    # use_pin_memory : bool, default=False
+    #     Use pinned memory for faster CPU-GPU transfer when CPU offload is enabled
+    #     (Qwen models only)
+    # model_type : str, default="flux"
+    #     Model architecture type: "flux" for Flux models or "qwen" for Qwen-Image models
+    #
+    # Returns
+    # -------
+    # ModelPatcher
+    #     ComfyUI ModelPatcher object (NunchakuModelPatcher for Qwen, standard for Flux)
+    #
+    # Raises
+    # ------
+    # RuntimeError
+    #     If Nunchaku is not available or loading fails
+    # ValueError
+    #     If model file not found or invalid
+    #
+    # Examples
+    # --------
+    # >>> # Load Flux model
+    # >>> model, name = load_nunchaku_model(
+    # ...     "models/svdq-fp4_r32-flux.safetensors",
+    # ...     cpu_offload=True,
+    # ...     cache_threshold=0.12,
+    # ...     model_type="flux"
+    # ... )
+    # >>>
+    # >>> # Load Qwen model
+    # >>> model, name = load_nunchaku_model(
+    # ...     "models/qwen-image-quant.safetensors",
+    # ...     cpu_offload=True,
+    # ...     model_type="qwen"
+    # ... )
     if not NUNCHAKU_AVAILABLE:
         raise RuntimeError(
             "Nunchaku support is not available.\n\n"
@@ -691,17 +669,15 @@ def load_nunchaku_model(
 
 
 def get_nunchaku_info() -> dict:
-    """
-    Get information about Nunchaku support availability.
-    
-    Returns
-    -------
-    dict
-        Dictionary with keys:
-        - 'available': bool - Whether Nunchaku is available
-        - 'version': str | None - Nunchaku version if available
-        - 'wrapper_available': bool - Whether ComfyFluxWrapper is available
-    """
+    # Get information about Nunchaku support availability.
+    #
+    # Returns
+    # -------
+    # dict
+    #     Dictionary with keys:
+    #     - 'available': bool - Whether Nunchaku is available
+    #     - 'version': str | None - Nunchaku version if available
+    #     - 'wrapper_available': bool - Whether ComfyFluxWrapper is available
     info: dict[str, bool | str | None] = {
         'available': NUNCHAKU_AVAILABLE,
         'version': None,
@@ -801,7 +777,7 @@ _RE_ALPHA_SUFFIX = re.compile(r"\.(?:alpha|lora_alpha)(?:\.[^.]+)*$")
 
 
 def _rename_layer_underscore_layer_name(old_name: str) -> str:
-    """Convert underscore patterns to dot notation for Qwen layer names."""
+    # Convert underscore patterns to dot notation for Qwen layer names.
     rules = [
         (r'_(\d+)_attn_to_out_(\d+)', r'.\1.attn.to_out.\2'),
         (r'_(\d+)_img_mlp_net_(\d+)_proj', r'.\1.img_mlp.net.\2.proj'),
@@ -821,7 +797,7 @@ def _rename_layer_underscore_layer_name(old_name: str) -> str:
 
 
 def _classify_and_map_qwen_key(key: str) -> Optional[Tuple[str, str, Optional[str], str]]:
-    """Classify and map a Qwen LoRA key using regex patterns."""
+    # Classify and map a Qwen LoRA key using regex patterns.
     k = key
     if k.startswith("transformer."):
         k = k[len("transformer."):]
@@ -862,12 +838,12 @@ def _classify_and_map_qwen_key(key: str) -> Optional[Tuple[str, str, Optional[st
 
 
 def _is_indexable_module(m):
-    """Check if a module is list-like."""
+    # Check if a module is list-like.
     return isinstance(m, (nn.ModuleList, nn.Sequential, list, tuple))
 
 
 def _get_module_by_name(model: nn.Module, name: str) -> Optional[nn.Module]:
-    """Traverse a path like 'a.b.3.c' to find and return a module."""
+    # Traverse a path like 'a.b.3.c' to find and return a module.
     if not name:
         return model
     module = model
@@ -889,7 +865,7 @@ def _get_module_by_name(model: nn.Module, name: str) -> Optional[nn.Module]:
 
 
 def _resolve_module_name(model: nn.Module, name: str) -> Tuple[str, Optional[nn.Module]]:
-    """Resolve a name string path to a module with fallback paths."""
+    # Resolve a name string path to a module with fallback paths.
     m = _get_module_by_name(model, name)
     if m is not None:
         return name, m
@@ -922,7 +898,7 @@ def _resolve_module_name(model: nn.Module, name: str) -> Tuple[str, Optional[nn.
 
 
 def _load_lora_state_dict(lora_state_dict_or_path: Union[str, Path, Dict[str, torch.Tensor]]) -> Dict[str, torch.Tensor]:
-    """Load LoRA state dict from path or return existing dict."""
+    # Load LoRA state dict from path or return existing dict.
     if isinstance(lora_state_dict_or_path, (str, Path)):
         path = Path(lora_state_dict_or_path)
         if path.suffix == ".safetensors":
@@ -943,7 +919,7 @@ def _load_lora_state_dict(lora_state_dict_or_path: Union[str, Path, Dict[str, to
 
 def _fuse_qkv_lora(qkv_weights: Dict[str, torch.Tensor]) -> Tuple[
     Optional[torch.Tensor], Optional[torch.Tensor], Optional[torch.Tensor]]:
-    """Fuse Q/K/V LoRA weights into a single QKV tensor."""
+    # Fuse Q/K/V LoRA weights into a single QKV tensor.
     required_keys = ["Q_A", "Q_B", "K_A", "K_B", "V_A", "V_B"]
     if not all(k in qkv_weights for k in required_keys):
         return None, None, None
@@ -975,8 +951,9 @@ def _fuse_qkv_lora(qkv_weights: Dict[str, torch.Tensor]) -> Tuple[
 
 def _handle_proj_out_split(lora_dict: Dict[str, Dict[str, torch.Tensor]], base_key: str, model: nn.Module) -> Tuple[
     Dict[str, Tuple[torch.Tensor, torch.Tensor, Optional[torch.Tensor]]], List[str]]:
-    """Split single-block proj_out LoRA into two branches."""
-    result, consumed = {}, []
+    # Split single-block proj_out LoRA into two branches.
+    result: Dict[str, Tuple[torch.Tensor, torch.Tensor, Optional[torch.Tensor]]] = {}
+    consumed: List[str] = []
     m = re.search(r"single_transformer_blocks\.(\d+)", base_key)
     if not m or base_key not in lora_dict:
         return result, consumed
@@ -1008,7 +985,7 @@ def _handle_proj_out_split(lora_dict: Dict[str, Dict[str, torch.Tensor]], base_k
 
 
 def _qwen_unpack_lowrank_weight(weight: torch.Tensor, down: bool = True) -> torch.Tensor:
-    """Unpack Nunchaku low-rank weight (placeholder - uses nunchaku if available)."""
+    # Unpack Nunchaku low-rank weight (placeholder - uses nunchaku if available).
     try:
         from nunchaku.lora.flux.nunchaku_converter import unpack_lowrank_weight
         return unpack_lowrank_weight(weight, down=down)
@@ -1018,7 +995,7 @@ def _qwen_unpack_lowrank_weight(weight: torch.Tensor, down: bool = True) -> torc
 
 
 def _qwen_pack_lowrank_weight(weight: torch.Tensor, down: bool = True) -> torch.Tensor:
-    """Pack Nunchaku low-rank weight (placeholder - uses nunchaku if available)."""
+    # Pack Nunchaku low-rank weight (placeholder - uses nunchaku if available).
     try:
         from nunchaku.lora.flux.nunchaku_converter import pack_lowrank_weight
         return pack_lowrank_weight(weight, down=down)
@@ -1028,7 +1005,7 @@ def _qwen_pack_lowrank_weight(weight: torch.Tensor, down: bool = True) -> torch.
 
 
 def _qwen_reorder_adanorm_lora_up(weight: torch.Tensor, splits: int = 6) -> torch.Tensor:
-    """Reorder AdaNorm LoRA up weights (placeholder - uses nunchaku if available)."""
+    # Reorder AdaNorm LoRA up weights (placeholder - uses nunchaku if available).
     try:
         from nunchaku.lora.flux.nunchaku_converter import reorder_adanorm_lora_up
         return reorder_adanorm_lora_up(weight, splits=splits)
@@ -1039,7 +1016,7 @@ def _qwen_reorder_adanorm_lora_up(weight: torch.Tensor, splits: int = 6) -> torc
 
 def _apply_lora_to_qwen_module(module: nn.Module, A: torch.Tensor, B: torch.Tensor, module_name: str,
                                 model: nn.Module) -> None:
-    """Append combined LoRA weights to a Qwen module."""
+    # Append combined LoRA weights to a Qwen module.
     if A.ndim != 2 or B.ndim != 2:
         raise ValueError(f"{module_name}: A/B must be 2D, got {A.shape}, {B.shape}")
     if A.shape[1] != module.in_features:
@@ -1076,16 +1053,14 @@ def compose_qwen_loras_v2(
         model: torch.nn.Module,
         lora_configs: List[Tuple[Union[str, Path, Dict[str, torch.Tensor]], float]],
 ) -> None:
-    """
-    Compose multiple LoRAs into a Qwen model with individual strengths.
-    
-    Parameters
-    ----------
-    model : torch.nn.Module
-        The Qwen model to apply LoRAs to
-    lora_configs : List[Tuple[Union[str, Path, dict], float]]
-        List of (lora_path_or_dict, strength) tuples
-    """
+    # Compose multiple LoRAs into a Qwen model with individual strengths.
+    #
+    # Parameters
+    # ----------
+    # model : torch.nn.Module
+    #     The Qwen model to apply LoRAs to
+    # lora_configs : List[Tuple[Union[str, Path, dict], float]]
+    #     List of (lora_path_or_dict, strength) tuples
     cstr(f"[Qwen LoRA] Composing {len(lora_configs)} LoRAs for Qwen model...").msg.print()
     reset_qwen_lora_v2(model)
     
@@ -1169,7 +1144,7 @@ def compose_qwen_loras_v2(
 
 
 def reset_qwen_lora_v2(model: nn.Module) -> None:
-    """Remove all appended LoRA weights from a Qwen model."""
+    # Remove all appended LoRA weights from a Qwen model.
     if not hasattr(model, "_lora_slots") or not model._lora_slots:
         return
     
@@ -1203,24 +1178,22 @@ def reset_qwen_lora_v2(model: nn.Module) -> None:
 # ============================================================================
 
 class ComfyQwenImageWrapper(nn.Module):
-    """
-    Wrapper for NunchakuQwenImageTransformer2DModel to support ComfyUI workflows with LoRA.
-    
-    This wrapper separates LoRA composition from the forward pass for maximum efficiency.
-    It detects changes to its `loras` attribute and recomposes the underlying model
-    lazily when the forward pass is executed.
-    
-    Attributes
-    ----------
-    model : NunchakuQwenImageTransformer2DModel
-        The wrapped Qwen transformer model
-    loras : List[Tuple[Union[str, Path, dict], float]]
-        List of (lora_path, strength) tuples to apply
-    cpu_offload_setting : str
-        CPU offload mode: "auto", "enable", or "disable"
-    vram_margin_gb : float
-        VRAM safety margin for auto mode (default: 4.0 GB)
-    """
+    # Wrapper for NunchakuQwenImageTransformer2DModel to support ComfyUI workflows with LoRA.
+    #
+    # This wrapper separates LoRA composition from the forward pass for maximum efficiency.
+    # It detects changes to its `loras` attribute and recomposes the underlying model
+    # lazily when the forward pass is executed.
+    #
+    # Attributes
+    # ----------
+    # model : NunchakuQwenImageTransformer2DModel
+    #     The wrapped Qwen transformer model
+    # loras : List[Tuple[Union[str, Path, dict], float]]
+    #     List of (lora_path, strength) tuples to apply
+    # cpu_offload_setting : str
+    #     CPU offload mode: "auto", "enable", or "disable"
+    # vram_margin_gb : float
+    #     VRAM safety margin for auto mode (default: 4.0 GB)
     
     def __init__(
             self,
@@ -1253,7 +1226,7 @@ class ComfyQwenImageWrapper(nn.Module):
         self._last_device = None
     
     def to_safely(self, device):
-        """Safely move the model to the specified device."""
+        # Safely move the model to the specified device.
         if hasattr(self.model, "to_safely"):
             self.model.to_safely(device)
         else:
@@ -1271,12 +1244,10 @@ class ComfyQwenImageWrapper(nn.Module):
             transformer_options=None,
             **kwargs,
     ):
-        """
-        Forward pass for the wrapped Qwen model.
-        
-        Detects changes to the `self.loras` list and recomposes the model
-        on-the-fly before inference.
-        """
+        # Forward pass for the wrapped Qwen model.
+        #
+        # Detects changes to the `self.loras` list and recomposes the model
+        # on-the-fly before inference.
         if transformer_options is None:
             transformer_options = {}
         
@@ -1383,7 +1354,7 @@ class ComfyQwenImageWrapper(nn.Module):
         return self._execute_model(x, timestep, context, guidance, control, transformer_options, **kwargs)
     
     def _execute_model(self, x, timestep, context, guidance, control, transformer_options, **kwargs):
-        """Helper function to run the Qwen model's forward pass."""
+        # Helper function to run the Qwen model's forward pass.
         model_device = next(self.model.parameters()).device
         
         # Move input tensors to model device

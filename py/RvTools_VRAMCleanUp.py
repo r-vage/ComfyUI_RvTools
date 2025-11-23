@@ -47,7 +47,7 @@ class Eclipse_VRAMCleanup:
     CATEGORY = CATEGORY.MAIN.value + CATEGORY.TOOLS.value
 
     def _validate_prompt_server(self):
-        """Validate that PromptServer is available and accessible"""
+        # Validate that PromptServer is available and accessible
         try:
             if not hasattr(PromptServer, 'instance') or PromptServer.instance is None:
                 return False, "PromptServer instance not available"
@@ -56,7 +56,7 @@ class Eclipse_VRAMCleanup:
             return False, f"PromptServer validation error: {e}"
 
     def _send_cleanup_signal(self, offload_model, offload_cache):
-        """Send cleanup signal to ComfyUI frontend"""
+        # Send cleanup signal to ComfyUI frontend
         signal_data = {
             "type": "cleanup_request",
             "data": {
@@ -74,7 +74,7 @@ class Eclipse_VRAMCleanup:
             return False, f"Failed to send cleanup signal: {e}"
 
     def _aggressive_vram_cleanup(self):
-        """Perform aggressive VRAM cleanup using PyTorch and garbage collection"""
+        # Perform aggressive VRAM cleanup using PyTorch and garbage collection
         try:
             if not torch.cuda.is_available():
                 return False, "CUDA not available"
@@ -104,7 +104,7 @@ class Eclipse_VRAMCleanup:
             return False, f"Aggressive cleanup failed: {str(e)}"
 
     def empty_cache(self, anything, offload_model, offload_cache, aggressive_cleanup, unique_id=None, extra_pnginfo=None):
-        """Send VRAM cleanup signal to ComfyUI frontend with validation and feedback"""
+        # Send VRAM cleanup signal to ComfyUI frontend with validation and feedback
         start_time = time.time()
 
         try:

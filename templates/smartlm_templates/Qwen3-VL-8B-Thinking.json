@@ -1,0 +1,30 @@
+{
+  "repo_id": "Qwen/Qwen3-VL-8B-Thinking",
+  "local_path": "",
+  "mmproj_path": "",
+  "model_type": "qwenvl",
+  "default": false,
+  "default_task": "Detailed Description",
+  "default_text_input": "",
+  "max_tokens": 1024,
+  "quantization": "auto",
+  "attention_mode": "auto",   
+  "quantized": false,
+  "vram_requirement": {
+    "full": 12.0,
+    "8bit": 7.0,
+    "4bit": 4.5
+  },
+  "_available_tasks": [
+    "Custom",
+    "Tags",
+    "Simple Description",
+    "Detailed Description",
+    "Ultra Detailed Description",
+    "Cinematic Description",
+    "Detailed Analysis",
+    "Video Summary",
+    "Short Story",
+    "Prompt Refine & Expand"
+  ]
+}

@@ -61,9 +61,9 @@ def _read_pyproject_version() -> str:
 			return m.group(1)
 
 	# Final fallback
-	# Historically the project used version "1.15.0"; use it as a safer
+	# Historically the project used version "1.0.50"; use it as a safer
 	# fallback when pyproject.toml can't be parsed.
-	return "1.15.0"
+	return "1.0.50"
 
 
 __version__ = _read_pyproject_version()

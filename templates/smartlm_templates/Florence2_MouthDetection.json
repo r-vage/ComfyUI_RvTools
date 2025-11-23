@@ -1,0 +1,27 @@
+{
+  "repo_id": "gokaygokay/Florence-2-Flux-Large",
+  "local_path": "Florence-2-Flux-Large",
+  "mmproj_path": "",
+  "model_type": "florence2",
+  "default": false,
+  "default_task": "caption_to_phrase_grounding",
+  "default_text_input": "mouth",
+  "max_tokens": 128,
+  "quantization": "4bit",
+  "attention_mode": "auto",
+  "quantized": false,
+  "vram_requirement": {
+    "full": 3.7,
+    "8bit": 2.2,
+    "4bit": 1.4
+  },
+  "convert_to_bboxes": false,
+  "_available_tasks": [
+    "caption",
+    "detailed_caption",
+    "prompt_generation",
+    "grounding",
+    "detection",
+    "ocr"
+  ]
+}

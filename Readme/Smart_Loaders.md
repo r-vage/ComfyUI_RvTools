@@ -379,7 +379,7 @@ Model-specific options for reduced VRAM:
 2. Set `template_action` to "Save"
 3. Enter name in `new_template_name` (auto-fills if updating existing template)
 4. Click "Execute Template Action" button
-5. Template saved to `ComfyUI/models/smart_loader_templates/<name>.json`
+5. Template saved to `ComfyUI/models/Eclipse/loader_templates/<name>.json`
 6. Node automatically switches back to "Load" mode with saved template selected
 
 **Updating an Existing Template:**
@@ -703,7 +703,7 @@ The template system intelligently saves only relevant configuration for your set
 3. Set `template_action` to "Save"
 4. Enter descriptive name in `new_template_name`
 5. Click "Execute Template Action"
-6. Template saved to `ComfyUI/models/smart_loader_templates/<name>.json`
+6. Template saved to `ComfyUI/models/Eclipse/loader_templates/<name>.json`
 
 **Naming Tips:**
 - Use descriptive names: `Flux_Dev_1024`, `SDXL_Portrait`, `Qwen_Analysis`
@@ -727,7 +727,7 @@ The template system intelligently saves only relevant configuration for your set
 2. Set `template_action` to "Save"
 3. Enter name in `new_template_name` (auto-fills with loaded template name if updating)
 4. Click "Execute Template Action" button
-5. Template saves to `ComfyUI/models/smart_loader_templates/<name>.json`
+5. Template saves to `ComfyUI/models/Eclipse/loader_templates/<name>.json`
 6. Node automatically switches back to "Load" mode
 
 **Auto-Fill Feature:**
@@ -757,7 +757,7 @@ Smart Loader uses a dual-location template system similar to SmartPrompt's wildc
 - Safe to customize without affecting the extension
 - Delete this folder to reset to bundled defaults
 
-**Bundled Templates:** `ComfyUI/custom_nodes/ComfyUI_Eclipse/json/loader_templates/`
+**Bundled Templates:** `ComfyUI/custom_nodes/ComfyUI_Eclipse/templates/loader_templates/`
 - Default templates included with the extension
 - Auto-copied to models folder on first run
 - Updated when you update the extension
@@ -782,7 +782,7 @@ Smart Loader uses a dual-location template system similar to SmartPrompt's wildc
 4. Template removed immediately
 
 **Backup:**
-- Copy entire `ComfyUI/models/smart_loader_templates/` folder
+- Copy entire `ComfyUI/models/Eclipse/loader_templates/` folder
 - Keep backups of important configurations
 - Version control with Git if desired
 

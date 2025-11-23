@@ -31,11 +31,9 @@ except ImportError:
 any = AnyType("*")
 
 class Eclipse_ShowAny:
-    """
-    Display any type of data as formatted text output.
-    Accepts any input type and converts it to readable text format.
-    Automatically detects and previews IMAGE tensors.
-    """
+    # Display any type of data as formatted text output.
+    # Accepts any input type and converts it to readable text format.
+    # Automatically detects and previews IMAGE tensors.
     
     def __init__(self):
         self.output_dir = folder_paths.get_temp_directory()
@@ -66,21 +64,21 @@ class Eclipse_ShowAny:
     CATEGORY = CATEGORY.MAIN.value + CATEGORY.TOOLS.value
 
     def _is_mask_tensor(self, tensor):
-        """Check if a tensor is a MASK tensor (2D or 3D)"""
+        # Check if a tensor is a MASK tensor (2D or 3D)
         if not TORCH_AVAILABLE or not isinstance(tensor, torch.Tensor):
             return False
         # Mask format: [height, width] or [batch, height, width]
         return tensor.dim() in [2, 3] and tensor.shape[-1] > 1 and tensor.shape[-2] > 1
 
     def _is_image_tensor(self, tensor):
-        """Check if a tensor is an IMAGE tensor (4D with valid channels)"""
+        # Check if a tensor is an IMAGE tensor (4D with valid channels)
         if not TORCH_AVAILABLE or not isinstance(tensor, torch.Tensor):
             return False
         # Image format: [batch, height, width, channels]
         return tensor.dim() == 4 and tensor.shape[-1] in [1, 3, 4]
     
     def _save_image_preview(self, image_tensor):
-        """Save image tensor to temp folder and return metadata for preview"""
+        # Save image tensor to temp folder and return metadata for preview
         results = []
         
         filename_prefix = "ShowAny" + self.prefix_append
@@ -106,7 +104,7 @@ class Eclipse_ShowAny:
         return results
 
     def _save_mask_preview(self, mask_tensor):
-        """Save mask tensor to temp folder and return metadata for preview"""
+        # Save mask tensor to temp folder and return metadata for preview
         results: List[Dict[str, str]] = []
         
         filename_prefix = "ShowAnyMask" + self.prefix_append
@@ -146,7 +144,7 @@ class Eclipse_ShowAny:
 
 
     def _format_tensor(self, tensor):
-        """Format tensor for display - show actual values for small tensors, summary for large ones"""
+        # Format tensor for display - show actual values for small tensors, summary for large ones
         shape = list(tensor.shape)
         dtype = tensor.dtype
         device = tensor.device
@@ -191,11 +189,9 @@ class Eclipse_ShowAny:
                    f"Sample:\n{sample_str}\n...")
 
     def show_value(self, show_images, unique_id=None, extra_pnginfo=None, **kwargs):
-        """
-        Convert any input to displayable text format.
-        Handles strings, numbers, lists, dicts, tensors, and other objects.
-        Previews IMAGE tensors when show_images is enabled.
-        """
+        # Convert any input to displayable text format.
+        # Handles strings, numbers, lists, dicts, tensors, and other objects.
+        # Previews IMAGE tensors when show_images is enabled.
         # Extract show_images parameter (it's a list)
         show_images_enabled = show_images[0] == "show" if isinstance(show_images, list) else show_images == "show"
         

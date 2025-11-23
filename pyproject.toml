@@ -1,7 +1,7 @@
 [project]
 name = "ComfyUI_Eclipse"
 description = "ComfyUI custom nodes and utilities for workflow building, type conversions, checkpoint/pipe loaders and file utilities."
-version = "1.0.44"
+version = "1.0.50"
 license = {file = "LICENSE"} 
 
 authors = [
@@ -31,4 +31,3 @@ DisplayName = "ComfyUI_Eclipse"
 Icon = "https://raw.githubusercontent.com/r-vage/ComfyUI_Eclipse/refs/heads/main/Readme/icon_eclipse.png"
 includes = [] 
 # "requires-comfyui" = ">=1.0.0"  # ComfyUI version compatibility
-

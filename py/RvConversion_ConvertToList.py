@@ -28,7 +28,7 @@ def pil2tensor(image):
 
 # Helper function for mask conversion
 def make_3d_mask(mask):
-    """Convert mask to 3D format"""
+    # Convert mask to 3D format
     if not hasattr(mask, "shape"):
         return mask
     if len(mask.shape) == 4:
@@ -59,11 +59,9 @@ class RvConversion_ConvertToList:
     FUNCTION = "execute"
 
     def execute(self, input, convert_to: str):
-        """
-        Convert input to list format.
-        For image color conversions (RGB, RGBA, GRAYSCALE), use ImageConvert node instead.
-        Returns list-based conversions based on convert_to selection.
-        """
+        # Convert input to list format.
+        # For image color conversions (RGB, RGBA, GRAYSCALE), use ImageConvert node instead.
+        # Returns list-based conversions based on convert_to selection.
         # Handle image conversions
         if convert_to == "IMAGE_BATCH_TO_LIST":
             return self._convert_image_batch_to_list(input)
@@ -80,34 +78,32 @@ class RvConversion_ConvertToList:
         return ([input],)
     
     def _convert_image_batch_to_list(self, images):
-        """
-        Convert image batch to list of images.
-        Fallback: if not an image batch, return as single-item list.
-        """
+        # Convert image batch to list of images.
+        # Fallback: if not an image batch, return as single-item list.
         # Check if input is tensor-like
         if not isinstance(images, (torch.Tensor, list, tuple)):
-            cstr(f"[Eclipse ConvertToList] IMAGE_BATCH_TO_LIST: Input is not a batch, returning as single-item list").warning.print()
+            cstr(f"[Convert] image_batch_to_list: Input is not a batch, returning as single-item list").warning.print()
             return ([images],)
         
         try:
             if isinstance(images, (list, tuple)):
                 if len(images) == 0:
-                    cstr(f"[Eclipse ConvertToList] IMAGE_BATCH_TO_LIST: Empty list, returning as-is").warning.print()
+                    cstr(f"[Convert] image_batch_to_list: Empty list, returning as-is").warning.print()
                     return ([],)
                 # Validate each image is a tensor with shape
                 for i, img in enumerate(images):
                     if not hasattr(img, "shape") or img.ndim < 3:
-                        cstr(f"[Eclipse ConvertToList] IMAGE_BATCH_TO_LIST: Image at index {i} is not a valid tensor, returning as-is").warning.print()
+                        cstr(f"[Convert] image_batch_to_list: Image at index {i} is not a valid tensor, returning as-is").warning.print()
                         return (list(images),)
                 return (list(images),)
             
             if not hasattr(images, "shape") or not hasattr(images, "__getitem__"):
-                cstr(f"[Eclipse ConvertToList] IMAGE_BATCH_TO_LIST: Not a valid batch tensor, returning as single-item list").warning.print()
+                cstr(f"[Convert] image_batch_to_list: Not a valid batch tensor, returning as single-item list").warning.print()
                 return ([images],)
             
             batch_size = images.shape[0]
             if batch_size == 0:
-                cstr(f"[Eclipse ConvertToList] IMAGE_BATCH_TO_LIST: Empty batch, returning empty list").warning.print()
+                cstr(f"[Convert] image_batch_to_list: Empty batch, returning empty list").warning.print()
                 return ([],)
             
             # Validate each image in batch and ensure 4D shape [1, H, W, C]
@@ -116,34 +112,32 @@ class RvConversion_ConvertToList:
                 img = images[i:i + 1, ...]
                 # Verify it's 4D tensor with batch dimension of 1
                 if not hasattr(img, "shape") or img.ndim != 4:
-                    cstr(f"[Eclipse ConvertToList] IMAGE_BATCH_TO_LIST: Image at batch index {i} is not valid 4D tensor, returning as single-item list").error.print()
+                    cstr(f"[Convert] image_batch_to_list: Image at batch index {i} is not valid 4D tensor, returning as single-item list").error.print()
                     return ([images],)
                 img_list.append(img)
             
             return (img_list,)
         except Exception as e:
-            cstr(f"[Eclipse ConvertToList] IMAGE_BATCH_TO_LIST conversion failed: {e}, returning as single-item list").error.print()
+            cstr(f"[Convert] image_batch_to_list conversion failed: {e}, returning as single-item list").error.print()
             return ([images],)
     
     def _convert_mask_batch_to_list(self, masks):
-        """
-        Convert mask batch to list of masks.
-        Fallback: if not a mask batch, return as single-item list.
-        """
+        # Convert mask batch to list of masks.
+        # Fallback: if not a mask batch, return as single-item list.
         if masks is None:
-            cstr(f"[Eclipse ConvertToList] MASK_BATCH_TO_LIST: Input is None, returning empty list").warning.print()
+            cstr(f"[Convert] mask_batch_to_list: Input is None, returning empty list").warning.print()
             return ([],)
         
         try:
             # Already a list/tuple
             if isinstance(masks, (list, tuple)):
                 if len(masks) == 0:
-                    cstr(f"[Eclipse ConvertToList] MASK_BATCH_TO_LIST: Empty list, returning as-is").msg.print()
+                    cstr(f"[Convert] mask_batch_to_list: Empty list, returning as-is").msg.print()
                     return ([],)
                 # Validate each mask is a tensor with shape
                 for i, m in enumerate(masks):
                     if not hasattr(m, "shape") or m.ndim < 2:
-                        cstr(f"[Eclipse ConvertToList] MASK_BATCH_TO_LIST: Mask at index {i} is not a valid tensor, returning as-is").warning.print()
+                        cstr(f"[Convert] mask_batch_to_list: Mask at index {i} is not a valid tensor, returning as-is").warning.print()
                         return (list(masks),)
                 return (list(masks),)
             
@@ -151,7 +145,7 @@ class RvConversion_ConvertToList:
             if hasattr(masks, "shape") and hasattr(masks, "__getitem__"):
                 batch_size = masks.shape[0]
                 if batch_size == 0:
-                    cstr(f"[Eclipse ConvertToList] MASK_BATCH_TO_LIST: Empty batch, returning empty list").msg.print()
+                    cstr(f"[Convert] mask_batch_to_list: Empty batch, returning empty list").msg.print()
                     return ([],)
                 
                 # Convert to list of 3D masks
@@ -159,38 +153,36 @@ class RvConversion_ConvertToList:
                 for i in range(batch_size):
                     m = make_3d_mask(masks[i])
                     if not hasattr(m, "shape") or m.ndim < 2:
-                        cstr(f"[Eclipse ConvertToList] MASK_BATCH_TO_LIST: Mask at batch index {i} is not valid, returning as single-item list").warning.print()
+                        cstr(f"[Convert] mask_batch_to_list: Mask at batch index {i} is not valid, returning as single-item list").warning.print()
                         return ([masks],)
                     mask_list.append(m)
                 return (mask_list,)
             
-            cstr(f"[Eclipse ConvertToList] MASK_BATCH_TO_LIST: Not a valid mask batch, returning as single-item list").warning.print()
+            cstr(f"[Convert] mask_batch_to_list: Not a valid mask batch, returning as single-item list").warning.print()
             return ([masks],)
         except Exception as e:
-            cstr(f"[Eclipse ConvertToList] MASK_BATCH_TO_LIST conversion failed: {e}, returning as single-item list").error.print()
+            cstr(f"[Convert] mask_batch_to_list conversion failed: {e}, returning as single-item list").error.print()
             return ([masks],)
     
     def _convert_latent_batch_to_list(self, latents):
-        """
-        Convert latent batch to list of individual latents.
-        A latent batch is a dict: {"samples": torch.Tensor} with shape [B, C, H, W]
-        A latent list is a list of dicts: [{"samples": tensor}, ...] each with shape [1, C, H, W]
-        Fallback: if not a latent batch, return as single-item list.
-        """
+        # Convert latent batch to list of individual latents.
+        # A latent batch is a dict: {"samples": torch.Tensor} with shape [B, C, H, W]
+        # A latent list is a list of dicts: [{"samples": tensor}, ...] each with shape [1, C, H, W]
+        # Fallback: if not a latent batch, return as single-item list.
         if latents is None:
-            cstr(f"[Eclipse ConvertToList] LATENT_BATCH_TO_LIST: Input is None, returning empty list").warning.print()
+            cstr(f"[Convert] latent_batch_to_list: Input is None, returning empty list").warning.print()
             return ([],)
         
         try:
             # Already a list/tuple of latent dicts
             if isinstance(latents, (list, tuple)):
                 if len(latents) == 0:
-                    cstr(f"[Eclipse ConvertToList] LATENT_BATCH_TO_LIST: Empty list, returning as-is").msg.print()
+                    cstr(f"[Convert] latent_batch_to_list: Empty list, returning as-is").msg.print()
                     return ([],)
                 # Validate each latent is a dict with "samples"
                 for i, latent in enumerate(latents):
                     if not isinstance(latent, dict) or "samples" not in latent:
-                        cstr(f"[Eclipse ConvertToList] LATENT_BATCH_TO_LIST: Item at index {i} is not a valid latent dict, returning as-is").warning.print()
+                        cstr(f"[Convert] latent_batch_to_list: Item at index {i} is not a valid latent dict, returning as-is").warning.print()
                         return (list(latents),)
                 return (list(latents),)
             
@@ -199,12 +191,12 @@ class RvConversion_ConvertToList:
                 samples = latents["samples"]
                 
                 if not hasattr(samples, "shape") or not hasattr(samples, "__getitem__"):
-                    cstr(f"[Eclipse ConvertToList] LATENT_BATCH_TO_LIST: 'samples' is not a valid tensor, returning as single-item list").warning.print()
+                    cstr(f"[Convert] latent_batch_to_list: 'samples' is not a valid tensor, returning as single-item list").warning.print()
                     return ([latents],)
                 
                 batch_size = samples.shape[0]
                 if batch_size == 0:
-                    cstr(f"[Eclipse ConvertToList] LATENT_BATCH_TO_LIST: Empty batch, returning empty list").msg.print()
+                    cstr(f"[Convert] latent_batch_to_list: Empty batch, returning empty list").msg.print()
                     return ([],)
                 
                 # Convert to list of individual latent dicts
@@ -215,13 +207,13 @@ class RvConversion_ConvertToList:
                     latent_dict = {"samples": single_sample}
                     latent_list.append(latent_dict)
                 
-                cstr(f"[Eclipse ConvertToList] LATENT_BATCH_TO_LIST: Split batch into {len(latent_list)} individual latents").msg.print()
+                cstr(f"[Convert] latent_batch_to_list: Split batch into {len(latent_list)} individual latents").msg.print()
                 return (latent_list,)
             
-            cstr(f"[Eclipse ConvertToList] LATENT_BATCH_TO_LIST: Not a valid latent batch dict, returning as single-item list").warning.print()
+            cstr(f"[Convert] latent_batch_to_list: Not a valid latent batch dict, returning as single-item list").warning.print()
             return ([latents],)
         except Exception as e:
-            cstr(f"[Eclipse ConvertToList] LATENT_BATCH_TO_LIST conversion failed: {e}, returning as single-item list").error.print()
+            cstr(f"[Convert] latent_batch_to_list conversion failed: {e}, returning as single-item list").error.print()
             import traceback
             traceback.print_exc()
             return ([latents],)

@@ -28,11 +28,11 @@ random.setstate(initial_random_state)
 
 
 def new_random_seed():
-    """ Gets a new random seed from the eclipse_seed_random_state and resetting the previous state."""
+    # Gets a new random seed from the eclipse_seed_random_state and resetting the previous state.
     global eclipse_seed_random_state
     prev_random_state = random.getstate()
     random.setstate(eclipse_seed_random_state)
-    seed = random.randint(1, 1125899906842624)
+    seed = random.randint(0, 2**64 - 1)
     eclipse_seed_random_state = random.getstate()
     random.setstate(prev_random_state)
     return seed
@@ -100,7 +100,7 @@ class RvFolder_SmartFolder:
                    context_length=None, loop_count=None, overlap=None, skip_first_frames=None, 
                    skip_calculation=None, skip_calculation_control=None, 
                    select_every_nth=None, batch_size=None, prompt=None, extra_pnginfo=None, unique_id=None):
-        """Forces a changed state if we happen to get a special seed, as if from the API directly."""
+        # Forces a changed state if we happen to get a special seed, as if from the API directly.
         if seed in (-1, -2, -3):
             # This isn't used, but a different value than previous will force it to be "changed"
             return new_random_seed()
@@ -146,7 +146,7 @@ class RvFolder_SmartFolder:
 
                 # Common parameters
                 "batch_size": ("INT", {"default": 1, "min": 1, "max": 4096}, "Batch size (number of items per batch)."),
-                "seed": ("INT", {"default": 0, "min": -1125899906842624, "max": 1125899906842624, "tooltip": "Random seed for folder naming. Use -1 for random, -2 to increment, -3 to decrement."}),
+                "seed": ("INT", {"default": 0, "min": -3, "max": 2**64 - 1, "tooltip": "Random seed for folder naming. Use -1 for random, -2 to increment, -3 to decrement."}),
             },
             "hidden": {
                 "prompt": "PROMPT",

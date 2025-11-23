@@ -69,20 +69,24 @@ Select "beautiful woman" and it appears in your final prompt. Select "Random" an
 
 ### File Location
 
-**Primary Location:** `ComfyUI/models/wildcards/smartprompt/`  
-**Fallback Location:** `ComfyUI_Eclipse/prompt/`
+**Primary Location:** `ComfyUI/models/Eclipse/smart_prompt/`  
+**Wildcard Integration:** `ComfyUI/models/wildcards/smart_prompt/` (junction → Eclipse)  
+**Fallback Location:** `ComfyUI_Eclipse/templates/prompt/`
 
-Smart Prompt uses a dual-location system:
+Smart Prompt uses a multi-location system:
 
-1. **Primary (Wildcards Integration):** On first run, Smart Prompt automatically copies files from the extension's `prompt/` folder to `ComfyUI/models/wildcards/smartprompt/`. This enables wildcard integration while keeping the original files safe in the extension directory.
+1. **Primary (User Files):** On first run, Smart Prompt automatically copies files from the extension's `templates/prompt/` folder to `ComfyUI/models/Eclipse/smart_prompt/`. This is your workspace for customization.
 
-2. **Fallback (Extension Directory):** If the smartprompt folder doesn't exist or is deleted, Smart Prompt falls back to using `ComfyUI_Eclipse/prompt/` directly.
+2. **Wildcard Junction:** A junction (Windows) or symlink (Unix) at `ComfyUI/models/wildcards/smart_prompt/` points to `Eclipse/smart_prompt/` for seamless wildcard processor access.
+
+3. **Fallback (Extension Directory):** If the Eclipse folder doesn't exist, Smart Prompt falls back to using `ComfyUI_Eclipse/templates/prompt/` directly.
 
 **Benefits:**
-- **Wildcard Integration:** Files in `smartprompt/` can be used with the Wildcard Processor node (e.g., `__smartprompt/subjects/character__`)
-- **Safe Customization:** Edit files in `smartprompt/` without affecting the extension's originals
-- **Easy Reset:** Delete `smartprompt/` folder to get a fresh copy from the extension
-- **Updates Preserved:** Extension updates modify `ComfyUI_Eclipse/prompt/`, not your customized `smartprompt/` files
+- **Wildcard Integration:** Files accessible via `__smart_prompt/subjects/character__` syntax
+- **Safe Customization:** Edit files in Eclipse folder without affecting extension originals
+- **Git-Safe:** Your changes in Eclipse folder won't conflict with repository updates
+- **Easy Reset:** Delete `models/Eclipse/smart_prompt/` folder to get fresh copy from extension
+- **Updates Preserved:** Extension updates modify `ComfyUI_Eclipse/templates/prompt/`, not your customized files in `Eclipse/smart_prompt/`
 
 ---
 
@@ -90,7 +94,7 @@ Smart Prompt uses a dual-location system:
 
 ### Step 1: Understand the File Structure
 
-Navigate to `ComfyUI/models/wildcards/smartprompt/` (created on first run) or `ComfyUI_Eclipse/prompt/` (template location).
+Navigate to `ComfyUI/models/Eclipse/smart_prompt/` (created on first run) or `ComfyUI_Eclipse/templates/prompt/` (template location).
 
 You'll find folders like:
 ```
@@ -284,7 +288,7 @@ sketch, draft style
    ```
    ComfyUI/models/wildcards/smartprompt/
    ```
-   (Or edit templates in `ComfyUI_Eclipse/prompt/` and delete the smartprompt folder to get a fresh copy)
+   (Or edit templates in `ComfyUI_Eclipse/templates/prompt/` and delete the Eclipse/smart_prompt folder to get a fresh copy)
 
 2. **Choose or Create Folder:**
    - Use existing: `subjects/`, `settings/`, `environments/`
@@ -365,9 +369,9 @@ The **folder** dropdown filters which widgets are visible:
 - Cleaner interface, focused selection
 - Faster workflow for specific tasks
 
-### Creating Custom Folders
+#### Creating Custom Folders
 
-1. **Navigate to:** `ComfyUI/models/wildcards/smartprompt/`
+1. **Navigate to:** `ComfyUI/models/Eclipse/smart_prompt/`
 
 2. **Create New Folder:**
    - Name it descriptively: `colors/`, `textures/`, `cameras/`, etc.
@@ -687,8 +691,9 @@ charcoal sketch, high contrast
 **Solutions:**
 
 1. **Check folder exists:**
-   - Primary: `ComfyUI/models/wildcards/smartprompt/`
-   - Fallback: `ComfyUI_Eclipse/prompt/`
+   - Primary: `ComfyUI/models/Eclipse/smart_prompt/`
+   - Wildcard junction: `ComfyUI/models/wildcards/smart_prompt/`
+   - Fallback: `ComfyUI_Eclipse/templates/prompt/`
 
 2. **Check folder structure:**
    ```
@@ -703,7 +708,7 @@ charcoal sketch, high contrast
    - Number and name separated by `_`
 
 4. **Try resetting:**
-   - Delete `ComfyUI/models/wildcards/smartprompt/` folder
+   - Delete `ComfyUI/models/Eclipse/smart_prompt/` folder
    - Restart ComfyUI (will auto-copy fresh files from extension)
 
 5. **Restart ComfyUI:**
@@ -795,8 +800,8 @@ charcoal sketch, high contrast
    - Clear browser cache (Ctrl+F5)
 
 2. **Check file location:**
-   - Primary: Files in `ComfyUI/models/wildcards/smartprompt/`
-   - Fallback: Files in `ComfyUI_Eclipse/prompt/`
+   - Primary: Files in `ComfyUI/models/Eclipse/smart_prompt/`
+   - Fallback: Files in `ComfyUI_Eclipse/templates/prompt/`
    - Files in correct subfolder?
 
 3. **Verify filename:**
@@ -904,7 +909,7 @@ Save workflow for quick loading.
 **Combine with Wildcard Processor:**
 ```
 Smart Prompt → prompt (base structure)
-Wildcard Processor → adds variations (e.g., __smartprompt/subjects/character__)
+Wildcard Processor → adds variations (e.g., __smart_prompt/subjects/character__)
 Merge Strings → combine both
 ```
 
@@ -916,7 +921,7 @@ Smart Prompt 2 → Negative CLIP
 
 Different prompt libraries for positive/negative prompts.
 
-**Note:** Smart Prompt files in `ComfyUI/models/wildcards/smartprompt/` can be accessed by Wildcard Processor using the syntax: `__smartprompt/folder/filename__`
+**Note:** Smart Prompt files in `ComfyUI/models/wildcards/smart_prompt/` (junction to Eclipse/smart_prompt/) can be accessed by Wildcard Processor using the syntax: `__smart_prompt/folder/filename__`
 
 ---
 
@@ -929,9 +934,10 @@ Different prompt libraries for positive/negative prompts.
 - Name becomes label (underscores → spaces)
 
 ### File Location
-- Primary: `ComfyUI/models/wildcards/smartprompt/` (auto-created on first run)
-- Fallback: `ComfyUI_Eclipse/prompt/` (template/backup)
-- Wildcard syntax: `__smartprompt/folder/filename__`
+- Primary: `ComfyUI/models/Eclipse/smart_prompt/` (auto-created on first run, user-editable)
+- Wildcard: `ComfyUI/models/wildcards/smart_prompt/` (junction to Eclipse folder)
+- Fallback: `ComfyUI_Eclipse/templates/prompt/` (template/backup)
+- Wildcard syntax: `__smart_prompt/folder/filename__`
 
 ### Selection Modes
 | Mode | Behavior |

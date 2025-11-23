@@ -168,7 +168,7 @@ def handle_qdiffusion(params):
 	pass
 
 def handle_comfyui(params):
-	"""Extract generation data from ComfyUI embedded metadata"""
+	# Extract generation data from ComfyUI embedded metadata
 	gen_data = {}
 	
 	# Extract parameters (generation settings)

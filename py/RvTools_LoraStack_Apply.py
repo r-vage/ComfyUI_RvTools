@@ -20,19 +20,17 @@ any = AnyType("*")
 
 
 def is_nunchaku_flux_model(model: Any) -> bool:
-    """
-    Check if a model is a Nunchaku FLUX model by detecting ComfyFluxWrapper.
-    
-    Parameters
-    ----------
-    model : Any
-        The model (ModelPatcher) to check.
-        
-    Returns
-    -------
-    bool
-        True if the model has ComfyFluxWrapper, False otherwise.
-    """
+    # Check if a model is a Nunchaku FLUX model by detecting ComfyFluxWrapper.
+    #
+    # Parameters
+    # ----------
+    # model : Any
+    #     The model (ModelPatcher) to check.
+    #
+    # Returns
+    # -------
+    # bool
+    #     True if the model has ComfyFluxWrapper, False otherwise.
     try:
         model_wrapper = model.model.diffusion_model  # type: ignore
         
@@ -50,19 +48,17 @@ def is_nunchaku_flux_model(model: Any) -> bool:
 
 
 def is_nunchaku_qwen_model(model: Any) -> bool:
-    """
-    Check if a model is a Nunchaku Qwen model by detecting ComfyQwenImageWrapper.
-    
-    Parameters
-    ----------
-    model : Any
-        The model (ModelPatcher) to check.
-        
-    Returns
-    -------
-    bool
-        True if the model has ComfyQwenImageWrapper, False otherwise.
-    """
+    # Check if a model is a Nunchaku Qwen model by detecting ComfyQwenImageWrapper.
+    #
+    # Parameters
+    # ----------
+    # model : Any
+    #     The model (ModelPatcher) to check.
+    #
+    # Returns
+    # -------
+    # bool
+    #     True if the model has ComfyQwenImageWrapper, False otherwise.
     try:
         model_wrapper = model.model.diffusion_model  # type: ignore
         
@@ -120,7 +116,7 @@ class Eclipse_LoraStack_Apply:
             return self._apply_lora_stack_standard(model, clip, lora_params)
 
     def _apply_lora_stack_standard(self, model, clip, lora_params):
-        """Apply LoRAs to standard (non-Nunchaku) models using ComfyUI's loader."""
+        # Apply LoRAs to standard (non-Nunchaku) models using ComfyUI's loader.
         # Initialise the model and clip
         model_lora = model
         clip_lora = clip
@@ -150,7 +146,7 @@ class Eclipse_LoraStack_Apply:
         return (model_lora, clip_lora, lora_string)
 
     def _apply_lora_stack_nunchaku_flux(self, model: Any, clip: Any, lora_params: list[Any]) -> tuple[Any, Any, str]:
-        """Apply LoRAs to Nunchaku FLUX models via ComfyFluxWrapper."""
+        # Apply LoRAs to Nunchaku FLUX models via ComfyFluxWrapper.
         try:
             # Import required Nunchaku components
             from nunchaku.lora.flux import to_diffusers  # type: ignore
@@ -273,7 +269,7 @@ class Eclipse_LoraStack_Apply:
         return (ret_model, clip, lora_string)
 
     def _apply_lora_stack_nunchaku_qwen(self, model: Any, clip: Any, lora_params: list[Any]) -> tuple[Any, Any, str]:
-        """Apply LoRAs to Nunchaku Qwen models via ComfyQwenImageWrapper."""
+        # Apply LoRAs to Nunchaku Qwen models via ComfyQwenImageWrapper.
         try:
             # Import required Qwen wrapper
             from ..core.nunchaku_wrapper import ComfyQwenImageWrapper  # type: ignore

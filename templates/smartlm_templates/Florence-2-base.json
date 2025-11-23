@@ -1,0 +1,27 @@
+{
+  "repo_id": "microsoft/Florence-2-base",
+  "local_path": "Florence-2-base",
+  "mmproj_path": "",
+  "model_type": "florence2",
+  "default": false,
+  "default_task": "more_detailed_caption",
+  "default_text_input": "",
+  "max_tokens": 512,
+  "quantization": "auto",
+  "attention_mode": "auto",   
+  "quantized": false,
+  "vram_requirement": {
+    "full": 0.5,
+    "8bit": 0.3,
+    "4bit": 0.2
+  },
+  "convert_to_bboxes": false,
+  "_available_tasks": [
+    "caption",
+    "detailed_caption",
+    "prompt_generation",
+    "grounding",
+    "detection",
+    "ocr"
+  ]
+}

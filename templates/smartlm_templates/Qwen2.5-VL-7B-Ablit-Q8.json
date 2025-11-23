@@ -1,0 +1,30 @@
+{
+  "repo_id": "https://huggingface.co/mradermacher/Qwen2.5-VL-7B-Abliterated-Caption-it-GGUF/resolve/main/Qwen2.5-VL-7B-Abliterated-Caption-it.Q8_0.gguf",
+  "local_path": "Qwen2.5-VL-7B-Abliterated-Caption-it.Q8_0.gguf",
+  "mmproj_path": "Qwen2.5-VL-7B-Abliterated-Caption-it.Q8_0.mmproj.gguf",
+  "mmproj_url": "https://huggingface.co/mradermacher/Qwen2.5-VL-7B-Abliterated-Caption-it-GGUF/resolve/main/Qwen2.5-VL-7B-Abliterated-Caption-it.mmproj-Q8_0.gguf",
+  "model_type": "qwenvl",
+  "default": false,
+  "default_task": "Video Summary",
+  "default_text_input": "",
+  "max_tokens": 1024,
+  "quantization": "auto",
+  "attention_mode": "auto",
+  "quantized": true,
+  "vram_requirement": {
+    "full": 10.0
+  },
+  "context_size": 32768,
+  "_available_tasks": [
+    "Custom",
+    "Tags",
+    "Simple Description",
+    "Detailed Description",
+    "Ultra Detailed Description",
+    "Cinematic Description",
+    "Detailed Analysis",
+    "Video Summary",
+    "Short Story",
+    "Prompt Refine & Expand"
+  ]
+}

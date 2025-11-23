@@ -1,0 +1,27 @@
+{
+  "repo_id": "MiaoshouAI/Florence-2-base-PromptGen-v1.5",
+  "local_path": "Florence-2-base-PromptGen",
+  "mmproj_path": "",
+  "model_type": "florence2",
+  "default": false,
+  "default_task": "more_detailed_caption",
+  "default_text_input": "",
+  "max_tokens": 512,
+  "quantization": "auto",
+  "attention_mode": "auto",   
+  "quantized": false,
+  "vram_requirement": {
+    "full": 1.2,
+    "8bit": 0.7,
+    "4bit": 0.5
+  },
+  "convert_to_bboxes": false,
+  "_available_tasks": [
+    "caption",
+    "detailed_caption",
+    "prompt_generation",
+    "grounding",
+    "detection",
+    "ocr"
+  ]
+}

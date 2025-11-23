@@ -35,6 +35,14 @@ Welcome to the user documentation for ComfyUI_Eclipse! This guide is designed fo
 - Nested wildcards
 - Creating wildcard files
 
+**[Smart Language Model Loader Guide](Smart_Language_Model_Loader_Guide.md)** ⭐ NEW
+- **What it does:** Single node for analyzing images/videos with AI, generating tags, creating descriptions, and processing text
+- **Model types:** QwenVL (detailed analysis, video support), Florence-2 (fast tagging, OCR), LLM (text processing)
+- **Key features:** Pre-configured templates for all models, auto-download from HuggingFace, transformers + GGUF support
+- **Use cases:** Auto-tag generations, create training captions, video summaries, OCR, object detection, prompt enhancement
+- **Getting started:** 5-minute quick start, model comparison chart, VRAM requirements, practical examples
+- **Advanced:** Quantization options, performance optimization, troubleshooting
+
 ### Image Processing
 
 **[Save Images Guide](Save_Images.md)**
@@ -74,6 +82,13 @@ If you're new to ComfyUI_Eclipse loaders:
    - Generate infinite variations
    - Control randomization
 
+3.5. **Vision & Language AI:** [Smart Language Model Loader Guide](Smart_Language_Model_Loader_Guide.md) ⭐ NEW
+   - Single node for image/video/text AI analysis
+   - QwenVL (detailed descriptions, video), Florence-2 (fast tags, OCR), LLM (text processing)
+   - Pre-configured templates, auto-download models
+   - Practical use cases with examples
+   - 5-minute quick start tutorial
+
 4. **Advanced Setup:** [Nunchaku Installation](Nunchaku_Installation.md)
    - Install quantized model support (optional)
    - Reduce VRAM usage significantly
@@ -92,6 +107,11 @@ If you're new to ComfyUI_Eclipse loaders:
 - **Work with pipes** → [Checkpoint Loader Small (Pipe)](Checkpoint_Loaders.md#checkpoint-loader-small-pipe)
 - **Build prompts from files** → [Smart Prompt Guide](Smart_Prompt.md)
 - **Create prompt templates** → [Wildcard Processor Guide](Wildcard_Processor.md)
+- **Analyze images with AI** → [Smart Language Model Loader Guide](Smart_Language_Model_Loader_Guide.md)
+- **Generate image descriptions/tags** → [Smart Language Model Loader Guide](Smart_Language_Model_Loader_Guide.md)
+- **Understand video content** → [Smart Language Model Loader Guide](Smart_Language_Model_Loader_Guide.md) (QwenVL models)
+- **Auto-tag generated images** → [Smart Language Model Loader Guide](Smart_Language_Model_Loader_Guide.md) (Florence-2 models)
+- **Process text with LLM** → [Smart Language Model Loader Guide](Smart_Language_Model_Loader_Guide.md) (LLM models)
 - **Save images with metadata** → [Save Images Guide](Save_Images.md)
 - **Organize outputs with placeholders** → [Save Images Guide](Save_Images.md#placeholder-system)
 - **Install Nunchaku support** → [Nunchaku Installation](Nunchaku_Installation.md)
@@ -131,6 +151,18 @@ A: Use [Smart Prompt](Smart_Prompt.md) for dropdown-based selection from organiz
 
 A: **Smart Prompt** uses numbered text files to create dropdown menus (select from curated options). **Wildcard Processor** uses template syntax like `{option1|option2}` for dynamic expansion (infinite variations from templates).
 
+**Q: How do I analyze images or videos with AI?**
+
+A: Use the [Smart Language Model Loader](Smart_Language_Model_Loader_Guide.md) node. It's a single unified node that supports QwenVL (detailed analysis, video support), Florence-2 (fast tagging, OCR), and text-only LLM models. Just connect an image, select a template (model preset), choose a task, and run. Models download automatically on first use.
+
+**Q: What can Smart Language Model Loader do?**
+
+A: **Image Analysis:** Generate detailed descriptions, create SD/Flux tags, analyze composition/lighting. **Video:** Summarize content across frames (QwenVL). **Text Extraction:** OCR for documents/screenshots (Florence-2). **Object Detection:** Find and locate objects with bounding boxes. **Training Data:** Create captions for LoRA/DreamBooth. **Text Processing:** Refine prompts, convert tags to descriptions (LLM models). See [Smart Language Model Loader Guide](Smart_Language_Model_Loader_Guide.md) for examples.
+
+**Q: Which model should I use?**
+
+A: **Fast tagging:** Florence-2-base-PromptGen-v2.0 (~1s, ~2GB VRAM). **Detailed descriptions:** Qwen3-VL-2B-Instruct (~3-5s, ~4GB VRAM). **Video analysis:** Any QwenVL model (supports frame batches). **Text-only:** Mistral-7B-Instruct or other LLM models. See the [model comparison chart](Smart_Language_Model_Loader_Guide.md#supported-models) for full details on size/speed/quality trade-offs.
+
 **Q: How do I install Nunchaku for quantized models?**
 
 A: Follow the detailed [Nunchaku Installation Guide](Nunchaku_Installation.md). It includes step-by-step commands for ComfyUI Portable, dependency management, and GPU compatibility information.
@@ -150,13 +182,33 @@ A: RTX 30 and 40 series GPUs work well with the primary benefit being lower VRAM
 | GGUF Models | `ComfyUI/models/diffusion_models/` |
 | CLIP Files | `ComfyUI/models/clip/`<br>`ComfyUI/models/text_encoders/` |
 | VAE Files | `ComfyUI/models/vae/` |
-| Templates | `ComfyUI/models/smart_loader_templates/` (primary)<br>`ComfyUI_Eclipse/json/loader_templates/` (bundled) |
-| Smart Prompt Files | `ComfyUI/models/wildcards/smartprompt/` (primary)<br>`ComfyUI_Eclipse/prompt/` (bundled) |
+| Templates | `ComfyUI/models/Eclipse/loader_templates/` (primary)<br>`ComfyUI_Eclipse/templates/loader_templates/` (bundled) |
+| Smart Prompt Files | `ComfyUI/models/Eclipse/smart_prompt/` (primary)<br>`ComfyUI/models/wildcards/smart_prompt/` (junction)<br>`ComfyUI_Eclipse/templates/prompt/` (bundled) |
 | Wildcard Files | `ComfyUI/models/wildcards/` |
+| Smart LML Models | `ComfyUI/models/LLM/` (QwenVL, Florence-2, LLM) |
+| Smart LML Templates | `ComfyUI/models/Eclipse/smartlm_templates/` (user)<br>`ComfyUI_Eclipse/templates/smartlm_templates/` (bundled) |
 
 ### Required Extensions
 
 Some features require additional extensions:
+
+**For Smart Language Model Loader (QwenVL, Florence-2, LLM):**
+
+The Smart LML node requires Python packages for AI model support:
+- `transformers` (HuggingFace models - QwenVL, Florence-2, LLM)
+- `llama-cpp-python` (GGUF models - low VRAM option)
+
+These are typically auto-installed by ComfyUI's dependency manager. If you encounter import errors:
+
+```bash
+# For ComfyUI Portable (Windows):
+python_embeded\python.exe -m pip install transformers llama-cpp-python
+
+# For standard Python environments:
+pip install transformers llama-cpp-python
+```
+
+See the [Smart Language Model Loader Guide](Smart_Language_Model_Loader_Guide.md#installation--setup) for detailed installation and troubleshooting.
 
 **For Nunchaku Models (Quantized Flux/Qwen):**
 ```bash
@@ -179,8 +231,9 @@ git clone https://github.com/city96/ComfyUI-GGUF
 | `.ckpt` | ⚠️ Legacy | Works but shows warning |
 | `.pt` | ⚠️ Legacy | Works but shows warning |
 | `.pth` | ⚠️ Legacy | Works but shows warning |
+| `.bin` | ⚠️ Risky | PyTorch binary - can execute code |
 
-Always prefer `.safetensors` when available for safety and speed.
+Always prefer `.safetensors` when available for safety and speed. Avoid `.bin`, `.ckpt`, `.pt`, and `.pth` from untrusted sources as they can contain malicious code.
 
 ### Support & Help
 

@@ -26,11 +26,11 @@ random.setstate(initial_random_state)
 
 
 def new_random_seed():
-    """ Gets a new random seed from the eclipse_seed_random_state and resetting the previous state."""
+    # Gets a new random seed from the eclipse_seed_random_state and resetting the previous state.
     global eclipse_seed_random_state
     prev_random_state = random.getstate()
     random.setstate(eclipse_seed_random_state)
-    seed = random.randint(1, 1125899906842624)
+    seed = random.randint(0, 2**64 - 1)
     eclipse_seed_random_state = random.getstate()
     random.setstate(prev_random_state)
     return seed
@@ -42,7 +42,7 @@ class RvSettings_Sampler_Settings_Small_Seed:
 
     @classmethod
     def IS_CHANGED(cls, allow_overwrite=None, sampler_name=None, scheduler=None, steps=None, cfg=None, seed=None, prompt=None, extra_pnginfo=None, unique_id=None):
-        """Forces a changed state if we happen to get a special seed, as if from the API directly."""
+        # Forces a changed state if we happen to get a special seed, as if from the API directly.
         if seed in (-1, -2, -3):
             # This isn't used, but a different value than previous will force it to be "changed"
             return new_random_seed()
@@ -57,7 +57,7 @@ class RvSettings_Sampler_Settings_Small_Seed:
                 "scheduler": (SCHEDULERS_ANY, {"tooltip": "Select the scheduler algorithm."}),
                 "steps": ("INT", {"default": 20, "min": 1, "step": 1, "tooltip": "Number of sampling steps."}),
                 "cfg": ("FLOAT", {"default": 3.50, "min": 0.00, "step": 0.1, "tooltip": "Classifier-Free Guidance scale."}),
-                "seed": ("INT", {"default": 0, "min": -1125899906842624, "max": 1125899906842624, "tooltip": "Random seed for generation."}),
+                "seed": ("INT", {"default": 0, "min": -3, "max": 2**64 - 1, "tooltip": "Random seed for generation. Use -1 for random, -2 to increment, -3 to decrement."}),
             },
             "hidden": {
                 "prompt": "PROMPT",

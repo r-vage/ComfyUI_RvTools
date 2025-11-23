@@ -10,8 +10,11 @@ requests
 PyYAML
 aiohttp
 
-# QwenVL Vision-Language Models
-#transformers>=4.57.0
-#huggingface-hub>=0.23.0
-#accelerate>=0.33.0
-#bitsandbytes>=0.43.0
+# Vision-Language Models (QwenVL, Florence-2)
+# Nunchaku requires transformers>=4.56.2
+# Qwen3-VL requires transformers>=4.57.1
+transformers>=4.56.2
+# transformers>=4.57.1  # Uncomment for Qwen3-VL support
+huggingface-hub>=0.20.0
+accelerate>=0.26.0
+bitsandbytes>=0.41.0

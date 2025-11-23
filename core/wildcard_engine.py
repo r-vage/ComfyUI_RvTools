@@ -10,17 +10,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-Wildcard Processing Engine for Eclipse
-
-Processes text with wildcard syntax supporting:
-- {option1|option2|option3} - random selection
-- __keyword__ - wildcard reference
-- 2$$opt1|opt2 - quantity selection
-- 1-3$$items - range selection
-- 1.0::item1|2.0::item2 - probability weights
-- 3#__keyword__ - quantifier
-"""
+# Wildcard Processing Engine for Eclipse
+#
+# Processes text with wildcard syntax supporting:
+# - {option1|option2|option3} - random selection
+# - __keyword__ - wildcard reference
+# - 2$$opt1|opt2 - quantity selection
+# - 1-3$$items - range selection
+# - 1.0::item1|2.0::item2 - probability weights
+# - 3#__keyword__ - quantifier
 
 import re
 import random
@@ -43,36 +41,36 @@ RE_WildCardQuantifier = re.compile(
 
 
 def wildcard_normalize(x: str) -> str:
-    """Normalize wildcard keywords to lowercase with / separator."""
+    # Normalize wildcard keywords to lowercase with / separator.
     return x.replace("\\", "/").replace(' ', '-').lower()
 
 
 def get_wildcard_list() -> List[str]:
-    """Get list of available wildcards in format: ['__keyword1__', '__keyword2__']"""
+    # Get list of available wildcards in format: ['__keyword1__', '__keyword2__']
     with wildcard_lock:
         return [f"__{x}__" for x in sorted(wildcard_dict.keys())]
 
 
 def get_wildcard_dict() -> Dict[str, List[str]]:
-    """Get a copy of the wildcard dictionary (thread-safe)."""
+    # Get a copy of the wildcard dictionary (thread-safe).
     with wildcard_lock:
         return wildcard_dict.copy()
 
 
 def is_numeric_string(input_str: str) -> bool:
-    """Check if string represents a number."""
+    # Check if string represents a number.
     return re.match(r'^-?(\d*\.?\d+|\d+\.?\d*)$', input_str) is not None
 
 
 def safe_float(x: str) -> float:
-    """Safely convert string to float, default 1.0 if not numeric."""
+    # Safely convert string to float, default 1.0 if not numeric.
     if is_numeric_string(x):
         return float(x)
     return 1.0
 
 
 def process_comment_out(text: str) -> str:
-    """Remove comment lines (lines starting with #) and merge continuations."""
+    # Remove comment lines (lines starting with #) and merge continuations.
     lines = text.split('\n')
     lines0: list[str] = []
     flag = False
@@ -94,7 +92,7 @@ def process_comment_out(text: str) -> str:
 
 
 def read_wildcard(k: str, v) -> None:
-    """Recursively read wildcard structures from YAML."""
+    # Recursively read wildcard structures from YAML.
     if isinstance(v, list):
         k = wildcard_normalize(k)
         wildcard_dict[k] = v
@@ -111,7 +109,7 @@ def read_wildcard(k: str, v) -> None:
 
 
 def read_wildcard_dict(wildcard_path: str) -> Dict[str, List[str]]:
-    """Load all wildcards from directory of .txt and .yaml files."""
+    # Load all wildcards from directory of .txt and .yaml files.
     if not os.path.exists(wildcard_path):
         cstr(f"[Wildcard] Path does not exist: {wildcard_path}").warning.print()
         return wildcard_dict
@@ -153,7 +151,7 @@ def read_wildcard_dict(wildcard_path: str) -> Dict[str, List[str]]:
 
 
 def wildcard_load(wildcard_path: str) -> None:
-    """Load all wildcards from disk (thread-safe)."""
+    # Load all wildcards from disk (thread-safe).
     global wildcard_dict
 
     with wildcard_lock:
@@ -163,17 +161,15 @@ def wildcard_load(wildcard_path: str) -> None:
 
 
 def process(text: str, seed: Optional[int] = None) -> str:
-    """
-    Process wildcard text with all supported syntax patterns.
-    
-    Supports:
-    - {option1|option2|option3} - random selection
-    - __keyword__ - wildcard reference
-    - 2$$opt1|opt2 - quantity selection
-    - 1-3$$items - range selection
-    - 1.0::item1|2.0::item2 - probability weights
-    - 3#__keyword__ - quantifier
-    """
+    # Process wildcard text with all supported syntax patterns.
+    #
+    # Supports:
+    # - {option1|option2|option3} - random selection
+    # - __keyword__ - wildcard reference
+    # - 2$$opt1|opt2 - quantity selection
+    # - 1-3$$items - range selection
+    # - 1.0::item1|2.0::item2 - probability weights
+    # - 3#__keyword__ - quantifier
     text = process_comment_out(text)
 
     if seed is not None:
@@ -183,7 +179,7 @@ def process(text: str, seed: Optional[int] = None) -> str:
     local_wildcard_dict = get_wildcard_dict()
 
     def replace_options(string: str) -> Tuple[str, bool]:
-        """Replace {option1|option2|...} patterns."""
+        # Replace {option1|option2|...} patterns.
         replacements_found = False
 
         def replace_option(match):
@@ -284,7 +280,7 @@ def process(text: str, seed: Optional[int] = None) -> str:
         return replaced_string, replacements_found
 
     def get_wildcard_options(string: str) -> List[str]:
-        """Get options from wildcard references in a string."""
+        # Get options from wildcard references in a string.
         pattern = r"__([\w.\-+/*\\]+?)__"
         matches = re.findall(pattern, string)
 
@@ -313,7 +309,7 @@ def process(text: str, seed: Optional[int] = None) -> str:
         return options
 
     def replace_wildcard(string: str) -> Tuple[str, bool]:
-        """Replace __keyword__ patterns."""
+        # Replace __keyword__ patterns.
         pattern = r"__([\w.\-+/*\\]+?)__"
         matches = re.findall(pattern, string)
 

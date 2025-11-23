@@ -64,7 +64,7 @@ class RvText_WildcardProcessor:
                 "seed": ("INT", {
                     "default": 0,
                     "min": -3,
-                    "max": 0xffffffffffffffff,
+                    "max": 2**64 - 1,
                     "tooltip": "Seed controls wildcard expansion in populate mode.\nSpecial values: -1=randomize each time, -2=increment from last, -3=decrement from last\nNormal: change to generate new outputs, fix to keep same output.\nCan be connected to seed nodes like rgthree's Seed node."
                 }),
             },

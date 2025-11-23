@@ -1,0 +1,27 @@
+{
+  "repo_id": "HuggingFaceM4/Florence-2-DocVQA",
+  "local_path": "Florence-2-DocVQA",
+  "mmproj_path": "",
+  "model_type": "florence2",
+  "default": false,
+  "default_task": "ocr",
+  "default_text_input": "",
+  "max_tokens": 512,
+  "quantization": "auto",
+  "attention_mode": "auto",   
+  "quantized": false,
+  "vram_requirement": {
+    "full": 3.7,
+    "8bit": 2.2,
+    "4bit": 1.4
+  },
+  "convert_to_bboxes": false,
+  "_available_tasks": [
+    "caption",
+    "detailed_caption",
+    "prompt_generation",
+    "grounding",
+    "detection",
+    "ocr"
+  ]
+}

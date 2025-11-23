@@ -1,0 +1,24 @@
+{
+  "repo_id": "https://huggingface.co/bartowski/Mistral-7B-Instruct-v0.3-GGUF/resolve/main/Mistral-7B-Instruct-v0.3-Q5_K_M.gguf",
+  "local_path": "Mistral-7B-Instruct-v0.3.Q5_K_M.gguf",
+  "mmproj_path": "",
+  "model_type": "llm",
+  "default": false,
+  "default_task": "Tags to Natural Language",
+  "default_text_input": "",
+  "max_tokens": 2048,
+  "quantization": "fp16",
+  "attention_mode": "auto",
+  "quantized": true,
+  "vram_requirement": {
+    "full": 5.7
+  },
+  "context_size": 4096,
+  "_available_tasks": [
+    "Tags to Natural Language",
+    "Expand Description",
+    "Refine Prompt",
+    "Custom Instruction",
+    "Direct Chat"
+  ]
+}

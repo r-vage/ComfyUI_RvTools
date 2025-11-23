@@ -61,13 +61,11 @@ _original_ctx_inputs_list = [
 ORIG_CTX_OPTIONAL_INPUTS, ORIG_CTX_RETURN_TYPES, ORIG_CTX_RETURN_NAMES = _create_context_data(_original_ctx_inputs_list)
 
 def new_context(pipe: Optional[dict[Any, Any]] = None, **kwargs) -> dict:
-    """
-    Creates a new context from the provided data, with an optional base pipe to start.
-    
-    Priority logic:
-    1. If pipe has _allow_overwrite=False (default): Use pipe values, kwargs as fallback
-    2. If pipe has _allow_overwrite=True: Use kwargs (direct inputs), pipe as fallback
-    """
+    # Creates a new context from the provided data, with an optional base pipe to start.
+    #
+    # Priority logic:
+    # 1. If pipe has _allow_overwrite=False (default): Use pipe values, kwargs as fallback
+    # 2. If pipe has _allow_overwrite=True: Use kwargs (direct inputs), pipe as fallback
     context = pipe if pipe is not None else None
     new_ctx = {}
     

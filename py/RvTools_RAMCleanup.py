@@ -59,12 +59,12 @@ class Eclipse_RAMCleanup:
     CATEGORY = CATEGORY.MAIN.value + CATEGORY.TOOLS.value
 
     def get_ram_usage(self):
-        """Get current RAM usage statistics"""
+        # Get current RAM usage statistics
         memory = psutil.virtual_memory()
         return memory.percent, memory.available / (1024 * 1024)
 
     def get_detailed_memory_info(self):
-        """Get detailed memory information"""
+        # Get detailed memory information
         memory = psutil.virtual_memory()
         return {
             'total': memory.total / (1024 * 1024),  # MB
@@ -75,7 +75,7 @@ class Eclipse_RAMCleanup:
         }
 
     def _clear_file_cache_windows(self):
-        """Clear Windows file cache"""
+        # Clear Windows file cache
         try:
             result = ctypes.windll.kernel32.SetSystemFileCacheSize(-1, -1, 0)
             return result == 0
@@ -83,7 +83,7 @@ class Eclipse_RAMCleanup:
             return False
 
     def _check_sudo_available(self):
-        """Check if sudo is available and configured"""
+        # Check if sudo is available and configured
         try:
             # Check if sudo command exists
             result = subprocess.run(
@@ -110,7 +110,7 @@ class Eclipse_RAMCleanup:
             return False, f"sudo check failed: {str(e)}"
 
     def _clear_file_cache_linux(self):
-        """Clear Linux file cache using multiple methods"""
+        # Clear Linux file cache using multiple methods
         # Check if sudo is available first
         sudo_ok, sudo_msg = self._check_sudo_available()
         if not sudo_ok:
@@ -133,7 +133,7 @@ class Eclipse_RAMCleanup:
         return False
 
     def _clear_process_memory_windows(self):
-        """Clear working set of user processes (safely)"""
+        # Clear working set of user processes (safely)
         cleaned_count = 0
 
         # System processes to avoid (case-insensitive)
@@ -174,7 +174,7 @@ class Eclipse_RAMCleanup:
             return 0
 
     def _clear_dlls_windows(self):
-        """Clear current process working set"""
+        # Clear current process working set
         try:
             # This affects the current Python process
             result = ctypes.windll.kernel32.SetProcessWorkingSetSize(-1, -1, -1)
@@ -183,7 +183,7 @@ class Eclipse_RAMCleanup:
             return False
 
     def _clear_dlls_linux(self):
-        """Sync filesystem buffers on Linux"""
+        # Sync filesystem buffers on Linux
         try:
             subprocess.run(["sync"], check=True, capture_output=True, timeout=5)
             return True
@@ -191,7 +191,7 @@ class Eclipse_RAMCleanup:
             return False
 
     def clean_ram(self, anything, clean_file_cache, clean_processes, clean_dlls, retry_times, unique_id=None, extra_pnginfo=None):
-        """Main RAM cleanup function with improved error handling and safety"""
+        # Main RAM cleanup function with improved error handling and safety
         if retry_times < 1 or retry_times > 10:
             cstr(f"Invalid retry_times value: {retry_times}. Using default of 3.").warning.print()
             retry_times = 3
