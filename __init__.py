@@ -90,18 +90,64 @@ eclipse_loader_dir = os.path.join(eclipse_dir, 'loader_templates')
 eclipse_smartlm_dir = os.path.join(eclipse_dir, 'smartlm_templates')
 eclipse_config_dir = os.path.join(eclipse_dir, 'config')
 
-# One-time copy of templates to Eclipse folder (after migration)
+# Check if force_update is enabled in config
+import json
+force_update = False
+config_file = os.path.join(repo_config_dir, 'smartlm_prompt_defaults.json')
+if os.path.exists(config_file):
+    try:
+        with open(config_file, 'r', encoding='utf-8') as f:
+            config_data = json.load(f)
+            force_update = config_data.get('_force_update', False)
+    except:
+        pass
+
+# One-time copy of templates to Eclipse folder (smart_prompt and loader - normal behavior)
 if not os.path.exists(eclipse_prompt_dir) and os.path.exists(repo_prompt_dir):
     copy_prompt_files_once(repo_prompt_dir, eclipse_prompt_dir)
 
 if not os.path.exists(eclipse_loader_dir) and os.path.exists(repo_loader_dir):
     copy_prompt_files_once(repo_loader_dir, eclipse_loader_dir)
 
-if not os.path.exists(eclipse_smartlm_dir) and os.path.exists(repo_smartlm_dir):
-    copy_prompt_files_once(repo_smartlm_dir, eclipse_smartlm_dir)
+# smartlm_templates: copy on first run OR force update if flag is set
+if force_update or (not os.path.exists(eclipse_smartlm_dir) and os.path.exists(repo_smartlm_dir)):
+    import shutil
+    if force_update and os.path.exists(eclipse_smartlm_dir):
+        # Force update: overwrite existing smartlm templates
+        for item in os.listdir(repo_smartlm_dir):
+            src = os.path.join(repo_smartlm_dir, item)
+            dst = os.path.join(eclipse_smartlm_dir, item)
+            if os.path.isfile(src):
+                shutil.copy2(src, dst)
+        cstr("[Eclipse] Force updated smartlm_templates").msg.print()
+    else:
+        copy_prompt_files_once(repo_smartlm_dir, eclipse_smartlm_dir)
 
-if not os.path.exists(eclipse_config_dir) and os.path.exists(repo_config_dir):
-    copy_prompt_files_once(repo_config_dir, eclipse_config_dir)
+# Note: smartlm_prompt_defaults.json is always loaded from repo folder
+# Other config files: copy on first run OR force update if flag is set
+if force_update or not os.path.exists(eclipse_config_dir):
+    os.makedirs(eclipse_config_dir, exist_ok=True)
+    if force_update and os.path.exists(repo_config_dir):
+        # Force update: overwrite config files (except smartlm_prompt_defaults.json)
+        import shutil
+        for item in os.listdir(repo_config_dir):
+            if item != 'smartlm_prompt_defaults.json':  # Skip this one, always loaded from repo
+                src = os.path.join(repo_config_dir, item)
+                dst = os.path.join(eclipse_config_dir, item)
+                if os.path.isfile(src):
+                    shutil.copy2(src, dst)
+        cstr("[Eclipse] Force updated config files").msg.print()
+
+# Reset force_update flag after updates are complete
+if force_update:
+    try:
+        with open(config_file, 'r', encoding='utf-8') as f:
+            config_data = json.load(f)
+        config_data['_force_update'] = False
+        with open(config_file, 'w', encoding='utf-8') as f:
+            json.dump(config_data, f, indent=4)
+    except Exception as e:
+        cstr(f"[Eclipse] Warning: Could not reset _force_update flag: {e}").warning.print()
 
 # Create junction for wildcards/smart_prompt → Eclipse/smart_prompt (no duplication)
 wildcards_smartprompt_dir = os.path.join(comfyui_root, 'models', 'wildcards', 'smart_prompt')
