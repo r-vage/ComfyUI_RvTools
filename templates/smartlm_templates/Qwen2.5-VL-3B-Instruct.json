@@ -3,7 +3,6 @@
   "local_path": "",
   "mmproj_path": "",
   "model_type": "qwenvl",
-  "default": true,
   "default_task": "Video Summary",
   "default_text_input": "",
   "max_tokens": 1024,

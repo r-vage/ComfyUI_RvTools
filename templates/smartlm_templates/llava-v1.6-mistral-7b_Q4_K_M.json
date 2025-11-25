@@ -4,12 +4,11 @@
   "mmproj_path": "llava-v1.6-mistral-7b.Q4_K_M.mmproj.gguf",
   "mmproj_url": "https://huggingface.co/cjpais/llava-1.6-mistral-7b-gguf/resolve/main/mmproj-model-f16.gguf",
   "model_type": "qwenvl",
-  "default": false,
   "default_task": "Detailed Description",
   "default_text_input": "",
   "max_tokens": 2048,
   "quantization": "fp16",
-  "attention_mode": "auto",   
+  "attention_mode": "auto",
   "quantized": true,
   "vram_requirement": {
     "full": 5.6

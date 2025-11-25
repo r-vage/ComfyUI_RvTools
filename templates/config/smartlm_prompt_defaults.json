@@ -1,4 +1,5 @@
 {
+    "_force_update": true,
     "_preset_prompts": [
         "Custom",
         "Tags",
@@ -74,10 +75,6 @@
         "region_caption": {
             "prompt": "<OD>",
             "description": "Object detection with captions"
-        },
-        "referring_expression_segmentation": {
-            "prompt": "<REFERRING_EXPRESSION_SEGMENTATION>",
-            "description": "Segment objects based on text description"
         }
     }
 }

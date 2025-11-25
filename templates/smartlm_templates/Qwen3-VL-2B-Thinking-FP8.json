@@ -3,12 +3,11 @@
   "local_path": "",
   "mmproj_path": "",
   "model_type": "qwenvl",
-  "default": false,
   "default_task": "Detailed Description",
   "default_text_input": "",
   "max_tokens": 1024,
   "quantization": "auto",
-  "attention_mode": "auto",   
+  "attention_mode": "auto",
   "quantized": true,
   "vram_requirement": {
     "full": 2.5

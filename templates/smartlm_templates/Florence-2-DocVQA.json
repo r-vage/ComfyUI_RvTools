@@ -3,12 +3,11 @@
   "local_path": "Florence-2-DocVQA",
   "mmproj_path": "",
   "model_type": "florence2",
-  "default": false,
   "default_task": "ocr",
   "default_text_input": "",
   "max_tokens": 512,
   "quantization": "auto",
-  "attention_mode": "auto",   
+  "attention_mode": "auto",
   "quantized": false,
   "vram_requirement": {
     "full": 3.7,

@@ -3,7 +3,6 @@
   "local_path": "Florence-2-Flux-Large",
   "mmproj_path": "",
   "model_type": "florence2",
-  "default": false,
   "default_task": "more_detailed_caption",
   "default_text_input": "",
   "max_tokens": 1024,

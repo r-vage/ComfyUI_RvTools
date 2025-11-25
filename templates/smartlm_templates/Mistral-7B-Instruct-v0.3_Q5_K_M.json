@@ -3,7 +3,6 @@
   "local_path": "Mistral-7B-Instruct-v0.3.Q5_K_M.gguf",
   "mmproj_path": "",
   "model_type": "llm",
-  "default": false,
   "default_task": "Tags to Natural Language",
   "default_text_input": "",
   "max_tokens": 2048,

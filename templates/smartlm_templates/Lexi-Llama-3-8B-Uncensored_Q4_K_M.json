@@ -3,12 +3,11 @@
   "local_path": "Lexi-Llama-3-8B-Uncensored_Q4_K_M.gguf",
   "mmproj_path": "",
   "model_type": "llm",
-  "default": false,
   "default_task": "Tags to Natural Language",
   "default_text_input": "",
   "max_tokens": 2048,
   "quantization": "auto",
-  "attention_mode": "auto",   
+  "attention_mode": "auto",
   "quantized": true,
   "vram_requirement": {
     "full": 5.5

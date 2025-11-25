@@ -3,12 +3,11 @@
   "local_path": "Florence-2-base-PromptGen",
   "mmproj_path": "",
   "model_type": "florence2",
-  "default": false,
   "default_task": "more_detailed_caption",
   "default_text_input": "",
   "max_tokens": 512,
   "quantization": "auto",
-  "attention_mode": "auto",   
+  "attention_mode": "auto",
   "quantized": false,
   "vram_requirement": {
     "full": 1.2,
