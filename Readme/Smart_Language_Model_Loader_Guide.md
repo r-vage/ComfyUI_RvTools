@@ -298,24 +298,35 @@ Simply select a template from the `template_name` dropdown in the node. Each tem
 - Supported features (video, tasks, etc.)
 - Optimal parameters (max_tokens, etc.)
 
-Models download automatically when first selected.
+Models download automatically when first selected. Templates are automatically updated with `local_path` and actual `vram_requirement` after models are downloaded.
 
-**Need a model repository URL?** See [MODEL_REPOS_REFERENCE.md](MODEL_REPOS_REFERENCE.md) for a complete list of HuggingFace repository IDs you can copy-paste when creating new templates.
+**Need a model repository URL?** See [MODEL_REPOS_REFERENCE.md](MODEL_REPOS_REFERENCE.md) for a complete list of HuggingFace repository IDs you can copy-paste when creating templates manually.
 
-### Creating and Managing Templates
+### Template System Modes
 
-The Smart Language Model Loader includes built-in template management for creating custom model configurations:
+The Smart Language Model Loader provides four template operation modes:
 
 **Template Actions:**
-- **None** (default) - Normal operation, load and use selected template
-- **New** - Create a new template with custom model configuration
-- **Delete** - Remove selected template from disk
+- **None** (default) - Manual configuration mode. Configure model settings directly without using a template.
+- **Load** - Load and use a saved template. Model settings come from the template file.
+- **Save** - Save current configuration as a new template.
+- **Delete** - Remove selected template from disk.
 
-**Creating New Templates:**
+**Using Templates (Load Mode):**
 
-1. Set `template_action` to **New**
-2. Fill in the new template configuration:
-   - `new_template_name`: Unique name for your template
+1. Set `template_action` to **Load**
+2. Select a template from the `template_name` dropdown
+3. Run workflow - model loads with template settings
+4. Generation parameters (max_tokens, quantization, etc.) and task defaults are applied from template
+5. Configuration widgets (model_type, model_source, etc.) are hidden in Load mode
+
+**Creating New Templates (Save Mode):**
+
+1. Set `template_action` to **None**
+2. Configure all model settings:
+   - `model_type`: Select model type (QwenVL, Florence2, LLM) and format (GGUF variant if applicable)
+   - `model_source`: HuggingFace or Local
+   - Model paths: `repo_id`/`local_path` (HuggingFace) or `local_model` (Local)
    - `new_model_type`: Select model type (QwenVL/Florence2/LLM, with Transformers/GGUF variants)
    - `new_model_source`: Choose **HuggingFace** (auto-download) or **Local** (already downloaded)
    - For HuggingFace:
@@ -330,33 +341,36 @@ The Smart Language Model Loader includes built-in template management for creati
    - `new_quantized`: Whether model is pre-quantized (auto-set for GGUF)
    - `new_vram_full`: Model size in GB (auto-calculates 8bit/4bit for transformers)
    - `new_context_size`: Context window size (GGUF only, default 32768)
-   - `new_set_default`: Make this the default template for its model type
-3. Run the workflow - template is created and saved to `ComfyUI/models/Eclipse/smartlm_templates/`
-4. The `_available_tasks` field is automatically added based on model type
-5. Node stops execution after template creation (no model loading)
+   - For GGUF QwenVL: Configure mmproj source and paths
+   - Generation parameters: `max_tokens`, `quantization`, `attention_mode`
+   - Task defaults: Select default task/preset and text input for your model type
+3. Set `template_action` to **Save**
+4. Enter a unique name in `save_template_name`
+5. Click the **⚡Execute Template Action** button
+6. Template is saved to `ComfyUI/models/Eclipse/smartlm_templates/`
+7. Mode automatically switches back to **None** after save
 
 **Deleting Templates:**
 
-1. Select template to delete from `template_name` dropdown
-2. Set `template_action` to **Delete**
-3. Run workflow - template file is removed from disk
-4. Node stops execution after deletion (no model loading)
+1. Set `template_action` to **Delete**
+2. Select template to delete from `template_name` dropdown
+3. Click the **⚡Execute Template Action** button
+4. Template file is removed from disk
 
-**Notes:**
-- Template operations interrupt workflow execution (by design)
-- Widget visibility adapts to selected model type and source
-- All widgets reset to defaults when entering "New" mode
-- VRAM requirements auto-calculate 8bit (~50%) and 4bit (~25%) for non-quantized transformers models
-- Templates are saved to user-editable Eclipse folder, not bundled templates folder
+**Switching Between Modes:**
 
-### Auto-Saving Template Changes
+When switching from **Load** to **None** or **Save** mode:
+- Configuration widgets are automatically populated with values from the loaded template
+- Prefers "Local" source if model has been downloaded (`local_path` exists)
+- Falls back to "HuggingFace" source if model not yet downloaded (only `repo_id` exists)
+- Generation parameters and task defaults remain unchanged (already set by template)
 
-Enable `auto_save_template` to automatically save widget changes back to the template file. This feature:
-- Saves only visible widgets based on detected model type (QwenVL, Florence-2, or LLM)
-- Preserves your preferred settings: max_tokens, quantization, tasks, prompts
-- Updates the template file after each successful execution
-- Useful for maintaining model-specific preferences
-- Handled automatically in JavaScript after execution
+**Automatic Template Updates:**
+
+Templates are automatically updated after model download:
+- `local_path` is set after successful download
+- `vram_requirement` is calculated from actual file sizes
+- No user interaction required - happens in background
 
 ### Template Structure
 
@@ -507,12 +521,11 @@ All templates include an `_available_tasks` field that documents the available t
 **Core Fields (All Models):**
 - `model_type`: `"qwenvl"`, `"florence2"`, or `"llm"` - Determines model type and available features
 - `repo_id`: HuggingFace repository ID or direct download URL (auto-downloads if not local)
-- `local_path`: Path relative to `models/LLM/` (folder for transformers, file for GGUF)
-- `default`: Set to `true` to make this the default template (only one per model type)
+- `local_path`: Path relative to `models/LLM/` (folder for transformers, file for GGUF) - automatically set after download
 - `quantized`: Whether model is pre-quantized (FP8, GGUF, etc.)
-- `vram_requirement`: VRAM estimates in GB - `{"full": X, "8bit": Y, "4bit": Z}`
+- `vram_requirement`: VRAM estimates in GB - `{"full": X, "8bit": Y, "4bit": Z}` - automatically calculated from actual file size after download
 
-**Widget Default Values (Saved by auto_save_template):**
+**Default Widget Values:**
 - `max_tokens`: Default maximum tokens to generate (64-2048)
 - `quantization`: Default quantization setting ("auto", "fp16", "bf16", "fp32", "8bit", "4bit")
   - **"auto"** (recommended): VRAM-aware automatic selection - analyzes available memory and model VRAM requirements, then selects fp16 (if sufficient VRAM), 8bit (if fp16 too large), or 4bit (if 8bit too large) with 20% safety margin
