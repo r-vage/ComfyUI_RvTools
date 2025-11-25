@@ -38,10 +38,11 @@ Welcome to the user documentation for ComfyUI_Eclipse! This guide is designed fo
 **[Smart Language Model Loader Guide](Smart_Language_Model_Loader_Guide.md)** ⭐ NEW
 - **What it does:** Single node for analyzing images/videos with AI, generating tags, creating descriptions, and processing text
 - **Model types:** QwenVL (detailed analysis, video support), Florence-2 (fast tagging, OCR), LLM (text processing)
-- **Key features:** Pre-configured templates, auto-download from HuggingFace, transformers + GGUF support, None/Load/Save/Delete template modes
+- **Key features:** Pre-configured templates, auto-download from HuggingFace, transformers + GGUF support, flexible template system
+- **Template modes:** **None** (default, manual setup), **Load** (apply saved templates), **Save** (create new templates), **Delete** (remove templates)
 - **Use cases:** Auto-tag generations, create training captions, video summaries, OCR, object detection, prompt enhancement
 - **Getting started:** 5-minute quick start, model comparison chart, VRAM requirements, practical examples
-- **Template system:** Load templates for quick use, Save custom configs, templates auto-update after download with local paths and actual VRAM
+- **Template workflow:** No auto-loading - start fresh or load as needed. Multi-node support: load template → switch to None → customize per node
 - **Advanced:** Quantization options, performance optimization, troubleshooting
 
 ### Image Processing

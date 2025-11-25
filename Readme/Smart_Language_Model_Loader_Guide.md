@@ -304,13 +304,18 @@ Models download automatically when first selected. Templates are automatically u
 
 ### Template System Modes
 
-The Smart Language Model Loader provides four template operation modes:
+The Smart Language Model Loader provides four template operation modes. **None** is the default mode - the node does NOT auto-load templates on startup. This gives you full flexibility to work with templates exactly when and how you need them.
 
 **Template Actions:**
-- **None** (default) - Manual configuration mode. Configure model settings directly without using a template.
-- **Load** - Load and use a saved template. Model settings come from the template file.
+- **None** (default) - Manual configuration mode. Configure model settings directly without using a template. Node always starts in None mode - you decide if and when to load a template.
+- **Load** - Load and apply a saved template. Model settings come from the template file.
 - **Save** - Save current configuration as a new template.
 - **Delete** - Remove selected template from disk.
+
+**Key Behavior:**
+- **No Auto-Loading:** The node never automatically loads a template. You start with a blank slate in None mode every time.
+- **Multi-Node Workflows:** You can use the same template across multiple nodes in one workflow, then customize each node independently. Workflow: Load template → switch to None → adjust settings for specific node.
+- **Template Name Auto-Fill:** When switching to Save mode, the `new_template_name` field intelligently auto-populates using: (1) currently loaded template name if in Load mode, (2) `local_model` path for Local source, or (3) extracted repo name from `repo_id` for HuggingFace source.
 
 **Using Templates (Load Mode):**
 
@@ -319,14 +324,12 @@ The Smart Language Model Loader provides four template operation modes:
 3. Run workflow - model loads with template settings
 4. Generation parameters (max_tokens, quantization, etc.) and task defaults are applied from template
 5. Configuration widgets (model_type, model_source, etc.) are hidden in Load mode
+6. **Optional:** Switch to **None** mode to customize settings while keeping template as starting point
 
 **Creating New Templates (Save Mode):**
 
 1. Set `template_action` to **None**
 2. Configure all model settings:
-   - `model_type`: Select model type (QwenVL, Florence2, LLM) and format (GGUF variant if applicable)
-   - `model_source`: HuggingFace or Local
-   - Model paths: `repo_id`/`local_path` (HuggingFace) or `local_model` (Local)
    - `new_model_type`: Select model type (QwenVL/Florence2/LLM, with Transformers/GGUF variants)
    - `new_model_source`: Choose **HuggingFace** (auto-download) or **Local** (already downloaded)
    - For HuggingFace:
@@ -341,11 +344,10 @@ The Smart Language Model Loader provides four template operation modes:
    - `new_quantized`: Whether model is pre-quantized (auto-set for GGUF)
    - `new_vram_full`: Model size in GB (auto-calculates 8bit/4bit for transformers)
    - `new_context_size`: Context window size (GGUF only, default 32768)
-   - For GGUF QwenVL: Configure mmproj source and paths
    - Generation parameters: `max_tokens`, `quantization`, `attention_mode`
    - Task defaults: Select default task/preset and text input for your model type
 3. Set `template_action` to **Save**
-4. Enter a unique name in `save_template_name`
+4. Enter a unique name in `new_template_name` (auto-filled intelligently based on context)
 5. Click the **⚡Execute Template Action** button
 6. Template is saved to `ComfyUI/models/Eclipse/smartlm_templates/`
 7. Mode automatically switches back to **None** after save
@@ -365,12 +367,27 @@ When switching from **Load** to **None** or **Save** mode:
 - Falls back to "HuggingFace" source if model not yet downloaded (only `repo_id` exists)
 - Generation parameters and task defaults remain unchanged (already set by template)
 
+When switching to **Save** mode:
+- `new_template_name` field auto-fills based on context (loaded template name → local_model path → extracted repo name)
+- Edit as needed before saving
+
 **Automatic Template Updates:**
 
 Templates are automatically updated after model download:
 - `local_path` is set after successful download
 - `vram_requirement` is calculated from actual file sizes
 - No user interaction required - happens in background
+
+**Multi-Node Workflow Pattern:**
+
+The flexible None-default design supports advanced workflows:
+
+1. **Load Template:** Switch to Load mode, select template, run to load model
+2. **Switch to None:** Change `template_action` to None - configuration widgets appear with template values
+3. **Customize Per Node:** Adjust settings (quantization, max_tokens, task) for this specific node
+4. **Repeat:** Add another Smart LML node, load same template, customize differently
+
+This allows you to use one template (e.g., "Qwen3-VL-2B-Instruct") across multiple nodes in a workflow, with each node having different generation parameters or task settings.
 
 ### Template Structure
 
