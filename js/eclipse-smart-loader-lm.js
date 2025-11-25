@@ -464,8 +464,9 @@ app.registerExtension({
                         }
                     }
                     
-                    // When switching to None or Save mode from Load mode, populate widgets with template values
-                    if ((templateAction === "None" || templateAction === "Save") && templateName && templateName !== "None") {
+                    // When switching to None mode from Load mode, populate widgets with template values
+                    // Save mode should preserve current widget values (user may have made changes)
+                    if (templateAction === "None" && templateName && templateName !== "None") {
                         const config = await loadTemplateConfig(templateName);
                         if (config) {
                             // Set model_type (combine base type with GGUF if needed)
@@ -501,6 +502,21 @@ app.registerExtension({
                                         if (normalizedPath && !normalizedPath.endsWith('.gguf') && !normalizedPath.endsWith('/')) {
                                             normalizedPath = normalizedPath + '/';
                                         }
+                                        
+                                        // Handle legacy templates with root-level GGUF files (e.g., "file.gguf" instead of "folder/file.gguf")
+                                        // Check if normalizedPath exists in dropdown options
+                                        const availableOptions = localModelWidget.options?.values || [];
+                                        if (!availableOptions.includes(normalizedPath) && normalizedPath.endsWith('.gguf')) {
+                                            // Legacy format: try to find matching folder/file.gguf pattern
+                                            const filename = normalizedPath.split('/').pop(); // Get filename only
+                                            const folderPath = filename.replace('.gguf', ''); // Remove extension for folder name
+                                            const expectedPath = `${folderPath}/${filename}`;
+                                            
+                                            if (availableOptions.includes(expectedPath)) {
+                                                normalizedPath = expectedPath;
+                                            }
+                                        }
+                                        
                                         localModelWidget.value = normalizedPath;
                                     }
                                 } else if (hasRepoId) {

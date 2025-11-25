@@ -1,6 +1,6 @@
 {
   "repo_id": "https://huggingface.co/bartowski/Lexi-Llama-3-8B-Uncensored-GGUF/resolve/main/Lexi-Llama-3-8B-Uncensored-Q4_K_M.gguf",
-  "local_path": "Lexi-Llama-3-8B-Uncensored_Q4_K_M.gguf",
+  "local_path": "",
   "mmproj_path": "",
   "model_type": "llm",
   "default_task": "Tags to Natural Language",
@@ -10,8 +10,9 @@
   "attention_mode": "auto",
   "quantized": true,
   "vram_requirement": {
-    "full": 5.5
+    "full": 14.0
   },
+  "context_size": 16384,
   "_available_tasks": [
     "Tags to Natural Language",
     "Expand Description",

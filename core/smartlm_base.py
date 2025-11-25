@@ -750,7 +750,17 @@ class SmartLMLBase:
         else:
             # Use repo name - for QwenVL use Qwen-VL subfolder, for Florence-2 use repo name
             model_name = repo_id.split("/")[-1]
-            if model_type == ModelType.QWENVL:
+            
+            # For direct GGUF URL downloads, create folder structure properly
+            if is_direct_url and model_name.lower().endswith(".gguf"):
+                # Extract filename and create model-specific folder
+                filename = model_name
+                folder_name = Path(filename).stem  # Remove .gguf extension for folder name
+                if model_type == ModelType.QWENVL or "qwen" in filename.lower():
+                    target = models_base / "Qwen-VL" / folder_name / filename
+                else:
+                    target = models_base / folder_name / filename
+            elif model_type == ModelType.QWENVL:
                 target = models_base / "Qwen-VL" / model_name
             else:
                 target = models_base / model_name
@@ -788,15 +798,20 @@ class SmartLMLBase:
                 downloaded = True
             else:
                 raise ValueError(f"Template '{template_name}' local_path '{local_path}' not found at {target}")
+        else:
+            cstr(f"[SmartLM] Model already exists at {target}").msg.print()
         
-        # Update template with local_path after successful download for offline usage
-        if downloaded and not local_path:
-            # Calculate relative path from models/LLM
-            relative_path = target.relative_to(models_base)
-            update_template_local_path(template_name, str(relative_path))
+        # Update template with local_path after download/verification for offline usage
+        # Always calculate relative path and update if different from template
+        relative_path = target.relative_to(models_base)
+        current_local_path = str(relative_path)
         
-        # Update vram_requirement with actual file size after download
-        if downloaded:
+        # Update if local_path is empty or different from actual path
+        if not local_path or local_path != current_local_path:
+            update_template_local_path(template_name, current_local_path)
+        
+        # Update vram_requirement with actual file size (after download or if file exists)
+        if downloaded or target.exists():
             try:
                 total_size_gb = 0.0
                 if target.is_file():
