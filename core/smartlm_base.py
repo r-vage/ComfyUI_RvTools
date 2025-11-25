@@ -54,9 +54,8 @@ TEMPLATE_DIR = ECLIPSE_TEMPLATE_DIR if ECLIPSE_TEMPLATE_DIR.exists() else REPO_T
 ECLIPSE_CONFIG_DIR = Path(folder_paths.models_dir) / "Eclipse" / "config"
 REPO_CONFIG_DIR = NODE_DIR / "templates" / "config"
 
-PROMPT_CONFIG_PATH = (ECLIPSE_CONFIG_DIR / "smartlm_prompt_defaults.json" 
-                      if (ECLIPSE_CONFIG_DIR / "smartlm_prompt_defaults.json").exists() 
-                      else REPO_CONFIG_DIR / "smartlm_prompt_defaults.json")
+# Always load smartlm_prompt_defaults.json from repo (no user edits needed)
+PROMPT_CONFIG_PATH = REPO_CONFIG_DIR / "smartlm_prompt_defaults.json"
 LLM_FEW_SHOT_CONFIG_PATH = (ECLIPSE_CONFIG_DIR / "llm_few_shot_training.json" 
                             if (ECLIPSE_CONFIG_DIR / "llm_few_shot_training.json").exists() 
                             else REPO_CONFIG_DIR / "llm_few_shot_training.json")
@@ -91,21 +90,7 @@ def get_template_list() -> List[str]:
                 templates.append(f.stem)
     return sorted(templates) if templates else ["Qwen2.5-VL-3B-Instruct"]
 
-def get_default_template() -> str:
-    # Get the template marked as default, or first available
-    if TEMPLATE_DIR.exists():
-        for f in TEMPLATE_DIR.iterdir():
-            if f.suffix == '.json' and not f.name.startswith('_'):
-                try:
-                    with open(f, 'r') as file:
-                        data = json.load(file)
-                        if data.get('default', False):
-                            return f.stem
-                except Exception:
-                    continue
-    # Fallback to first template or hardcoded default
-    templates = get_template_list()
-    return templates[0] if templates else "Qwen2.5-VL-3B-Instruct"
+
 
 def load_template(name: str) -> dict:
     # Load a Smart LML template configuration
@@ -139,6 +124,27 @@ def update_template_local_path(name: str, local_path: str) -> bool:
                 return True
     except Exception as e:
         cstr(f"[SmartLM] Warning: Could not update template {name}: {e}").warning.print()
+    return False
+
+def update_template_vram_requirement(name: str, vram_req: dict) -> bool:
+    # Update template's vram_requirement with actual file size after download
+    if not name or name == "None" or name == "__temp_manual_config__":
+        return False
+    template_path = TEMPLATE_DIR / f"{name}.json"
+    try:
+        if template_path.exists():
+            with open(template_path, 'r') as f:
+                template_data = json.load(f)
+            
+            # Only update if different
+            current_vram = template_data.get("vram_requirement", {})
+            if current_vram != vram_req:
+                template_data["vram_requirement"] = vram_req
+                with open(template_path, 'w') as f:
+                    json.dump(template_data, f, indent=2)
+                return True
+    except Exception as e:
+        cstr(f"[SmartLM] Warning: Could not update template {name} vram_requirement: {e}").warning.print()
     return False
 
 def update_template_settings(name: str, settings: dict, auto_save: bool = True) -> bool:
@@ -788,6 +794,80 @@ class SmartLMLBase:
             # Calculate relative path from models/LLM
             relative_path = target.relative_to(models_base)
             update_template_local_path(template_name, str(relative_path))
+        
+        # Update vram_requirement with actual file size after download
+        if downloaded:
+            try:
+                total_size_gb = 0.0
+                if target.is_file():
+                    # Single file (GGUF, safetensors, etc.)
+                    total_size_gb = target.stat().st_size / (1024**3)
+                elif target.is_dir():
+                    # Model folder - check for sharded models first, then single files
+                    # Priority: .safetensors (preferred) > .bin > .pt
+                    all_files = list(target.rglob('*'))
+                    model_files = [f for f in all_files if f.is_file()]
+                    
+                    # Check for shard files (e.g., model-00001-of-00005.safetensors)
+                    safetensors_files = [f for f in model_files if f.suffix == '.safetensors']
+                    bin_files = [f for f in model_files if f.suffix == '.bin']
+                    pt_files = [f for f in model_files if f.suffix == '.pt']
+                    gguf_files = [f for f in model_files if f.suffix == '.gguf']
+                    
+                    # Check if we have shards (files with -of- pattern)
+                    has_shards = lambda files: any('-of-' in f.name for f in files)
+                    
+                    # Priority: safetensors shards > single safetensors > bin shards > single bin > pt > gguf
+                    if has_shards(safetensors_files):
+                        # Use safetensors shards
+                        for file in safetensors_files:
+                            if '-of-' in file.name:
+                                total_size_gb += file.stat().st_size / (1024**3)
+                    elif safetensors_files:
+                        # Single safetensors file (no shards)
+                        for file in safetensors_files:
+                            total_size_gb += file.stat().st_size / (1024**3)
+                    elif has_shards(bin_files):
+                        # Use bin shards
+                        for file in bin_files:
+                            if '-of-' in file.name:
+                                total_size_gb += file.stat().st_size / (1024**3)
+                    elif bin_files:
+                        # Single bin file
+                        for file in bin_files:
+                            total_size_gb += file.stat().st_size / (1024**3)
+                    elif pt_files:
+                        # PT files
+                        for file in pt_files:
+                            total_size_gb += file.stat().st_size / (1024**3)
+                    elif gguf_files:
+                        # GGUF files
+                        for file in gguf_files:
+                            total_size_gb += file.stat().st_size / (1024**3)
+                
+                if total_size_gb > 0.1:  # Only update if we found significant files (>100MB)
+                    vram_full = round(total_size_gb, 1)
+                    
+                    # Check if model is pre-quantized
+                    model_name_lower = str(target).lower()
+                    has_quant_markers = any(marker in model_name_lower for marker in [
+                        "fp8", "int8", "int4", "q4", "q5", "q6", "q8", "_q4_", "_q5_", "_q8_",
+                        "gptq", "awq", "gguf"
+                    ])
+                    is_gguf = str(target).lower().endswith(".gguf")
+                    is_quantized = template_info.get("quantized", has_quant_markers or is_gguf)
+                    
+                    # Build vram_requirement
+                    vram_req = {"full": vram_full}
+                    if not is_quantized:
+                        vram_req["8bit"] = round(vram_full * 0.5, 1)
+                        vram_req["4bit"] = round(vram_full * 0.25, 1)
+                    
+                    # Update template with actual size
+                    update_template_vram_requirement(template_name, vram_req)
+                    cstr(f"[SmartLM] Updated template with actual model size: {vram_full} GB").msg.print()
+            except Exception as e:
+                cstr(f"[SmartLM] Could not calculate model size after download: {e}").warning.print()
         
         # Return both the model file path and its parent folder
         return (str(target), str(target.parent))
@@ -1624,11 +1704,18 @@ class SmartLMLBase:
         else:
             task_prompt = task_or_prompt
         
-        # Build full prompt for generation (task token + text input)
-        if text_input and text_input.strip():
+        # Tasks that require text input after the task token
+        tasks_requiring_text = [
+            "caption_to_phrase_grounding",
+            "docvqa"
+        ]
+        
+        # Build full prompt for generation (task token + text input only for tasks that need it)
+        if task_or_prompt in tasks_requiring_text and text_input and text_input.strip():
             # Tasks like <CAPTION_TO_PHRASE_GROUNDING> expect text after the task token with a space
             prompt = f"{task_prompt} {text_input.strip()}"
         else:
+            # Caption tasks and others should ONLY have the task token
             prompt = task_prompt
         
         # HYBRID APPROACH: Handle device management based on quantization
@@ -1709,8 +1796,15 @@ class SmartLMLBase:
                         elif 'polygons' in parsed_data and parsed_data['polygons']:
                             bboxes = []
                             for polygon in parsed_data['polygons']:
-                                x_coords = [pt[0] for pt in polygon]
-                                y_coords = [pt[1] for pt in polygon]
+                                # polygon can be flat list [x1, y1, x2, y2, ...] or list of points [[x1, y1], ...]
+                                if polygon and isinstance(polygon[0], (int, float)):
+                                    # Flat list format
+                                    x_coords = [polygon[j] for j in range(0, len(polygon), 2)]
+                                    y_coords = [polygon[j] for j in range(1, len(polygon), 2)]
+                                else:
+                                    # List of points format
+                                    x_coords = [pt[0] for pt in polygon]
+                                    y_coords = [pt[1] for pt in polygon]
                                 bbox = [min(x_coords), min(y_coords), max(x_coords), max(y_coords)]
                                 bboxes.append(bbox)
                             # Preserve key order: remove polygons first, then add bboxes at the same position
@@ -1721,7 +1815,34 @@ class SmartLMLBase:
                                 parsed_data['labels'] = labels
                             cstr(f"[SmartLM] Converted {len(bboxes)} polygons to bboxes").msg.print()
                     
-                    # Log detection count
+                    # Filter out oversized detections (likely detecting whole image instead of specific objects)
+                    # Remove boxes that cover >95% of image area
+                    if 'bboxes' in parsed_data and parsed_data['bboxes']:
+                        image_area = W * H
+                        filtered_bboxes = []
+                        filtered_labels = []
+                        labels = parsed_data.get('labels', [])
+                        
+                        for i, bbox in enumerate(parsed_data['bboxes']):
+                            x1, y1, x2, y2 = bbox
+                            bbox_width = abs(x2 - x1)
+                            bbox_height = abs(y2 - y1)
+                            bbox_area = bbox_width * bbox_height
+                            area_ratio = bbox_area / image_area
+                            
+                            # Keep boxes that are <95% of image area
+                            if area_ratio < 0.95:
+                                filtered_bboxes.append(bbox)
+                                if i < len(labels):
+                                    filtered_labels.append(labels[i])
+                            else:
+                                cstr(f"[SmartLM] Filtered out oversized detection ({area_ratio:.1%} of image)").warning.print()
+                        
+                        parsed_data['bboxes'] = filtered_bboxes
+                        if filtered_labels:
+                            parsed_data['labels'] = filtered_labels
+                    
+                    # Log detection count after filtering
                     if 'bboxes' in parsed_data:
                         cstr(f"[SmartLM] Detected {len(parsed_data['bboxes'])} bboxes").msg.print()
                     elif 'quad_boxes' in parsed_data:
@@ -1733,8 +1854,13 @@ class SmartLMLBase:
             parsed_data = {}
         
         # Clean up special tokens for text output
-        clean_results = results.replace('</s>', '').replace('<s>', '')
-        clean_results = re.sub(r'<[^>]*>', '', clean_results).strip()
+        # Special handling for ocr_with_region to preserve line breaks
+        if task_or_prompt == 'ocr_with_region':
+            clean_results = re.sub(r'</?s>|<[^>]*>', '\n', results)
+            clean_results = re.sub(r'\n+', '\n', clean_results).strip()
+        else:
+            # For all other tasks including plain ocr: just remove <s> and </s>
+            clean_results = results.replace('</s>', '').replace('<s>', '')
         
         # HYBRID APPROACH: Offload non-quantized models back
         if hasattr(self, 'is_quantized') and not self.is_quantized and offload_device != device:
@@ -1849,6 +1975,10 @@ class SmartLMLBase:
         polygons: list[list[list[float]]] = data.get("polygons", [])
         labels = data.get("labels", [])
         
+        # Color palette for labels
+        colormap = ['blue', 'orange', 'green', 'purple', 'brown', 'pink', 'olive', 'cyan', 'red',
+                    'lime', 'indigo', 'violet', 'aqua', 'magenta', 'gold', 'tan', 'skyblue']
+        
         # Try to load font once
         font: Any  # Can be FreeTypeFont or ImageFont
         try:
@@ -1861,41 +1991,64 @@ class SmartLMLBase:
             # bbox format: [x1, y1, x2, y2]
             x1, y1, x2, y2 = bbox
             
-            # Draw rectangle
+            # Draw rectangle in red
             draw.rectangle([x1, y1, x2, y2], outline="red", width=3)
             
-            # Draw label if available
-            if i < len(labels):
-                label = labels[i]
-                # Get text bounding box
-                text_bbox = draw.textbbox((x1, y1 - 25), label, font=font)
-                draw.rectangle(text_bbox, fill="red")
-                draw.text((x1, y1 - 25), label, fill="white", font=font)
+            # Determine label text: index.label or just index if no label
+            if i < len(labels) and labels[i]:
+                label_text = f"{i}.{labels[i]}"
+            else:
+                # No label (region_proposal, etc.) - just show index
+                label_text = str(i)
+            
+            # Pick a color from the colormap for the label
+            import random
+            label_color = random.choice(colormap)
+            
+            # Get text bounding box and draw label with colored background
+            text_bbox = draw.textbbox((x1, y1 - 25), label_text, font=font)
+            draw.rectangle(text_bbox, fill=label_color)
+            draw.text((x1, y1 - 25), label_text, fill="white", font=font)
         
         # Draw quad boxes (for OCR/text detection)
         for i, quad_box in enumerate(quad_boxes):
             # quad_box format: [x1, y1, x2, y2, x3, y3, x4, y4] - 4 corner points
             # Draw polygon connecting all 4 corners
             points = [(quad_box[j], quad_box[j+1]) for j in range(0, 8, 2)]
-            draw.polygon(points, outline="blue", width=3)
+            draw.polygon(points, outline="red", width=3)
             
-            # Draw label if available
-            if i < len(labels):
-                label = labels[i]
-                # Use first point for label position
-                x1, y1 = points[0]
-                text_bbox = draw.textbbox((x1, y1 - 25), label, font=font)
-                draw.rectangle(text_bbox, fill="blue")
-                draw.text((x1, y1 - 25), label, fill="white", font=font)
+            # Draw indexed label with random color background
+            if i < len(labels) and labels[i]:
+                label_text = f"{i}.{labels[i]}"
+            else:
+                label_text = str(i)
+            
+            # Pick a color from the colormap for the label
+            import random
+            label_color = random.choice(colormap)
+            
+            # Use first point for label position
+            x1, y1 = points[0]
+            text_bbox = draw.textbbox((x1 + 8, y1 + 2), label_text, font=font)
+            draw.rectangle(text_bbox, fill=label_color)
+            draw.text((x1 + 8, y1 + 2), label_text, fill="white", font=font)
         
         # Draw polygons
         for i, polygon in enumerate(polygons):
-            # polygon format: [[x1, y1], [x2, y2], ..., [xn, yn]]
-            points = [tuple(point) for point in polygon]  # type: ignore[misc]
+            # polygon can be either:
+            # - Flat list: [x1, y1, x2, y2, ..., xn, yn]
+            # - List of points: [[x1, y1], [x2, y2], ..., [xn, yn]]
+            if polygon and isinstance(polygon[0], (int, float)):
+                # Flat list - convert to point tuples
+                points = [(polygon[j], polygon[j+1]) for j in range(0, len(polygon), 2)]
+            else:
+                # Already list of points
+                points = [tuple(point) for point in polygon]  # type: ignore[misc]
+            
             draw.polygon(points, outline="green", width=3)
             
             # Draw label if available
-            if i < len(labels):
+            if i < len(labels) and labels[i]:
                 label = labels[i]
                 # Use first point for label position
                 x1, y1 = points[0]

@@ -54,7 +54,7 @@ class RvConversion_DetectionToBboxes:
                 "grow": ("INT", {"default": 0, "min": -512, "max": 512, "step": 1, "tooltip": "Grow (positive) or shrink (negative) mask by N pixels"}),
                 "blur": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 64.0, "step": 0.1, "tooltip": "Gaussian blur radius to soften mask edges"}),
                 "combine_masks": ("BOOLEAN", {"default": True, "tooltip": "Combine all detections into single mask (True) or return separate masks (False)"}),
-                "indices": ("STRING", {"default": "0,1", "multiline": False, "tooltip": "When combine_masks=False, specify which detections to return (e.g., '0,1,4'). Leave empty for all."}),
+                "indices": ("STRING", {"default": "0,", "multiline": False, "tooltip": "When combine_masks=False, specify which detections to return (e.g., '0,1,4'). Leave empty for all."}),
             },
             "optional": {
                 "data_opt": ("JSON", {"tooltip": "Detection data from Smart Language Model Loader (bboxes/quad_boxes/polygons)"}),
@@ -92,6 +92,9 @@ class RvConversion_DetectionToBboxes:
             height, width, _ = image.shape
         
         # Determine detection source
+        # Prepare output bboxes in SAM2 Ultra format
+        output_bboxes: list[list] = []
+        
         if get_mask_from_image:
             # Use CV2 to detect rectangles from image
             bboxes, quad_boxes, polygons = self._detect_from_image(image, detect_color, threshold, min_area)
@@ -111,9 +114,6 @@ class RvConversion_DetectionToBboxes:
         
         # Count total detections
         total_detections = len(bboxes) + len(quad_boxes) + len(polygons)
-        
-        # Prepare output bboxes in SAM2 Ultra format
-        output_bboxes = []
         
         if total_detections == 0:
             # No detections - return empty mask and empty bboxes

@@ -24,7 +24,6 @@ from ..core.smartlm_base import (
     MODEL_CONFIGS,
     FLORENCE_TASKS,
     get_template_list,
-    get_default_template,
     load_template,
     detect_model_type,
     ModelType,
@@ -42,7 +41,6 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
     @classmethod
     def INPUT_TYPES(cls):
         templates = get_template_list()
-        default_template = get_default_template()
         qwen_prompts = MODEL_CONFIGS.get("_preset_prompts", ["Describe this image in detail."])
         preferred_qwen = "Detailed Description"
         default_qwen_prompt = preferred_qwen if preferred_qwen in qwen_prompts else qwen_prompts[0]
@@ -53,24 +51,21 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
         
         return {
             "required": {
-                "template_action": (["None", "New", "Delete"], {"default": "None", "tooltip": "Create new template or delete existing template. Template selection automatically loads settings."}),
-                "template_name": (templates, {"default": default_template, "tooltip": "Select model template (auto-loads on change)"}),
-                "new_template_name": ("STRING", {"default": "", "tooltip": "Name for new template (New mode only)"}),
-                "new_model_type": (["QwenVL (Transformers)", "QwenVL (GGUF)", "Florence2 (Transformers)", "LLM (Transformers)", "LLM (GGUF)"], {"default": "QwenVL (Transformers)", "tooltip": "New mode: Model type and format"}),
-                "new_model_source": (["HuggingFace", "Local"], {"default": "HuggingFace", "tooltip": "New mode: Model source - HuggingFace (download) or Local (models/LLM folder)"}),
-                "new_repo_id": ("STRING", {"default": "", "multiline": False, "tooltip": "New mode (HuggingFace): HuggingFace repo ID or direct download URL"}),
-                "new_local_model": (llm_models, {"default": llm_models[0] if llm_models else "None", "tooltip": "New mode (Local): Select model from models/LLM folder"}),
-                "new_local_path": ("STRING", {"default": "", "tooltip": "New mode (HuggingFace): Local filename after download (leave empty to use repo filename)"}),
-                "new_mmproj_source": (["HuggingFace", "Local"], {"default": "Local", "tooltip": "New mode (GGUF vision only): mmproj source"}),
-                "new_mmproj_url": ("STRING", {"default": "", "multiline": True, "tooltip": "New mode (HuggingFace): mmproj download URL"}),
-                "new_mmproj_local": (mmproj_files, {"default": mmproj_files[0] if mmproj_files else "None", "tooltip": "New mode (Local): Select mmproj from models/LLM folder"}),
-                "new_mmproj_path": ("STRING", {"default": "", "tooltip": "New mode (HuggingFace): mmproj filename after download"}),
-                "new_quantized": ("BOOLEAN", {"default": False, "tooltip": "New mode: Is model pre-quantized? (GGUF, GPTQ, AWQ, etc.)"}),
-                "new_vram_full": ("FLOAT", {"default": 3.0, "min": 0.1, "max": 200.0, "step": 0.1, "tooltip": "New mode: Enter model size in GB (e.g., 3B model ≈ 3GB). System will auto-calculate 8-bit (~50% of size) and 4-bit (~25% of size) VRAM requirements."}),
-                "new_context_size": ("INT", {"default": 32768, "min": 2048, "max": 131072, "step": 1024, "tooltip": "New mode: GGUF only - default context window size"}),
-                "new_set_default": ("BOOLEAN", {"default": False, "tooltip": "New mode: Set this template as default on startup"}),
+                "template_action": (["None", "Load", "Save", "Delete"], {"default": "None", "tooltip": "None: Manual configuration | Load: Use template | Save: Save as template | Delete: Remove template"}),
+                "template_name": (templates, {"default": templates[0] if templates else "None", "tooltip": "Select template to load or delete"}),
+                "new_template_name": ("STRING", {"default": "", "tooltip": "Save mode: Name for new template"}),
+                "model_type": (["QwenVL", "QwenVL (GGUF)", "Florence2", "Florence2 (GGUF)", "LLM", "LLM (GGUF)"], {"default": "QwenVL", "tooltip": "Model type and format: QwenVL/Florence2/LLM (Transformers) or with (GGUF) suffix for llama.cpp models"}),
+                "model_source": (["HuggingFace", "Local"], {"default": "HuggingFace", "tooltip": "Model source - HuggingFace (download) or Local (models/LLM folder)"}),
+                "repo_id": ("STRING", {"default": "", "multiline": False, "tooltip": "HuggingFace: Repo ID or direct download URL"}),
+                "local_model": (llm_models, {"default": llm_models[0] if llm_models else "None", "tooltip": "Local: Select model from models/LLM folder"}),
+                "local_path": ("STRING", {"default": "", "tooltip": "HuggingFace: Local filename after download (leave empty to use repo filename)"}),
+                "mmproj_source": (["HuggingFace", "Local"], {"default": "Local", "tooltip": "GGUF vision only: mmproj source"}),
+                "mmproj_url": ("STRING", {"default": "", "multiline": True, "tooltip": "HuggingFace: mmproj download URL"}),
+                "mmproj_local": (mmproj_files, {"default": mmproj_files[0] if mmproj_files else "None", "tooltip": "Local: Select mmproj from models/LLM folder"}),
+                "mmproj_path": ("STRING", {"default": "", "tooltip": "HuggingFace: mmproj filename after download"}),
                 "quantization": (["auto", "4bit", "8bit", "fp16", "bf16", "fp32"], {"default": "auto", "tooltip": "Model precision/quantization: auto (best for available memory), FP32 (full), BF16 (balanced), FP16 (standard), 8-bit/4-bit (lower VRAM, reduced quality)"}),
                 "attention_mode": (["auto", "flash_attention_2", "sdpa", "eager"], {"default": "auto", "tooltip": "Attention implementation: auto (best available), flash_attention_2 (fastest), sdpa (balanced), eager (fallback)"}),
+                "context_size": ("INT", {"default": 32768, "min": 2048, "max": 131072, "step": 1024, "tooltip": "Context window size. Transformers: auto | GGUF: Controls total input+output token capacity. Text-only LLM: 2048-4096, Vision models: 16384-32768 for images, 32768-65536 for videos."}),
                 "qwen_preset_prompt": (qwen_prompts, {"default": default_qwen_prompt, "tooltip": "QwenVL: Pre-configured prompt templates for common tasks. Select 'Custom' to use only your custom prompt"}),
                 "qwen_custom_prompt": ("STRING", {"default": "", "multiline": True, "tooltip": "QwenVL: For 'Custom' preset: main instruction. For other presets: additional hints/context appended to system prompt"}),
                 "florence_task": (florence_tasks, {"default": default_florence_task, "tooltip": "Florence-2: Select task type (caption, detailed_caption, prompt generation, grounding, detection, OCR, etc.)"}),
@@ -80,10 +75,8 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
                 "llm_custom_instruction": ("STRING", {"default": 'Generate a detailed prompt from "{prompt}"', "multiline": True, "tooltip": 'LLM: Custom instruction template (only used when mode is Custom Instruction). Use {prompt} as placeholder.'}),
                 "llm_prompt": ("STRING", {"default": "", "multiline": True, "tooltip": "LLM: Your input text/tags/description to process (used when text input is not connected)"}),
                 "max_tokens": ("INT", {"default": 512, "min": 64, "max": 2048, "tooltip": "Maximum number of tokens to generate in the output. Larger values allow longer responses but take more time. QwenVL: 512-1024, Florence-2: 512-1024, LLM: 512-2048"}),
-                "context_size": ("INT", {"default": 32768, "min": 2048, "max": 131072, "step": 1024, "tooltip": "GGUF only: Context window size (n_ctx). Controls total input+output token capacity. Text-only LLM: 2048-4096, Vision models: 16384-32768 for images, 32768-65536 for videos (each frame ~1000 tokens)."}),
                 "memory_cleanup": ("BOOLEAN", {"default": True, "tooltip": "Clear unused memory cache before loading LM model (safe, won't unload generation models). Disable if LM model is already loaded for faster reload."}),
                 "keep_model_loaded": ("BOOLEAN", {"default": False, "tooltip": "Keep model in VRAM between generations (faster, uses more VRAM)"}),
-                "auto_save_template": ("BOOLEAN", {"default": False, "tooltip": "Auto-save widget changes to template for next load (e.g., max_tokens, tasks, quantization). Useful for persistent preferences per model."}),
                 "seed": ("INT", {"default": 0, "min": -3, "max": 2**64 - 1, "control_after_generate": True, "tooltip": "Random seed for reproducible results."}),
             },
             "optional": {
@@ -103,34 +96,29 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
         template_action,
         template_name,
         new_template_name,
-        new_model_source,
-        new_repo_id,
-        new_local_model,
-        new_local_path,
-        new_mmproj_source,
-        new_mmproj_url,
-        new_mmproj_local,
-        new_mmproj_path,
-        new_model_type,
-        new_quantized,
-        new_vram_full,
-        new_context_size,
-        new_set_default,
+        model_type,
+        model_source,
+        repo_id,
+        local_model,
+        local_path,
+        mmproj_source,
+        mmproj_url,
+        mmproj_local,
+        mmproj_path,
         quantization,
         attention_mode,
+        context_size,
         qwen_preset_prompt,
         qwen_custom_prompt,
         florence_task,
-        florence_text_input,
         convert_to_bboxes,
+        florence_text_input,
         llm_instruction_mode,
         llm_custom_instruction,
         llm_prompt,
         max_tokens,
-        context_size,
         memory_cleanup,
         keep_model_loaded,
-        auto_save_template,
         seed,
         images=None,
         text=None,
@@ -142,84 +130,133 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
         from pathlib import Path
         start_time = time.time()
         
-        # Handle template actions (New/Delete)
-        if template_action == "New" and new_template_name and new_template_name.strip():
-            # Create new template from scratch with all required fields
+        # Extract base model type and format from combined model_type
+        is_gguf = "(GGUF)" in model_type
+        base_model_type = model_type.replace(" (GGUF)", "").strip()
+        internal_model_type = base_model_type.lower()
+        
+        # Handle template actions (Save/Delete)
+        if template_action == "Save" and new_template_name and new_template_name.strip():
+            # Save current configuration as template
             from ..core.smartlm_base import TEMPLATE_DIR
             template_path = TEMPLATE_DIR / f"{new_template_name.strip()}.json"
             
-            # Map display names to internal model_type values
-            model_type_map = {
-                "QwenVL (Transformers)": "qwenvl",
-                "QwenVL (GGUF)": "qwenvl",
-                "Florence2 (Transformers)": "florence2",
-                "LLM (Transformers)": "llm",
-                "LLM (GGUF)": "llm"
-            }
-            internal_model_type = model_type_map.get(new_model_type, "qwenvl")
-            is_gguf = "(GGUF)" in new_model_type
-            
             # Determine repo_id and local_path based on source
-            if new_model_source == "Local":
+            if model_source == "Local":
                 # Local model: use selected model as local_path, repo_id empty
-                repo_id = ""
-                local_path = new_local_model
+                final_repo_id = ""
+                # Ensure trailing slash for directory consistency
+                final_local_path = local_model.rstrip('/') + '/' if local_model and not local_model.endswith('.gguf') else local_model
             else:
                 # HuggingFace: use repo_id and optional local_path
-                repo_id = new_repo_id.strip()
-                local_path = new_local_path.strip()
+                final_repo_id = repo_id.strip()
+                # Normalize local_path - add trailing slash for directories
+                final_local_path = local_path.strip()
+                if final_local_path and not final_local_path.endswith('.gguf'):
+                    final_local_path = final_local_path.rstrip('/') + '/'
             
             # Determine mmproj_path and mmproj_url based on source (for GGUF vision models)
-            mmproj_path = ""
-            mmproj_url = ""
+            final_mmproj_path = ""
+            final_mmproj_url = ""
             if is_gguf and internal_model_type == "qwenvl":
-                if new_mmproj_source == "Local":
-                    mmproj_path = new_mmproj_local
+                if mmproj_source == "Local":
+                    final_mmproj_path = mmproj_local
                 else:
-                    mmproj_url = new_mmproj_url.strip()
-                    mmproj_path = new_mmproj_path.strip()
+                    final_mmproj_url = mmproj_url.strip()
+                    final_mmproj_path = mmproj_path.strip()
             
-            # Build template configuration from new_* widgets
+            # Auto-detect quantized status from model path/name
+            model_name_lower = (final_local_path or final_repo_id or "").lower()
+            has_quant_markers = any(marker in model_name_lower for marker in [
+                "fp8", "int8", "int4", "q4", "q5", "q6", "q8", "_q4_", "_q5_", "_q8_",
+                "gptq", "awq", "gguf"
+            ])
+            auto_quantized = has_quant_markers or is_gguf
+            
+            # Auto-detect model size - try file size first for local models, then fallback to name parsing
+            vram_full = 3.0  # Default estimate
+            if model_source == "Local" and final_local_path:
+                try:
+                    import folder_paths
+                    llm_dir = Path(folder_paths.models_dir) / "LLM"
+                    model_path = llm_dir / final_local_path
+                    
+                    total_size_gb = 0.0
+                    if model_path.is_file():
+                        # Single file (GGUF, safetensors, etc.)
+                        total_size_gb = model_path.stat().st_size / (1024**3)
+                    elif model_path.is_dir():
+                        # Model folder - sum all model files (safetensors, bin, pt, etc.)
+                        model_extensions = ['.safetensors', '.bin', '.pt', '.gguf']
+                        for file in model_path.rglob('*'):
+                            if file.is_file() and file.suffix in model_extensions:
+                                total_size_gb += file.stat().st_size / (1024**3)
+                    
+                    if total_size_gb > 0.1:  # Only use if we found significant files (>100MB)
+                        vram_full = round(total_size_gb, 1)
+                except Exception as e:
+                    cstr(f"[SmartLM] Could not calculate model size from files, using name-based estimate: {e}").warning.print()
+            
+            # Fallback: estimate from model name if file size calculation failed or not local
+            if vram_full == 3.0:  # Still default, use name-based detection
+                if "2b" in model_name_lower or "2.5b" in model_name_lower:
+                    vram_full = 4.0
+                elif "3b" in model_name_lower:
+                    vram_full = 6.0
+                elif "4b" in model_name_lower:
+                    vram_full = 8.0
+                elif "7b" in model_name_lower or "8b" in model_name_lower:
+                    vram_full = 14.0
+                elif "32b" in model_name_lower:
+                    vram_full = 64.0
+                elif "florence-2-base" in model_name_lower or "florence2-base" in model_name_lower:
+                    vram_full = 0.5  # ~230M params
+                elif "florence-2-large" in model_name_lower or "florence2-large" in model_name_lower:
+                    vram_full = 1.5  # ~770M params
+            
+            # Build template configuration from current widgets
             new_config = {
-                "repo_id": repo_id,
-                "local_path": local_path,
-                "mmproj_path": mmproj_path,
+                "repo_id": final_repo_id,
+                "local_path": final_local_path,
+                "mmproj_path": final_mmproj_path,
                 "model_type": internal_model_type,
-                "default": new_set_default,
                 "default_task": "",  # Will be set based on model type
                 "default_text_input": "",
                 "max_tokens": max_tokens,
                 "quantization": quantization,
                 "attention_mode": attention_mode,
-                "quantized": new_quantized or is_gguf,  # GGUF models are always quantized
+                "quantized": auto_quantized,
                 "vram_requirement": {
-                    "full": new_vram_full
+                    "full": vram_full
                 }
             }
             
             # Add mmproj_url if provided (GGUF vision models)
-            if mmproj_url:
-                new_config["mmproj_url"] = mmproj_url
+            if final_mmproj_url:
+                new_config["mmproj_url"] = final_mmproj_url
             
             # Auto-calculate 8bit/4bit VRAM from model size (for non-quantized models)
             # Skip for pre-quantized models (GGUF, GPTQ, AWQ, etc.)
-            if not new_quantized and not is_gguf:
+            if not auto_quantized:
                 # 8-bit: ~50% of full precision size
-                new_config["vram_requirement"]["8bit"] = round(new_vram_full * 0.5, 1)
+                new_config["vram_requirement"]["8bit"] = round(vram_full * 0.5, 1)
                 # 4-bit: ~25% of full precision size
-                new_config["vram_requirement"]["4bit"] = round(new_vram_full * 0.25, 1)
+                new_config["vram_requirement"]["4bit"] = round(vram_full * 0.25, 1)
             
             # Add context_size for GGUF models
             if is_gguf:
-                new_config["context_size"] = new_context_size
+                new_config["context_size"] = context_size
             
             # Set default_task based on model type
             if internal_model_type == "qwenvl":
-                new_config["default_task"] = "Detailed Description"
+                new_config["default_task"] = qwen_preset_prompt
+                new_config["default_text_input"] = qwen_custom_prompt
             elif internal_model_type == "florence2":
-                new_config["default_task"] = "detailed_caption"
+                new_config["default_task"] = florence_task
+                new_config["default_text_input"] = florence_text_input
             elif internal_model_type == "llm":
-                new_config["default_task"] = "Tags to Natural Language"
+                new_config["default_task"] = llm_instruction_mode
+                new_config["default_text_input"] = llm_custom_instruction
             
             # Add _available_tasks at the end as a user hint (documentation field)
             if internal_model_type == "qwenvl":
@@ -294,28 +331,190 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
         else:
             top_k = 50
         
-        # Load template and detect model type
-        template_info = load_template(template_name)
-        model_type = detect_model_type(template_info)
-        
-        # Check if model is GGUF (context_size only applies to GGUF)
-        is_gguf = False
-        if template_info:
-            local_path = template_info.get("local_path", "")
-            repo_id = template_info.get("repo_id", "")
-            is_gguf = local_path.lower().endswith(".gguf") or repo_id.lower().endswith(".gguf") or "gguf" in repo_id.lower()
-        
-        # Check if we need to reload model
-        if self.current_template != template_name or self.model is None:
-            if is_gguf:
-                cstr(f"[SmartLM] Loading template '{template_name}' (type: {model_type.value}, max_tokens: {max_tokens}, context: {context_size})").msg.print()
+        # Determine configuration source: Load template or use direct configuration (None mode)
+        if template_action == "Load" and template_name and template_name != "None":
+            # Load mode: Use template configuration
+            template_info = load_template(template_name)
+            detected_model_type = detect_model_type(template_info)
+            
+            # Check if model is GGUF
+            is_gguf = False
+            if template_info:
+                final_local_path = template_info.get("local_path", "")
+                final_repo_id = template_info.get("repo_id", "")
+                is_gguf = final_local_path.lower().endswith(".gguf") or final_repo_id.lower().endswith(".gguf") or "gguf" in final_repo_id.lower()
+            
+            # Load model from template
+            if self.current_template != template_name or self.model is None:
+                if is_gguf:
+                    cstr(f"[SmartLM] Loading template '{template_name}' (type: {detected_model_type.value}, max_tokens: {max_tokens}, context: {context_size})").msg.print()
+                else:
+                    cstr(f"[SmartLM] Loading template '{template_name}' (type: {detected_model_type.value}, max_tokens: {max_tokens})").msg.print()
+                self.load_model(template_name, quantization, attention_mode, device=device, context_size=context_size, 
+                              memory_cleanup=memory_cleanup, use_torch_compile=use_torch_compile)
+        else:
+            # None mode: Use direct configuration from widgets
+            # Determine repo_id and local_path
+            if model_source == "Local":
+                final_repo_id = ""
+                final_local_path = local_model
             else:
-                cstr(f"[SmartLM] Loading template '{template_name}' (type: {model_type.value}, max_tokens: {max_tokens})").msg.print()
-            self.load_model(template_name, quantization, attention_mode, device=device, context_size=context_size, 
-                          memory_cleanup=memory_cleanup, use_torch_compile=use_torch_compile)
+                final_repo_id = repo_id.strip()
+                final_local_path = local_path.strip()
+            
+            # Determine mmproj
+            final_mmproj_path = ""
+            final_mmproj_url = ""
+            if is_gguf and internal_model_type == "qwenvl":
+                if mmproj_source == "Local":
+                    final_mmproj_path = mmproj_local
+                else:
+                    final_mmproj_url = mmproj_url.strip()
+                    final_mmproj_path = mmproj_path.strip()
+            
+            # Auto-detect quantized status and VRAM requirements
+            model_name_lower = (final_local_path or final_repo_id or "").lower()
+            has_quant_markers = any(marker in model_name_lower for marker in [
+                "fp8", "int8", "int4", "q4", "q5", "q6", "q8", "_q4_", "_q5_", "_q8_",
+                "gptq", "awq", "gguf"
+            ])
+            auto_quantized = has_quant_markers or is_gguf
+            
+            # Auto-detect model size - try file size first for local models, then fallback to name parsing
+            vram_full = 3.0  # Default
+            if model_source == "Local" and final_local_path:
+                try:
+                    import folder_paths
+                    llm_dir = Path(folder_paths.models_dir) / "LLM"
+                    model_path = llm_dir / final_local_path
+                    
+                    total_size_gb = 0.0
+                    if model_path.is_file():
+                        # Single file (GGUF, safetensors, etc.)
+                        total_size_gb = model_path.stat().st_size / (1024**3)
+                    elif model_path.is_dir():
+                        # Model folder - check for sharded models first, then single files
+                        # Priority: .safetensors (preferred) > .bin > .pt
+                        all_files = list(model_path.rglob('*'))
+                        model_files = [f for f in all_files if f.is_file()]
+                        
+                        # Check for shard files (e.g., model-00001-of-00005.safetensors)
+                        safetensors_files = [f for f in model_files if f.suffix == '.safetensors']
+                        bin_files = [f for f in model_files if f.suffix == '.bin']
+                        pt_files = [f for f in model_files if f.suffix == '.pt']
+                        gguf_files = [f for f in model_files if f.suffix == '.gguf']
+                        
+                        # Check if we have shards (files with -of- pattern)
+                        has_shards = lambda files: any('-of-' in f.name for f in files)
+                        
+                        # Priority: safetensors shards > single safetensors > bin shards > single bin > pt > gguf
+                        if has_shards(safetensors_files):
+                            # Use safetensors shards
+                            for file in safetensors_files:
+                                if '-of-' in file.name:
+                                    total_size_gb += file.stat().st_size / (1024**3)
+                        elif safetensors_files:
+                            # Single safetensors file (no shards)
+                            for file in safetensors_files:
+                                total_size_gb += file.stat().st_size / (1024**3)
+                        elif has_shards(bin_files):
+                            # Use bin shards
+                            for file in bin_files:
+                                if '-of-' in file.name:
+                                    total_size_gb += file.stat().st_size / (1024**3)
+                        elif bin_files:
+                            # Single bin file
+                            for file in bin_files:
+                                total_size_gb += file.stat().st_size / (1024**3)
+                        elif pt_files:
+                            # PT files
+                            for file in pt_files:
+                                total_size_gb += file.stat().st_size / (1024**3)
+                        elif gguf_files:
+                            # GGUF files
+                            for file in gguf_files:
+                                total_size_gb += file.stat().st_size / (1024**3)
+                    
+                    if total_size_gb > 0.1:  # Only use if we found significant files (>100MB)
+                        vram_full = round(total_size_gb, 1)
+                except Exception as e:
+                    cstr(f"[SmartLM] Could not calculate model size from files, using name-based estimate: {e}").warning.print()
+            
+            # Fallback: estimate from model name if file size calculation failed or not local
+            if vram_full == 3.0:  # Still default, use name-based detection
+                if "2b" in model_name_lower or "2.5b" in model_name_lower:
+                    vram_full = 4.0
+                elif "3b" in model_name_lower:
+                    vram_full = 6.0
+                elif "4b" in model_name_lower:
+                    vram_full = 8.0
+                elif "7b" in model_name_lower or "8b" in model_name_lower:
+                    vram_full = 14.0
+                elif "32b" in model_name_lower:
+                    vram_full = 64.0
+                elif "florence" in model_name_lower:
+                    vram_full = 0.5 if "base" in model_name_lower else 1.5
+            
+            # Build temporary template_info for None mode
+            vram_req = {"full": vram_full}
+            # Auto-calculate 8bit/4bit VRAM for non-quantized models
+            if not auto_quantized:
+                vram_req["8bit"] = round(vram_full * 0.5, 1)
+                vram_req["4bit"] = round(vram_full * 0.25, 1)
+            
+            template_info = {
+                "repo_id": final_repo_id,
+                "local_path": final_local_path,
+                "mmproj_path": final_mmproj_path,
+                "model_type": internal_model_type,
+                "quantization": quantization,
+                "attention_mode": attention_mode,
+                "quantized": auto_quantized,
+                "vram_requirement": vram_req
+            }
+            
+            if final_mmproj_url:
+                template_info["mmproj_url"] = final_mmproj_url
+            
+            if is_gguf:
+                template_info["context_size"] = context_size
+            
+            detected_model_type = detect_model_type(template_info)
+            
+            # Load model from direct configuration (use None as cache key for manual config)
+            config_key = f"manual_{internal_model_type}_{final_repo_id or final_local_path}"
+            if self.current_template != config_key or self.model is None:
+                if is_gguf:
+                    cstr(f"[SmartLM] Loading model (type: {detected_model_type.value}, format: GGUF, max_tokens: {max_tokens}, context: {context_size})").msg.print()
+                else:
+                    cstr(f"[SmartLM] Loading model (type: {detected_model_type.value}, format: Transformers, max_tokens: {max_tokens})").msg.print()
+                
+                # Use direct loading method (create temporary template-like structure)
+                self.current_template = config_key
+                self.template_info = template_info
+                
+                # Call load_model_direct or similar - for now use existing load_model by creating temp template
+                from ..core.smartlm_base import TEMPLATE_DIR
+                temp_template_name = "__temp_manual_config__"
+                temp_template_path = TEMPLATE_DIR / f"{temp_template_name}.json"
+                
+                try:
+                    os.makedirs(TEMPLATE_DIR, exist_ok=True)
+                    with open(temp_template_path, 'w', encoding='utf-8') as f:
+                        json.dump(template_info, f, indent=2)
+                    
+                    self.load_model(temp_template_name, quantization, attention_mode, device=device, context_size=context_size,
+                                  memory_cleanup=memory_cleanup, use_torch_compile=use_torch_compile)
+                    
+                    # Clean up temp template
+                    if temp_template_path.exists():
+                        os.remove(temp_template_path)
+                except Exception as e:
+                    cstr(f"[SmartLM] Failed to load model from manual configuration: {e}").error.print()
+                    raise
         
         # Prepare prompt based on model type
-        if model_type == ModelType.QWENVL:
+        if detected_model_type == ModelType.QWENVL:
             # Use QwenVL prompts
             from ..core.smartlm_base import SYSTEM_PROMPTS
             
@@ -348,7 +547,7 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
                 frame_count=frame_count,
             )
             
-        elif model_type == ModelType.FLORENCE2:
+        elif detected_model_type == ModelType.FLORENCE2:
             # Florence-2 doesn't support video (multiple frames)
             input_image = images
             if images is not None and images.shape[0] > 1:
@@ -372,7 +571,7 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
                 convert_to_bboxes=convert_to_bboxes,
             )
         
-        elif model_type == ModelType.LLM:
+        elif detected_model_type == ModelType.LLM:
             # Text-only LLM: Use instruction mode to determine template and behavior
             # Map display names to config keys
             mode_map = {
@@ -418,14 +617,14 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
         # Generate visualization image if Florence-2 detection task
         output_image = None
         
-        if model_type == ModelType.FLORENCE2 and data and ("bboxes" in data or "quad_boxes" in data or "polygons" in data):
+        if detected_model_type == ModelType.FLORENCE2 and data and ("bboxes" in data or "quad_boxes" in data or "polygons" in data):
             try:
                 # Draw visualization with bboxes
-                output_image = self._draw_bboxes(input_image if model_type == ModelType.FLORENCE2 else images, data)
+                output_image = self._draw_bboxes(input_image if detected_model_type == ModelType.FLORENCE2 else images, data)
             except Exception as e:
                 cstr(f"[SmartLM] Could not draw bounding boxes: {e}").warning.print()
                 # Return original image if drawing fails
-                output_image = input_image if model_type == ModelType.FLORENCE2 else images
+                output_image = input_image if detected_model_type == ModelType.FLORENCE2 else images
         else:
             # No detections - return original image or blank
             if images is not None:
