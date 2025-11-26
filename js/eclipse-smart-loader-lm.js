@@ -678,7 +678,18 @@ app.registerExtension({
                                         if (modelPath && !modelPath.endsWith('.gguf') && !modelPath.endsWith('/')) {
                                             modelPath = modelPath + '/';
                                         }
-                                        localModelWidget.value = modelPath;
+                                        
+                                        // Check if modelPath exists in dropdown list
+                                        const validPaths = localModelWidget.options?.values || [];
+                                        if (validPaths.includes(modelPath)) {
+                                            localModelWidget.value = modelPath;
+                                        } else {
+                                            // Path not in list - reset to first valid item to avoid validation error
+                                            if (validPaths.length > 0) {
+                                                localModelWidget.value = validPaths[0];
+                                                console.log(`[SmartLM] Template path '${modelPath}' not found, using '${validPaths[0]}'`);
+                                            }
+                                        }
                                     }
                                     
                                     // Update stored template info with detected path
