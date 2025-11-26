@@ -155,9 +155,21 @@ class RvConversion_DetectionToBboxes:
         
         # Parse indices if provided and not combining
         selected_indices = None
+        include_following = False  # Flag to include all indices after the last specified one
         if not combine_masks and indices.strip():
             try:
-                selected_indices = [int(idx.strip()) for idx in indices.split(',') if idx.strip()]
+                # Check if ends with comma (means "and all following")
+                indices_clean = indices.strip()
+                if indices_clean.endswith(','):
+                    include_following = True
+                    indices_clean = indices_clean.rstrip(',')
+                
+                # Parse comma-separated indices
+                if indices_clean:
+                    selected_indices = [int(idx.strip()) for idx in indices_clean.split(',') if idx.strip()]
+                else:
+                    # Just a trailing comma with no indices means all
+                    selected_indices = list(range(len(masks)))
             except ValueError:
                 cstr(f"[DetectionToBboxes] Invalid indices format '{indices}', using all detections").warning.print()
                 selected_indices = None
@@ -166,6 +178,18 @@ class RvConversion_DetectionToBboxes:
         if selected_indices is not None:
             filtered_masks = []
             filtered_bboxes = []
+            
+            # If include_following is True, add all indices from the specified ones onwards
+            if include_following and selected_indices:
+                # Get all specified indices
+                specified = set(selected_indices)
+                # Add all indices starting from each specified index to end
+                all_indices = set()
+                for idx in selected_indices:
+                    for i in range(idx, len(masks)):
+                        all_indices.add(i)
+                selected_indices = sorted(list(all_indices))
+            
             for idx in selected_indices:
                 if 0 <= idx < len(masks):
                     filtered_masks.append(masks[idx])
