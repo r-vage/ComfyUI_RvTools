@@ -68,7 +68,9 @@ Smart Language Model Loader is a unified framework that supports three types of 
 - Text-to-text processing without vision
 - Prompt refinement and expansion
 - Tags to natural language conversion
-- Supports both transformers and GGUF formats
+- **Supports both transformers (full quality) and GGUF (low VRAM) formats**
+- Transformers support: Mistral, Llama, Qwen, and other HuggingFace models
+- Auto-quantization for transformers (fp16/8bit/4bit based on VRAM)
 
 ---
 
@@ -170,8 +172,14 @@ All models listed below are pre-configured as templates in `ComfyUI_Eclipse/temp
 **Recommended starter:** `Florence-2-base-PromptGen-v2.0` (best for prompt tags)
 **Note:** Detection templates are pre-configured with specific text inputs and convert_to_bboxes=False
 
-### Text-Only LLM Models (GGUF)
+### Text-Only LLM Models
 
+**Transformers Format (Full Quality):**
+| Template Name | Size | VRAM (fp16/8bit/4bit) | Context | Description |
+|--------------|------|----------------------|---------|-------------|
+| **Mistral-7B-Instruct-v0.3** | 7B | 14/8/4.5 GB | 32768 | General text processing, auto-quant |
+
+**GGUF Format (Pre-Quantized):**
 | Template Name | Size | Quant | VRAM | Context | Description |
 |--------------|------|-------|------|---------|-------------|
 | **Mistral-7B-Instruct-v0.3_Q5_K_M** | 7B | Q5_K_M | 5.7 GB | 4096 | General text processing |
@@ -179,6 +187,10 @@ All models listed below are pre-configured as templates in `ComfyUI_Eclipse/temp
 | **llava-v1.6-mistral-7b_Q4_K_M** | 7B | Q4_K_M | ~5 GB | Default | LLaVA vision model (GGUF) |
 
 **Note:** Text-only LLM models don't process images. Use for prompt refinement, text expansion, tags-to-description conversion, etc. All LLM templates default to "Tags to Natural Language" instruction mode.
+
+**Transformers vs GGUF:**
+- **Transformers:** Full model quality, auto-quantization (8bit/4bit) based on available VRAM, supports all HuggingFace LLM models
+- **GGUF:** Pre-quantized for lower VRAM, fixed quantization level, faster loading but slightly lower quality
 
 ---
 
@@ -684,19 +696,33 @@ Analyze the lighting in this scene. What time of day is it?
 
 ### LLM (Text-Only)
 
-**Supports:** Text input only (no images)
+**Supports:** Text input only (no images)  
+**Formats:** Transformers (HuggingFace) and GGUF (llama-cpp-python)
 
 **Strengths:**
 - ✅ Fast text-to-text processing
 - ✅ Prompt refinement and expansion
 - ✅ Tags to natural language conversion
 - ✅ Flexible instruction modes
+- ✅ Transformers support with auto-quantization (fp16/8bit/4bit)
+- ✅ GGUF support for pre-quantized models (lower VRAM)
+- ✅ Supports Mistral, Llama, Qwen, and other HuggingFace text models
 
 **Use Cases:**
 - Convert tags to natural language descriptions
 - Expand short descriptions into detailed prompts
 - Refine prompts for better quality
 - General text processing and chat
+
+**Model Format Selection:**
+- **LLM (Transformers):** Full quality, auto-quantization based on VRAM
+  - Use for models from HuggingFace without pre-quantization
+  - Example: `mistralai/Mistral-7B-Instruct-v0.3`
+  - Auto-selects 8bit for 16GB VRAM, 4bit for 8GB VRAM
+- **LLM (GGUF):** Pre-quantized, lower VRAM, faster loading
+  - Use for manually downloaded GGUF files
+  - Example: `Mistral-7B-Instruct-v0.3.Q5_K_M.gguf`
+  - Fixed quantization level
 
 **Instruction Modes:**
 - **Tags to Natural Language** - Convert comma-separated tags to prose
