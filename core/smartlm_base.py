@@ -31,6 +31,7 @@ from enum import Enum
 
 # Import cstr for logging
 from . import cstr
+from .smartlm_files import download_with_progress, get_llm_model_list, get_mmproj_list, calculate_model_size, search_model_file
 
 # Model type detection
 class ModelType(Enum):
@@ -47,8 +48,12 @@ REPO_TEMPLATE_DIR = NODE_DIR / "templates" / "smartlm_templates"
 import folder_paths
 ECLIPSE_TEMPLATE_DIR = Path(folder_paths.models_dir) / "Eclipse" / "smartlm_templates"
 
+def get_template_dir():
+    """Get current template directory (dynamic - always prefer Eclipse if exists)."""
+    return ECLIPSE_TEMPLATE_DIR if ECLIPSE_TEMPLATE_DIR.exists() else REPO_TEMPLATE_DIR
+
 # Use Eclipse folder if available, otherwise fallback to repo
-TEMPLATE_DIR = ECLIPSE_TEMPLATE_DIR if ECLIPSE_TEMPLATE_DIR.exists() else REPO_TEMPLATE_DIR
+TEMPLATE_DIR = get_template_dir()
 
 # Config files: check Eclipse first, fallback to repo
 ECLIPSE_CONFIG_DIR = Path(folder_paths.models_dir) / "Eclipse" / "config"
@@ -60,18 +65,8 @@ LLM_FEW_SHOT_CONFIG_PATH = (ECLIPSE_CONFIG_DIR / "llm_few_shot_training.json"
                             if (ECLIPSE_CONFIG_DIR / "llm_few_shot_training.json").exists() 
                             else REPO_CONFIG_DIR / "llm_few_shot_training.json")
 
-def download_with_progress(url: str, path: str, name: str) -> None:
-    # Download file with progress bar
-    import urllib.request
-    from tqdm import tqdm
-    
-    request = urllib.request.urlopen(url)
-    total = int(request.headers.get('Content-Length', 0))
-    with tqdm(total=total, desc=f'[SmartLM] Downloading {name}', unit='B', unit_scale=True, unit_divisor=1024) as progress:
-        urllib.request.urlretrieve(url, path, reporthook=lambda count, block_size, total_size: progress.update(block_size))
-
-# Ensure template directory exists
-TEMPLATE_DIR.mkdir(parents=True, exist_ok=True)
+# Ensure template directory exists (prefer Eclipse location)
+ECLIPSE_TEMPLATE_DIR.mkdir(parents=True, exist_ok=True)
 
 # Global configuration storage
 MODEL_CONFIGS = {}
@@ -84,8 +79,9 @@ LLAMA_CPP_MODULE = None  # Will be "llama_cpp_cuda" or "llama_cpp"
 def get_template_list() -> List[str]:
     # Get list of available Smart LML templates
     templates = []
-    if TEMPLATE_DIR.exists():
-        for f in TEMPLATE_DIR.iterdir():
+    template_dir = get_template_dir()
+    if template_dir.exists():
+        for f in template_dir.iterdir():
             if f.suffix == '.json' and not f.name.startswith('_'):
                 templates.append(f.stem)
     return sorted(templates) if templates else ["Qwen2.5-VL-3B-Instruct"]
@@ -96,7 +92,7 @@ def load_template(name: str) -> dict:
     # Load a Smart LML template configuration
     if not name or name == "None":
         return {}
-    template_path = TEMPLATE_DIR / f"{name}.json"
+    template_path = get_template_dir() / f"{name}.json"
     try:
         if template_path.exists():
             with open(template_path, 'r') as f:
@@ -107,16 +103,19 @@ def load_template(name: str) -> dict:
 
 def update_template_local_path(name: str, local_path: str) -> bool:
     # Update template's local_path field after successful download for offline usage
-    if not name or name == "None":
+    if not name or name == "None" or name == "__temp_manual_config__":
         return False
-    template_path = TEMPLATE_DIR / f"{name}.json"
+    template_path = get_template_dir() / f"{name}.json"
     try:
         if template_path.exists():
             with open(template_path, 'r') as f:
                 template_data = json.load(f)
             
+            # Compare paths directly (preserve trailing slashes for directories)
+            current_path = template_data.get("local_path") or ""
+            
             # Only update if local_path is empty or different
-            if template_data.get("local_path") != local_path:
+            if current_path != local_path:
                 template_data["local_path"] = local_path
                 with open(template_path, 'w') as f:
                     json.dump(template_data, f, indent=2)
@@ -130,7 +129,7 @@ def update_template_vram_requirement(name: str, vram_req: dict) -> bool:
     # Update template's vram_requirement with actual file size after download
     if not name or name == "None" or name == "__temp_manual_config__":
         return False
-    template_path = TEMPLATE_DIR / f"{name}.json"
+    template_path = get_template_dir() / f"{name}.json"
     try:
         if template_path.exists():
             with open(template_path, 'r') as f:
@@ -160,7 +159,7 @@ def update_template_settings(name: str, settings: dict, auto_save: bool = True) 
     if not auto_save or not name or name == "None" or not settings:
         return False
     
-    template_path = TEMPLATE_DIR / f"{name}.json"
+    template_path = get_template_dir() / f"{name}.json"
     try:
         if template_path.exists():
             with open(template_path, 'r') as f:
@@ -182,131 +181,6 @@ def update_template_settings(name: str, settings: dict, auto_save: bool = True) 
     except Exception as e:
         cstr(f"[SmartLM] Warning: Could not auto-save template {name}: {e}").warning.print()
     return False
-
-def get_llm_model_list() -> list:
-    # Scan models/LLM folder and return list of available models.
-    # Returns both folders (model repos) and individual files (.safetensors, .gguf, etc.)
-    # Scans recursively to find nested model folders (e.g., /LLM/qwen-vl/Qwen2-VL-2B-Instruct/)
-    try:
-        import folder_paths
-        llm_dir = Path(folder_paths.models_dir) / "LLM"
-        
-        if not llm_dir.exists():
-            return ["(No models/LLM folder found)"]
-        
-        models = []
-        model_folders_with_shards = set()  # Track folders with shard files to show folder instead of files
-        model_extensions = ['.safetensors', '.gguf', '.bin', '.pt']
-        
-        def scan_for_models(base_path: Path, relative_path: str = ""):
-            """Recursively scan for model folders and files"""
-            try:
-                for item in base_path.iterdir():
-                    if item.is_dir():
-                        # Build relative path
-                        item_rel_path = f"{relative_path}/{item.name}" if relative_path else item.name
-                        
-                        # Check if it's a valid model folder (contains config.json or model files)
-                        has_config = (item / "config.json").exists()
-                        model_files = [
-                            f for f in item.iterdir()
-                            if f.is_file() and f.suffix in model_extensions
-                        ]
-                        
-                        # Check if folder has shard files
-                        has_shards = any('-of-' in f.name or '.shard' in f.name.lower() for f in model_files)
-                        
-                        if has_config or model_files:
-                            # If folder has shards or config.json, show folder instead of individual files
-                            if has_shards or has_config:
-                                models.append(item_rel_path + "/")
-                                model_folders_with_shards.add(item_rel_path)
-                            # If single file in folder (like single GGUF), add the file path instead
-                            elif len(model_files) == 1:
-                                single_file = model_files[0]
-                                models.append(f"{item_rel_path}/{single_file.name}")
-                                model_folders_with_shards.add(item_rel_path)  # Mark to skip later
-                            # Multiple non-shard files - add folder
-                            else:
-                                models.append(item_rel_path + "/")
-                                model_folders_with_shards.add(item_rel_path)
-                        
-                        # Recurse into subdirectories (limit depth to avoid infinite loops)
-                        if relative_path.count('/') < 3:  # Max 3 levels deep
-                            scan_for_models(item, item_rel_path)
-                    
-                    elif item.is_file() and item.suffix in model_extensions:
-                        # Individual model file - only add if not inside a model folder already processed
-                        # Skip shard files (model-00001-of-00002.safetensors, etc.)
-                        is_shard = '-of-' in item.name or '.shard' in item.name.lower()
-                        
-                        # Check if the parent directory of this file is already processed
-                        parent_already_added = relative_path in model_folders_with_shards
-                        
-                        if not is_shard and not parent_already_added:
-                            if relative_path:
-                                models.append(f"{relative_path}/{item.name}")
-                            else:
-                                models.append(item.name)
-            except PermissionError:
-                pass  # Skip directories we can't access
-        
-        # Start recursive scan from LLM root
-        scan_for_models(llm_dir)
-        
-        if not models:
-            return ["(No models found in models/LLM)"]
-        
-        return sorted(models)
-    
-    except Exception as e:
-        cstr(f"[SmartLM] Error scanning models/LLM: {e}").error.print()
-        return ["(Error scanning models folder)"]
-
-def get_mmproj_list() -> list:
-    # Scan models/LLM folder for mmproj files for GGUF QwenVL models.
-    # Returns .mmproj files and .gguf files containing 'mmproj' in the name.
-    # Scans recursively to find nested mmproj files.
-    try:
-        import folder_paths
-        llm_dir = Path(folder_paths.models_dir) / "LLM"
-        
-        if not llm_dir.exists():
-            return ["None", "(No models/LLM folder found)"]
-        
-        mmproj_files = ["None"]  # Add None option for when mmproj is not needed
-        
-        def scan_for_mmproj(base_path: Path, relative_path: str = ""):
-            """Recursively scan for mmproj files"""
-            try:
-                for item in base_path.iterdir():
-                    if item.is_file():
-                        # Match .mmproj files or .gguf files with 'mmproj' in name
-                        if item.suffix == '.mmproj' or (item.suffix == '.gguf' and 'mmproj' in item.name.lower()):
-                            if relative_path:
-                                mmproj_files.append(f"{relative_path}/{item.name}")
-                            else:
-                                mmproj_files.append(item.name)
-                    
-                    elif item.is_dir():
-                        # Recurse into subdirectories (limit depth to avoid infinite loops)
-                        item_rel_path = f"{relative_path}/{item.name}" if relative_path else item.name
-                        if relative_path.count('/') < 3:  # Max 3 levels deep
-                            scan_for_mmproj(item, item_rel_path)
-            except PermissionError:
-                pass  # Skip directories we can't access
-        
-        # Start recursive scan from LLM root
-        scan_for_mmproj(llm_dir)
-        
-        if len(mmproj_files) == 1:  # Only "None" option
-            mmproj_files.append("(No mmproj files found)")
-        
-        return sorted(mmproj_files)
-    
-    except Exception as e:
-        cstr(f"[SmartLM] Error scanning for mmproj files: {e}").error.print()
-        return ["None", "(Error scanning mmproj files)"]
 
 def detect_model_type(template_info: dict) -> ModelType:
     # Detect model type from template configuration
@@ -714,6 +588,7 @@ class SmartLMLBase:
     
     def ensure_model_path(self, template_name: str) -> tuple[str, str]:
         # Download model if needed and return (model_path, model_folder_path)
+        # Handles legacy templates by searching LLM folder and auto-fixing paths
         template_info = load_template(template_name)
         if not template_info:
             raise ValueError(f"Template '{template_name}' not found")
@@ -734,21 +609,41 @@ class SmartLMLBase:
         import folder_paths
         models_base = Path(folder_paths.models_dir) / "LLM"
         
+        # Construct target path based on local_path or repo_id
+        target = None
+        needs_search = False
+        
         if local_path:
-            # For GGUF files, create model-specific folder
+            # Try to construct path from local_path
             if local_path.lower().endswith(".gguf"):
-                # Extract filename without extension for folder name
-                model_name = Path(local_path).stem
-                # For Qwen models, use Qwen-VL subfolder for compatibility with other nodes
-                if model_type == ModelType.QWENVL or "qwen" in local_path.lower():
-                    target = models_base / "Qwen-VL" / model_name / Path(local_path).name
+                # Check if local_path is just filename (legacy) or full path
+                if '/' in local_path or '\\' in local_path:
+                    # Already has path components - use as-is
+                    target = models_base / local_path
                 else:
-                    target = models_base / model_name / Path(local_path).name
+                    # Just filename - construct expected folder structure
+                    model_name = Path(local_path).stem
+                    if model_type == ModelType.QWENVL or "qwen" in local_path.lower():
+                        target = models_base / "Qwen-VL" / model_name / Path(local_path).name
+                    else:
+                        target = models_base / model_name / Path(local_path).name
             else:
                 # Non-GGUF: use specified local path as-is
                 target = models_base / local_path
+            
+            # If constructed target doesn't exist, search for the file
+            if not target.exists():
+                filename = Path(local_path).name  # Extract just the filename
+                cstr(f"[SmartLM] Searching for existing file: {filename}...").msg.print()
+                found_path = search_model_file(filename, models_base)
+                if found_path:
+                    target = found_path
+                    cstr(f"[SmartLM] ✓ Found existing file at {target}").msg.print()
+                else:
+                    # File not found, but local_path is set - will download below
+                    needs_search = False
         else:
-            # Use repo name - for QwenVL use Qwen-VL subfolder, for Florence-2 use repo name
+            # No local_path - construct from repo_id
             model_name = repo_id.split("/")[-1]
             
             # For direct GGUF URL downloads, create folder structure properly
@@ -760,6 +655,14 @@ class SmartLMLBase:
                     target = models_base / "Qwen-VL" / folder_name / filename
                 else:
                     target = models_base / folder_name / filename
+                
+                # Search for existing file if target doesn't exist
+                if not target.exists():
+                    cstr(f"[SmartLM] Searching for existing file: {filename}...").msg.print()
+                    found_path = search_model_file(filename, models_base)
+                    if found_path:
+                        target = found_path
+                        cstr(f"[SmartLM] ✓ Found existing file at {target}").msg.print()
             elif model_type == ModelType.QWENVL:
                 target = models_base / "Qwen-VL" / model_name
             else:
@@ -798,13 +701,16 @@ class SmartLMLBase:
                 downloaded = True
             else:
                 raise ValueError(f"Template '{template_name}' local_path '{local_path}' not found at {target}")
-        else:
-            cstr(f"[SmartLM] Model already exists at {target}").msg.print()
         
         # Update template with local_path after download/verification for offline usage
         # Always calculate relative path and update if different from template
+        # Use forward slashes for cross-platform compatibility (JSON standard)
         relative_path = target.relative_to(models_base)
-        current_local_path = str(relative_path)
+        current_local_path = relative_path.as_posix()
+        
+        # Add trailing slash for directories (transformers models)
+        if target.is_dir() and not current_local_path.endswith('/'):
+            current_local_path += '/'
         
         # Update if local_path is empty or different from actual path
         if not local_path or local_path != current_local_path:
@@ -813,52 +719,7 @@ class SmartLMLBase:
         # Update vram_requirement with actual file size (after download or if file exists)
         if downloaded or target.exists():
             try:
-                total_size_gb = 0.0
-                if target.is_file():
-                    # Single file (GGUF, safetensors, etc.)
-                    total_size_gb = target.stat().st_size / (1024**3)
-                elif target.is_dir():
-                    # Model folder - check for sharded models first, then single files
-                    # Priority: .safetensors (preferred) > .bin > .pt
-                    all_files = list(target.rglob('*'))
-                    model_files = [f for f in all_files if f.is_file()]
-                    
-                    # Check for shard files (e.g., model-00001-of-00005.safetensors)
-                    safetensors_files = [f for f in model_files if f.suffix == '.safetensors']
-                    bin_files = [f for f in model_files if f.suffix == '.bin']
-                    pt_files = [f for f in model_files if f.suffix == '.pt']
-                    gguf_files = [f for f in model_files if f.suffix == '.gguf']
-                    
-                    # Check if we have shards (files with -of- pattern)
-                    has_shards = lambda files: any('-of-' in f.name for f in files)
-                    
-                    # Priority: safetensors shards > single safetensors > bin shards > single bin > pt > gguf
-                    if has_shards(safetensors_files):
-                        # Use safetensors shards
-                        for file in safetensors_files:
-                            if '-of-' in file.name:
-                                total_size_gb += file.stat().st_size / (1024**3)
-                    elif safetensors_files:
-                        # Single safetensors file (no shards)
-                        for file in safetensors_files:
-                            total_size_gb += file.stat().st_size / (1024**3)
-                    elif has_shards(bin_files):
-                        # Use bin shards
-                        for file in bin_files:
-                            if '-of-' in file.name:
-                                total_size_gb += file.stat().st_size / (1024**3)
-                    elif bin_files:
-                        # Single bin file
-                        for file in bin_files:
-                            total_size_gb += file.stat().st_size / (1024**3)
-                    elif pt_files:
-                        # PT files
-                        for file in pt_files:
-                            total_size_gb += file.stat().st_size / (1024**3)
-                    elif gguf_files:
-                        # GGUF files
-                        for file in gguf_files:
-                            total_size_gb += file.stat().st_size / (1024**3)
+                total_size_gb = calculate_model_size(target)
                 
                 if total_size_gb > 0.1:  # Only update if we found significant files (>100MB)
                     vram_full = round(total_size_gb, 1)
@@ -879,8 +740,8 @@ class SmartLMLBase:
                         vram_req["4bit"] = round(vram_full * 0.25, 1)
                     
                     # Update template with actual size
-                    update_template_vram_requirement(template_name, vram_req)
-                    cstr(f"[SmartLM] Updated template with actual model size: {vram_full} GB").msg.print()
+                    if update_template_vram_requirement(template_name, vram_req):
+                        cstr(f"[SmartLM] Updated template with actual model size: {vram_full} GB").msg.print()
             except Exception as e:
                 cstr(f"[SmartLM] Could not calculate model size after download: {e}").warning.print()
         
@@ -897,17 +758,23 @@ class SmartLMLBase:
         
         model_folder_path = Path(model_folder)
         
-        # Use mmproj_path as the target filename (already includes renamed filename in template)
+        # Determine if mmproj_path is a full relative path from LLM folder or just a filename
         if mmproj_path:
-            target_filename = mmproj_path
+            # Check if mmproj_path contains subdirectories (local mmproj from different folder)
+            if '/' in mmproj_path or '\\' in mmproj_path:
+                # Full relative path from LLM folder (e.g., "Qwen-VL/Model/file.mmproj.gguf")
+                import folder_paths
+                llm_dir = Path(folder_paths.models_dir) / "LLM"
+                target = llm_dir / mmproj_path
+            else:
+                # Just a filename - should be in the model's folder
+                target = model_folder_path / mmproj_path
         elif mmproj_url:
             # Fallback: use original filename from URL if no mmproj_path specified
             target_filename = mmproj_url.split('/')[-1]
+            target = model_folder_path / target_filename
         else:
             return None
-        
-        # Target location: inside the model's folder
-        target = model_folder_path / target_filename
         
         # If it already exists, return it
         if target.exists():
@@ -989,16 +856,18 @@ class SmartLMLBase:
     def _load_qwenvl(self, template_name: str, quantization: str, attention: str, device: str, context_size: int = 32768, use_torch_compile: bool = False):
         # Load QwenVL model (supports both transformers and GGUF)
         template_info = load_template(template_name)
-        model_path, model_folder = self.ensure_model_path(template_name)
         
         # Check if this is a GGUF model
         local_path = template_info.get("local_path", "")
         is_gguf = local_path.lower().endswith(".gguf")
         
         if is_gguf:
-            # Load GGUF model with llama-cpp-python
+            # Load GGUF model with llama-cpp-python (_load_qwenvl_gguf calls ensure_model_path)
             self._load_qwenvl_gguf(template_name, template_info, device, context_size)
             return
+        
+        # For transformers models, ensure model path exists
+        model_path, model_folder = self.ensure_model_path(template_name)
         
         # Load transformers model
         from transformers import AutoModelForVision2Seq, AutoProcessor, AutoTokenizer
@@ -1236,17 +1105,32 @@ class SmartLMLBase:
         cstr(f"[SmartLM] ✓ GGUF model loaded with {n_gpu_layers} GPU layers").msg.print()
     
     def _load_llm(self, template_name: str, quantization: str, attention: str, device: str, context_size: int = 32768):
-        # Load text-only LLM model (GGUF only)
+        # Load text-only LLM model (supports both transformers and GGUF)
         template_info = load_template(template_name)
         local_path = template_info.get("local_path", "")
+        repo_id = template_info.get("repo_id", "")
         
-        # Only GGUF models supported for text-only LLM
-        is_gguf = local_path.lower().endswith(".gguf")
+        # Detect GGUF from multiple indicators (for legacy templates compatibility)
+        local_lower = local_path.lower()
+        repo_lower = repo_id.lower()
+        
+        # Check for .gguf extension
+        has_gguf_ext = local_lower.endswith(".gguf") or repo_lower.endswith(".gguf")
+        
+        # Check for "gguf" in repo/path name (e.g., "model-GGUF" repos)
+        has_gguf_name = "gguf" in local_lower or "gguf" in repo_lower
+        
+        # Check for GGUF quantization markers (Q4_K_M, Q5_K_S, Q8_0, etc.)
+        gguf_quant_markers = ["_q4_", "_q5_", "_q6_", "_q8_", "-q4-", "-q5-", "-q6-", "-q8-",
+                              "_k_m", "_k_s", "_k_l", "q4_k", "q5_k", "q6_k", "q8_0"]
+        has_gguf_quant = any(marker in local_lower or marker in repo_lower for marker in gguf_quant_markers)
+        
+        is_gguf = has_gguf_ext or has_gguf_name or has_gguf_quant
         
         if is_gguf:
             self._load_llm_gguf(template_name, template_info, device, context_size)
         else:
-            raise ValueError(f"Text-only LLM models currently only support GGUF format. Got: {local_path}")
+            self._load_llm_transformers(template_name, quantization, attention, device)
     
     def _load_llm_gguf(self, template_name: str, template_info: dict, device: str, context_size: int = 32768):
         # Load text-only GGUF model with llama-cpp-python (no vision support)
@@ -1296,6 +1180,84 @@ class SmartLMLBase:
         self.gguf_template = template_info
         
         cstr(f"[SmartLM] ✓ Text-only LLM GGUF loaded with {n_gpu_layers} GPU layers").msg.print()
+    
+    def _load_llm_transformers(self, template_name: str, quantization: str, attention: str, device: str):
+        # Load text-only LLM model with transformers (Mistral, Llama, etc.)
+        template_info = load_template(template_name)
+        
+        # Ensure model path exists
+        model_path, model_folder = self.ensure_model_path(template_name)
+        
+        # Load transformers model
+        from transformers import AutoModelForCausalLM, AutoTokenizer
+        from transformers import BitsAndBytesConfig
+        
+        # Auto-detect if model is pre-quantized
+        repo_id = template_info.get("repo_id", "")
+        local_path = template_info.get("local_path", "")
+        has_quant_markers = any(marker in local_path.lower() or marker in repo_id.lower() or marker in model_path.lower()
+                                for marker in ["fp8", "int8", "int4", "q4", "q5", "q6", "q8", "_q4_", "_q5_", "_q8_"])
+        
+        is_prequantized = template_info.get("quantized", has_quant_markers)
+        
+        # Determine quantization config and dtype
+        if is_prequantized:
+            quant_config = None
+            dtype = torch.bfloat16 if device == "cuda" else torch.float32
+        elif quantization == "4bit":
+            quant_config = BitsAndBytesConfig(
+                load_in_4bit=True,
+                bnb_4bit_compute_dtype=torch.float16,
+                bnb_4bit_quant_type="nf4",
+                bnb_4bit_use_double_quant=True,
+            )
+            dtype = None
+        elif quantization == "8bit":
+            quant_config = BitsAndBytesConfig(load_in_8bit=True)
+            dtype = None
+        else:
+            quant_config = None
+            dtype_map = {"fp16": torch.float16, "bf16": torch.bfloat16, "fp32": torch.float32}
+            dtype = dtype_map.get(quantization, torch.float16)
+            if device == "cpu" and dtype != torch.float32:
+                dtype = torch.float32
+        
+        cstr(f"[SmartLM] Loading text-only LLM (transformers): {model_path}").msg.print()
+        cstr(f"[SmartLM] Quantization: {quantization}, dtype: {dtype}, device: {device}").msg.print()
+        
+        # Load model
+        if quant_config:
+            self.model = AutoModelForCausalLM.from_pretrained(
+                model_path,
+                quantization_config=quant_config,
+                device_map="auto",
+                trust_remote_code=True,
+            )
+        else:
+            self.model = AutoModelForCausalLM.from_pretrained(
+                model_path,
+                torch_dtype=dtype,
+                device_map=device if device == "cuda" else None,
+                trust_remote_code=True,
+            )
+            if device == "cuda":
+                self.model.to("cuda")
+        
+        # Load tokenizer
+        self.processor = AutoTokenizer.from_pretrained(
+            model_path,
+            trust_remote_code=True,
+        )
+        
+        # Set padding token if not set
+        if self.processor.pad_token is None:
+            self.processor.pad_token = self.processor.eos_token
+        
+        # Mark as loaded
+        self.is_gguf = False
+        self.is_quantized = quantization in ["4bit", "8bit"] or is_prequantized
+        
+        cstr(f"[SmartLM] ✓ Text-only LLM loaded (transformers, {quantization})").msg.print()
     
     def _load_florence2(self, template_name: str, quantization: str, attention: str, device: str, use_torch_compile: bool = False):
         # Load Florence-2 model using wrapper for proper import handling
@@ -1623,9 +1585,21 @@ class SmartLMLBase:
                       llm_mode: str, instruction_template: str) -> str:
         # Generate text-only completion with LLM (no images)
         
-        # Set seed if provided
+        # Check if model is GGUF (llama-cpp-python) or transformers
+        is_gguf_model = hasattr(self, 'is_gguf') and self.is_gguf
+        
+        # Set seed if provided (method differs between GGUF and transformers)
         if seed is not None:
-            self.model.set_seed(seed)
+            if is_gguf_model:
+                self.model.set_seed(seed)
+            else:
+                # Transformers - set global seed
+                from transformers import set_seed
+                import hashlib
+                seed_bytes = str(seed).encode('utf-8')
+                hash_object = hashlib.sha256(seed_bytes)
+                hashed_seed = int(hash_object.hexdigest(), 16) % (2**32)
+                set_seed(hashed_seed)
         
         # Load configuration for the selected mode
         config = LLM_FEW_SHOT_EXAMPLES.get(llm_mode, LLM_FEW_SHOT_EXAMPLES.get("direct_chat", {}))
@@ -1656,20 +1630,47 @@ class SmartLMLBase:
                 {"role": "user", "content": prompt}
             ]
         
-        # Generate response
+        # Generate response - different methods for GGUF vs transformers
         try:
-            response = self.model.create_chat_completion(
-                messages=messages,
-                max_tokens=max_tokens,
-                temperature=temperature,
-                top_p=top_p,
-                top_k=top_k,
-                repeat_penalty=repetition_penalty,
-                stream=False
-            )
+            if is_gguf_model:
+                # GGUF model (llama-cpp-python) - use create_chat_completion
+                response = self.model.create_chat_completion(
+                    messages=messages,
+                    max_tokens=max_tokens,
+                    temperature=temperature,
+                    top_p=top_p,
+                    top_k=top_k,
+                    repeat_penalty=repetition_penalty,
+                    stream=False
+                )
+                text = response['choices'][0]['message']['content']
+            else:
+                # Transformers model - use tokenizer + generate
+                # Apply chat template to convert messages to text
+                input_text = self.processor.apply_chat_template(
+                    messages,
+                    tokenize=False,
+                    add_generation_prompt=True
+                )
+                
+                # Tokenize and generate
+                inputs = self.processor(input_text, return_tensors="pt").to(self.model.device)
+                
+                outputs = self.model.generate(
+                    **inputs,
+                    max_new_tokens=max_tokens,
+                    temperature=temperature,
+                    top_p=top_p,
+                    top_k=top_k,
+                    repetition_penalty=repetition_penalty,
+                    do_sample=temperature > 0,
+                    pad_token_id=self.processor.eos_token_id
+                )
+                
+                # Decode only the generated tokens (skip input)
+                generated_tokens = outputs[0][inputs['input_ids'].shape[1]:]
+                text = self.processor.decode(generated_tokens, skip_special_tokens=True)
             
-            # Extract text from response
-            text = response['choices'][0]['message']['content']
             return text.strip()
             
         except Exception as e:

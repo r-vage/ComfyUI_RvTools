@@ -12,6 +12,13 @@
 *
 * Dynamic widget visibility for Language Model nodes
 * Shows QwenVL widgets for QwenVL models, Florence-2 widgets for Florence-2 models
+* 
+* NOTE: Smart Loader LM has its own seed implementation (not using eclipse-seed.js) because:
+* - QwenVL models require int32 seed range (0 to 2^31-1 = 2147483647)
+* - Florence-2 and LLM models can use larger uint32 range (0 to 2^32-1)
+* - Seed range must be dynamically adjusted based on detected model type
+* 
+* TODO: Later try to clamp the seed widget range for QwenVL models to prevent invalid input
 */
 
 import { app, api } from './comfy/index.js';
@@ -30,6 +37,9 @@ const SPECIAL_SEEDS = [SPECIAL_SEED_RANDOM, SPECIAL_SEED_INCREMENT, SPECIAL_SEED
 // Store last seeds per node ID
 const nodeLastSeeds = {};
 
+// Store last loaded template configuration per node ID
+const nodeLoadedTemplates = {};
+
 app.registerExtension({
     name: "Eclipse.SmartLoaderLM",
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
@@ -46,6 +56,7 @@ app.registerExtension({
             let currentIsGGUF = false; // Track if current model is GGUF format
             let pendingTemplateSave = null;
             let pendingTemplateDelete = false;
+            let previousTemplateAction = "None"; // Track previous template_action to detect mode switches
             
             // Initialize seed tracking
             this._Eclipse_lastSeed = undefined;
@@ -206,13 +217,12 @@ app.registerExtension({
                 return hasGGUFExtension || hasGGUFInName;
             };
             
-            // Method to generate random seed
+            // Method to generate random seed with QwenVL-specific range limitation
             node.generateRandomSeed = function() {
                 const step = this._Eclipse_seedWidget?.options?.step || 1;
                 const randomMin = this._Eclipse_randomMin || 1;
                 
-                // Limit seed range based on model type
-                // QwenVL uses int32 range, Florence-2 and LLM can use full uint32 range
+                // QwenVL uses int32 range (2^31-1), Florence-2 and LLM can use larger range
                 let randomMax = this._Eclipse_randomMax || (2**32 - 1);
                 if (currentModelType === "qwenvl") {
                     randomMax = Math.min(randomMax, 2147483647); // Clamp to int32 max (2^31-1)
@@ -228,7 +238,7 @@ app.registerExtension({
                 return seed;
             };
             
-            // Method to determine seed to use
+            // Method to determine seed to use with QwenVL clamping
             node.getSeedToUse = function() {
                 const inputSeed = Number(this._Eclipse_seedWidget.value);
                 
@@ -258,7 +268,7 @@ app.registerExtension({
                 
                 let finalSeed = seedToUse != null ? seedToUse : inputSeed;
                 
-                // Clamp seed for QwenVL models (int32 range)
+                // Clamp seed for QwenVL models (int32 range: 0 to 2^31-1)
                 // Florence-2 and LLM can use full uint32 range
                 if (currentModelType === "qwenvl") {
                     finalSeed = Math.max(0, Math.min(finalSeed, 2147483647)); // Clamp to int32 (0 to 2^31-1)
@@ -425,6 +435,33 @@ app.registerExtension({
                     
                     const templateAction = getWidgetValue("template_action");
                     const templateName = getWidgetValue("template_name");
+                    const wasLoadMode = previousTemplateAction === "Load";
+                    
+                    // Helper: Check if current config matches the loaded template
+                    const matchesLoadedTemplate = () => {
+                        const loadedTemplate = nodeLoadedTemplates[node.id];
+                        if (!loadedTemplate) return false;
+                        
+                        // Compare model type
+                        const currentModelType = getWidgetValue("model_type");
+                        const currentModelTypeBase = currentModelType.replace(" (GGUF)", "").trim().toLowerCase();
+                        if (currentModelTypeBase !== loadedTemplate.modelType) return false;
+                        
+                        // Compare model path/repo
+                        const modelSource = getWidgetValue("model_source");
+                        if (modelSource === "Local") {
+                            const localModel = getWidgetValue("local_model");
+                            // Normalize for comparison (remove trailing slashes)
+                            const normalizedLocal = (localModel || "").replace(/\/+$/, "");
+                            const normalizedTemplate = (loadedTemplate.localPath || "").replace(/\/+$/, "");
+                            if (normalizedLocal !== normalizedTemplate) return false;
+                        } else {
+                            const repoId = getWidgetValue("repo_id");
+                            if (repoId !== loadedTemplate.repoId) return false;
+                        }
+                        
+                        return true;
+                    };
                     
                     // Auto-populate new_template_name when switching to Save mode (only if empty)
                     if (templateAction === "Save") {
@@ -435,8 +472,8 @@ app.registerExtension({
                         if (newTemplateNameWidget && !currentValue.trim()) {
                             let suggestedName = "";
                             
-                            // Priority 1: Use loaded template name if available
-                            if (templateName && templateName !== "None") {
+                            // Priority 1: Use loaded template name if current config matches it
+                            if (matchesLoadedTemplate() && templateName && templateName !== "None") {
                                 suggestedName = templateName;
                             } else {
                                 // Priority 2: Use local_model if available
@@ -444,7 +481,20 @@ app.registerExtension({
                                 if (modelSource === "Local") {
                                     const localModel = getWidgetValue("local_model");
                                     if (localModel && localModel !== "None") {
-                                        suggestedName = localModel;
+                                        // Clean: remove trailing slashes and get last folder name
+                                        let cleaned = localModel.replace(/\/+$/, ''); // Remove trailing slashes
+                                        // If path has folders (e.g., "Qwen-VL/Model/file.gguf"), get the parent folder name
+                                        if (cleaned.includes('/')) {
+                                            const parts = cleaned.split('/');
+                                            // For GGUF files, use parent folder; for directories, use last part
+                                            if (cleaned.endsWith('.gguf')) {
+                                                suggestedName = parts[parts.length - 2] || parts[parts.length - 1];
+                                            } else {
+                                                suggestedName = parts[parts.length - 1];
+                                            }
+                                        } else {
+                                            suggestedName = cleaned;
+                                        }
                                     }
                                 } else {
                                     // Priority 3: Extract model name from repo_id
@@ -464,110 +514,19 @@ app.registerExtension({
                         }
                     }
                     
-                    // When switching to None mode from Load mode, populate widgets with template values
-                    // Save mode should preserve current widget values (user may have made changes)
-                    if (templateAction === "None" && templateName && templateName !== "None") {
-                        const config = await loadTemplateConfig(templateName);
-                        if (config) {
-                            // Set model_type (combine base type with GGUF if needed)
-                            const detectedType = await detectModelType(templateName);
-                            const isGGUF = await detectIsGGUF(templateName);
-                            let modelTypeValue = "";
-                            if (detectedType === "qwenvl") {
-                                modelTypeValue = isGGUF ? "QwenVL (GGUF)" : "QwenVL";
-                            } else if (detectedType === "florence2") {
-                                modelTypeValue = isGGUF ? "Florence2 (GGUF)" : "Florence2";
-                            } else if (detectedType === "llm") {
-                                modelTypeValue = isGGUF ? "LLM (GGUF)" : "LLM";
-                            }
-                            
-                            const modelTypeWidget = node.widgets?.find(w => w.name === "model_type");
-                            if (modelTypeWidget && modelTypeValue) {
-                                modelTypeWidget.value = modelTypeValue;
-                            }
-                            
-                            // Set model_source and populate all relevant fields from template
-                            const hasRepoId = config.repo_id && config.repo_id.trim() !== "";
-                            const hasLocalPath = config.local_path && config.local_path.trim() !== "";
-                            const modelSourceWidget = node.widgets?.find(w => w.name === "model_source");
-                            
-                            if (modelSourceWidget) {
-                                // Prefer Local if local_path exists (cleaner UI)
-                                if (hasLocalPath) {
-                                    modelSourceWidget.value = "Local";
-                                    const localModelWidget = node.widgets?.find(w => w.name === "local_model");
-                                    if (localModelWidget) {
-                                        // Normalize local_path - add trailing slash for directories (not .gguf files)
-                                        let normalizedPath = config.local_path;
-                                        if (normalizedPath && !normalizedPath.endsWith('.gguf') && !normalizedPath.endsWith('/')) {
-                                            normalizedPath = normalizedPath + '/';
-                                        }
-                                        
-                                        // Handle legacy templates with root-level GGUF files (e.g., "file.gguf" instead of "folder/file.gguf")
-                                        // Check if normalizedPath exists in dropdown options
-                                        const availableOptions = localModelWidget.options?.values || [];
-                                        if (!availableOptions.includes(normalizedPath) && normalizedPath.endsWith('.gguf')) {
-                                            // Legacy format: try to find matching folder/file.gguf pattern
-                                            const filename = normalizedPath.split('/').pop(); // Get filename only
-                                            const folderPath = filename.replace('.gguf', ''); // Remove extension for folder name
-                                            const expectedPath = `${folderPath}/${filename}`;
-                                            
-                                            if (availableOptions.includes(expectedPath)) {
-                                                normalizedPath = expectedPath;
-                                            }
-                                        }
-                                        
-                                        localModelWidget.value = normalizedPath;
-                                    }
-                                } else if (hasRepoId) {
-                                    // Fallback to HuggingFace if only repo_id exists
-                                    modelSourceWidget.value = "HuggingFace";
-                                    const repoIdWidget = node.widgets?.find(w => w.name === "repo_id");
-                                    if (repoIdWidget) {
-                                        repoIdWidget.value = config.repo_id;
-                                    }
-                                    const localPathWidget = node.widgets?.find(w => w.name === "local_path");
-                                    if (localPathWidget) {
-                                        localPathWidget.value = config.local_path || "";
-                                    }
-                                }
-                            }
-                            
-                            // Update currentModelType and currentIsGGUF for visibility logic
-                            currentModelType = detectedType;
-                            currentIsGGUF = isGGUF;
-                            
-                            // For GGUF QwenVL models, load mmproj fields
-                            if (isGGUF && detectedType === "qwenvl") {
-                                const hasMmprojUrl = config.mmproj_url && config.mmproj_url.trim() !== "";
-                                const hasMmprojPath = config.mmproj_path && config.mmproj_path.trim() !== "";
-                                
-                                const mmprojSourceWidget = node.widgets?.find(w => w.name === "mmproj_source");
-                                if (mmprojSourceWidget) {
-                                    // Prefer Local if mmproj_path exists (cleaner UI)
-                                    if (hasMmprojPath) {
-                                        mmprojSourceWidget.value = "Local";
-                                        const mmprojLocalWidget = node.widgets?.find(w => w.name === "mmproj_local");
-                                        if (mmprojLocalWidget) {
-                                            mmprojLocalWidget.value = config.mmproj_path;
-                                        }
-                                    } else if (hasMmprojUrl) {
-                                        // Fallback to HuggingFace if only mmproj_url exists
-                                        mmprojSourceWidget.value = "HuggingFace";
-                                        const mmprojUrlWidget = node.widgets?.find(w => w.name === "mmproj_url");
-                                        if (mmprojUrlWidget) {
-                                            mmprojUrlWidget.value = config.mmproj_url;
-                                        }
-                                        const mmprojPathWidget = node.widgets?.find(w => w.name === "mmproj_path");
-                                        if (mmprojPathWidget) {
-                                            mmprojPathWidget.value = config.mmproj_path || "";
-                                        }
-                                    }
-                                }
-                            }
+                    // None mode: Keep current widget values (no reloading)
+                    // Widget values were set by Load mode and user can modify them freely
+                    
+                    // Clear new_template_name when switching away from Save mode
+                    if (previousTemplateAction === "Save" && templateAction !== "Save") {
+                        const newTemplateNameWidget = node.widgets?.find(w => w.name === "new_template_name");
+                        if (newTemplateNameWidget) {
+                            newTemplateNameWidget.value = "";
                         }
                     }
                     
+                    // Update previous action for next callback
+                    previousTemplateAction = templateAction;
                     updateVisibility();
                 };
             }
@@ -638,6 +597,8 @@ app.registerExtension({
             // Hook into template_name widget
             const templateWidget = node.widgets?.find(w => w.name === "template_name");
             if (templateWidget) {
+                let isLoadingTemplate = false;  // Prevent re-entry
+                
                 const originalCallback = templateWidget.callback;
                 templateWidget.callback = async function() {
                     if (originalCallback) {
@@ -647,13 +608,144 @@ app.registerExtension({
                     const templateName = getWidgetValue("template_name");
                     const templateAction = getWidgetValue("template_action");
                     
+                    // Clear new_template_name when loading a different template
+                    const newTemplateNameWidget = node.widgets?.find(w => w.name === "new_template_name");
+                    if (newTemplateNameWidget && newTemplateNameWidget.value) {
+                        newTemplateNameWidget.value = "";
+                    }
+                    
                     // Only load template values when in Load mode
                     if (templateAction === "Load" && templateName && templateName !== "None") {
+                        // Prevent re-entry during async operations
+                        if (isLoadingTemplate) {
+                            return;
+                        }
+                        isLoadingTemplate = true;
+                        
+                        try {
                         const config = await loadTemplateConfig(templateName);
                         const detectedType = await detectModelType(templateName);
                         const isGGUF = await detectIsGGUF(templateName);
                         currentModelType = detectedType;
                         currentIsGGUF = isGGUF;
+                        let mmprojAutoDetected = false; // Track if mmproj was auto-detected
+                        
+                        // Store the loaded template info for comparison later
+                        nodeLoadedTemplates[node.id] = {
+                            name: templateName,
+                            modelType: detectedType,
+                            localPath: config?.local_path || "",
+                            repoId: config?.repo_id || ""
+                        };
+                        
+                        // Load model source and paths from template
+                        if (config) {
+                            const hasRepoId = config.repo_id && config.repo_id.trim() !== "";
+                            const hasLocalPath = config.local_path && config.local_path.trim() !== "";
+                            const modelSourceWidget = node.widgets?.find(w => w.name === "model_source");
+                            
+                            if (modelSourceWidget) {
+                                // Check if model exists locally when template has repo_id but no local_path
+                                let detectedLocalPath = null;
+                                if (!hasLocalPath && hasRepoId) {
+                                    try {
+                                        // Try to find model locally by searching for common patterns
+                                        const repoName = config.repo_id.split('/').pop(); // Get last part of repo_id
+                                        const response = await api.fetchApi('/eclipse/smartlm/search_model', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({ repo_id: config.repo_id, model_type: detectedType })
+                                        });
+                                        if (response.ok) {
+                                            const result = await response.json();
+                                            if (result.found && result.local_path) {
+                                                detectedLocalPath = result.local_path;
+                                                console.log(`[SmartLM] Found existing model locally: ${detectedLocalPath}`);
+                                            }
+                                        }
+                                    } catch (e) {
+                                        console.warn('[SmartLM] Could not check for local model:', e);
+                                    }
+                                }
+                                
+                                // Prefer Local if local_path exists or was detected
+                                if (hasLocalPath || detectedLocalPath) {
+                                    modelSourceWidget.value = "Local";
+                                    const localModelWidget = node.widgets?.find(w => w.name === "local_model");
+                                    if (localModelWidget) {
+                                        let modelPath = detectedLocalPath || config.local_path;
+                                        // Normalize: add trailing slash for directories (not .gguf files)
+                                        if (modelPath && !modelPath.endsWith('.gguf') && !modelPath.endsWith('/')) {
+                                            modelPath = modelPath + '/';
+                                        }
+                                        localModelWidget.value = modelPath;
+                                    }
+                                    
+                                    // Update stored template info with detected path
+                                    if (detectedLocalPath && nodeLoadedTemplates[node.id]) {
+                                        nodeLoadedTemplates[node.id].localPath = detectedLocalPath;
+                                    }
+                                    
+                                    // For GGUF QwenVL models, also check if mmproj exists locally
+                                    if (isGGUF && detectedType === "qwenvl" && (config.mmproj_url || config.mmproj_path)) {
+                                        try {
+                                            // Search for mmproj in the same folder as the model
+                                            const modelPath = detectedLocalPath || config.local_path;
+                                            const mmprojResponse = await api.fetchApi('/eclipse/smartlm/search_mmproj', {
+                                                method: 'POST',
+                                                headers: { 'Content-Type': 'application/json' },
+                                                body: JSON.stringify({ 
+                                                    model_path: modelPath,
+                                                    mmproj_url: config.mmproj_url || ""
+                                                })
+                                            });
+                                            if (mmprojResponse.ok) {
+                                                const mmprojResult = await mmprojResponse.json();
+                                                if (mmprojResult.found && mmprojResult.local_path) {
+                                                    const mmprojSourceWidget = node.widgets?.find(w => w.name === "mmproj_source");
+                                                    const mmprojLocalWidget = node.widgets?.find(w => w.name === "mmproj_local");
+                                                    if (mmprojSourceWidget && mmprojLocalWidget) {
+                                                        mmprojSourceWidget.value = "Local";
+                                                        mmprojLocalWidget.value = mmprojResult.local_path;
+                                                        console.log(`[SmartLM] Found existing mmproj locally: ${mmprojResult.local_path}`);
+                                                        // Set flag to prevent template from overwriting
+                                                        mmprojAutoDetected = true;
+                                                    }
+                                                }
+                                            }
+                                        } catch (e) {
+                                            console.warn('[SmartLM] Could not check for local mmproj:', e);
+                                        }
+                                    }
+                                } else if (hasRepoId) {
+                                    modelSourceWidget.value = "HuggingFace";
+                                    const repoIdWidget = node.widgets?.find(w => w.name === "repo_id");
+                                    if (repoIdWidget) {
+                                        repoIdWidget.value = config.repo_id;
+                                    }
+                                    // Reset local_model to first item in list (widgets hidden in Load mode, but validation still checks)
+                                    const localModelWidget = node.widgets?.find(w => w.name === "local_model");
+                                    if (localModelWidget && localModelWidget.options?.values?.length > 0) {
+                                        localModelWidget.value = localModelWidget.options.values[0];
+                                    }
+                                }
+                            }
+                            
+                            // Load model_type (combine base type with GGUF if needed)
+                            let modelTypeValue = "";
+                            if (detectedType === "qwenvl") {
+                                modelTypeValue = isGGUF ? "QwenVL (GGUF)" : "QwenVL";
+                            } else if (detectedType === "florence2") {
+                                modelTypeValue = isGGUF ? "Florence2 (GGUF)" : "Florence2";
+                            } else if (detectedType === "llm") {
+                                modelTypeValue = isGGUF ? "LLM (GGUF)" : "LLM";
+                            }
+                            
+                            const modelTypeWidget = node.widgets?.find(w => w.name === "model_type");
+                            if (modelTypeWidget && modelTypeValue) {
+                                modelTypeWidget.value = modelTypeValue;
+                            }
+                        }
                         
                         // Load generation parameters from template if available
                         if (config && config.max_tokens !== undefined) {
@@ -672,6 +764,38 @@ app.registerExtension({
                             const attentionWidget = node.widgets?.find(w => w.name === "attention_mode");
                             if (attentionWidget) {
                                 attentionWidget.value = config.attention_mode;
+                            }
+                        }
+                        
+                        // Load context_size for GGUF models
+                        if (config && config.context_size !== undefined && isGGUF) {
+                            const contextSizeWidget = node.widgets?.find(w => w.name === "context_size");
+                            if (contextSizeWidget) {
+                                contextSizeWidget.value = config.context_size;
+                            }
+                        }
+                        
+                        // Load mmproj settings for GGUF vision models (QwenVL only)
+                        // Skip if mmproj was already auto-detected locally
+                        if (config && isGGUF && detectedType === "qwenvl" && !mmprojAutoDetected) {
+                            const hasMmprojPath = config.mmproj_path && config.mmproj_path.trim() !== "";
+                            const hasMmprojUrl = config.mmproj_url && config.mmproj_url.trim() !== "";
+                            
+                            const mmprojSourceWidget = node.widgets?.find(w => w.name === "mmproj_source");
+                            if (mmprojSourceWidget) {
+                                if (hasMmprojPath) {
+                                    mmprojSourceWidget.value = "Local";
+                                    const mmprojLocalWidget = node.widgets?.find(w => w.name === "mmproj_local");
+                                    if (mmprojLocalWidget) {
+                                        mmprojLocalWidget.value = config.mmproj_path;
+                                    }
+                                } else if (hasMmprojUrl) {
+                                    mmprojSourceWidget.value = "HuggingFace";
+                                    const mmprojUrlWidget = node.widgets?.find(w => w.name === "mmproj_url");
+                                    if (mmprojUrlWidget) {
+                                        mmprojUrlWidget.value = config.mmproj_url;
+                                    }
+                                }
                             }
                         }
                         
@@ -705,6 +829,7 @@ app.registerExtension({
                                     qwenCustomWidget.value = config.default_text_input;
                                     console.log(`[SmartLM] Loaded default_text_input from template`);
                                 }
+                            }
                         }
                         
                         // LLM: Load default_task and default_text_input (same as Florence-2 and QwenVL)
@@ -722,12 +847,18 @@ app.registerExtension({
                                 console.log(`[SmartLM] Loaded default_text_input from template`);
                             }
                         }
-                    }                        updateVisibility();
+                        } finally {
+                            isLoadingTemplate = false;
+                        }
                     }
+                    
+                    // Update previous action for next callback
+                    previousTemplateAction = templateAction;
+                    updateVisibility();
                 };
             }
             
-            // Find the seed widget and remove control_after_generate (we have our own seed controls)
+            // Find the seed widget and remove control_after_generate
             let seedWidget = null;
             for (const [i, widget] of this.widgets.entries()) {
                 const wname = (widget.name || '').toString().toLowerCase();
@@ -815,7 +946,7 @@ app.registerExtension({
                 }
             }
             
-            // Intercept the onExecuted to track last seed
+            // Handle onExecuted for template save/delete and seed tracking
             const onExecuted = node.onExecuted;
             node.onExecuted = async function(message) {
                 const result = onExecuted ? onExecuted.apply(this, arguments) : undefined;
@@ -834,6 +965,12 @@ app.registerExtension({
                     console.log(`✓ Template save completed, refreshing template list...`);
                     await new Promise(resolve => setTimeout(resolve, 100));
                     await refreshTemplateList();
+                    
+                    // Clear cached template data so reloading fetches fresh data from disk
+                    if (nodeLoadedTemplates[node.id]) {
+                        delete nodeLoadedTemplates[node.id];
+                        console.log(`✓ Cleared template cache for node ${node.id}`);
+                    }
                     
                     setWidgetValue("template_action", "None");
                     setWidgetValue("new_template_name", "");
@@ -871,6 +1008,12 @@ app.registerExtension({
                         console.log(`✓ Template save interrupted (as expected), refreshing template list...`);
                         await new Promise(resolve => setTimeout(resolve, 300));
                         await refreshTemplateList();
+                        
+                        // Clear cached template data so reloading fetches fresh data from disk
+                        if (nodeLoadedTemplates[node.id]) {
+                            delete nodeLoadedTemplates[node.id];
+                            console.log(`✓ Cleared template cache for node ${node.id}`);
+                        }
                         
                         setWidgetValue("template_action", "None");
                         setWidgetValue("new_template_name", "");
@@ -977,13 +1120,13 @@ app.registerExtension({
     },
     
     async setup() {
-        // Hook into the graphToPrompt to modify seed values in the prompt data
+        // Hook into the graphToPrompt to modify seed values with QwenVL-specific handling
         const originalGraphToPrompt = app.graphToPrompt;
         app.graphToPrompt = async function() {
             // Call the original graphToPrompt first
             const result = await originalGraphToPrompt.apply(this, arguments);
 
-            // Now modify the prompt data for all Smart LML nodes
+            // Now modify the prompt data for all Smart LM nodes
             const nodes = app.graph._nodes;
             for (const node of nodes) {
                 if (NODE_NAMES.includes(node.type) && node._Eclipse_seedWidget) {

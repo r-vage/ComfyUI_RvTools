@@ -29,6 +29,7 @@ from ..core.smartlm_base import (
     ModelType,
     get_llm_model_list,
     get_mmproj_list,
+    get_template_dir,
 )
 
 
@@ -51,16 +52,16 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
         
         return {
             "required": {
-                "template_action": (["None", "Load", "Save", "Delete"], {"default": "None", "tooltip": "None: Manual configuration | Load: Use template | Save: Save as template | Delete: Remove template"}),
+                "template_action": (["Load", "None", "Save", "Delete"], {"default": "None", "tooltip": "None: Manual configuration | Load: Use template | Save: Save as template | Delete: Remove template"}),
                 "template_name": (templates, {"default": templates[0] if templates else "None", "tooltip": "Select template to load or delete"}),
                 "new_template_name": ("STRING", {"default": "", "tooltip": "Save mode: Name for new template"}),
-                "model_type": (["QwenVL", "QwenVL (GGUF)", "Florence2", "Florence2 (GGUF)", "LLM", "LLM (GGUF)"], {"default": "QwenVL", "tooltip": "Model type and format: QwenVL/Florence2/LLM (Transformers) or with (GGUF) suffix for llama.cpp models"}),
-                "model_source": (["HuggingFace", "Local"], {"default": "HuggingFace", "tooltip": "Model source - HuggingFace (download) or Local (models/LLM folder)"}),
+                "model_type": (["QwenVL", "QwenVL (GGUF)", "Florence2", "Florence2 (GGUF)", "LLM", "LLM (GGUF)"], {"default": "QwenVL", "tooltip": "Model type and format: QwenVL/Florence2/LLM (Transformers) or with (GGUF) suffix for llama.cpp models. LLM is text-only (no vision)."}),
+                "model_source": (["HuggingFace", "Local"], {"default": "Local", "tooltip": "Model source - HuggingFace (download) or Local (models/LLM folder)"}),
                 "repo_id": ("STRING", {"default": "", "multiline": False, "tooltip": "HuggingFace: Repo ID or direct download URL"}),
                 "local_model": (llm_models, {"default": llm_models[0] if llm_models else "None", "tooltip": "Local: Select model from models/LLM folder"}),
                 "local_path": ("STRING", {"default": "", "tooltip": "HuggingFace: Local filename after download (leave empty to use repo filename)"}),
                 "mmproj_source": (["HuggingFace", "Local"], {"default": "Local", "tooltip": "GGUF vision only: mmproj source"}),
-                "mmproj_url": ("STRING", {"default": "", "multiline": True, "tooltip": "HuggingFace: mmproj download URL"}),
+                "mmproj_url": ("STRING", {"default": "", "multiline": False, "tooltip": "HuggingFace: mmproj download URL"}),
                 "mmproj_local": (mmproj_files, {"default": mmproj_files[0] if mmproj_files else "None", "tooltip": "Local: Select mmproj from models/LLM folder"}),
                 "mmproj_path": ("STRING", {"default": "", "tooltip": "HuggingFace: mmproj filename after download"}),
                 "quantization": (["auto", "4bit", "8bit", "fp16", "bf16", "fp32"], {"default": "auto", "tooltip": "Model precision/quantization: auto (best for available memory), FP32 (full), BF16 (balanced), FP16 (standard), 8-bit/4-bit (lower VRAM, reduced quality)"}),
@@ -128,6 +129,7 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
         import os
         import json
         from pathlib import Path
+        from ..core.smartlm_base import load_template
         start_time = time.time()
         
         # Extract base model type and format from combined model_type
@@ -138,15 +140,77 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
         # Handle template actions (Save/Delete)
         if template_action == "Save" and new_template_name and new_template_name.strip():
             # Save current configuration as template
-            from ..core.smartlm_base import TEMPLATE_DIR
-            template_path = TEMPLATE_DIR / f"{new_template_name.strip()}.json"
+            template_path = get_template_dir() / f"{new_template_name.strip()}.json"
+            
+            # Load existing template if it exists (to preserve values not in widgets)
+            existing_config = {}
+            if template_path.exists():
+                try:
+                    with open(template_path, 'r', encoding='utf-8') as f:
+                        existing_config = json.load(f)
+                    cstr(f"[SmartLM] Merging with existing template (preserving repo_id: {bool(existing_config.get('repo_id'))})").msg.print()
+                except Exception as e:
+                    cstr(f"[SmartLM] Could not load existing template for merge: {e}").warning.print()
+            else:
+                cstr(f"[SmartLM] Creating new template (no existing file to merge)").msg.print()
             
             # Determine repo_id and local_path based on source
             if model_source == "Local":
-                # Local model: use selected model as local_path, repo_id empty
-                final_repo_id = ""
                 # Ensure trailing slash for directory consistency
                 final_local_path = local_model.rstrip('/') + '/' if local_model and not local_model.endswith('.gguf') else local_model
+                
+                # Preserve repo_id if it's the same model (even when creating new template with different name)
+                # Check both existing template (if overwriting) AND loaded template from session
+                existing_local_path = existing_config.get("local_path", "").rstrip('/')
+                existing_repo_id = existing_config.get("repo_id", "")
+                current_local_path = final_local_path.rstrip('/')
+                
+                # Also check if we're using a model that was loaded from a template with repo_id
+                # This handles: Load template → None → Change values → Save as new template
+                loaded_template_repo_id = ""
+                if template_name and template_name != "None":
+                    try:
+                        loaded_template = load_template(template_name)
+                        if loaded_template:
+                            loaded_local_path = loaded_template.get("local_path", "").rstrip('/')
+                            loaded_repo_id = loaded_template.get("repo_id", "")
+                            # Match if paths are same, OR if loaded had empty local_path with repo_id
+                            # (template with URLs that got auto-detected)
+                            if loaded_local_path == current_local_path:
+                                # Same model path as loaded template
+                                loaded_template_repo_id = loaded_repo_id
+                            elif not loaded_local_path and loaded_repo_id and current_local_path:
+                                # Loaded template had repo_id but empty local_path (was auto-detected)
+                                # Preserve the repo_id for sharing
+                                loaded_template_repo_id = loaded_repo_id
+                    except:
+                        pass
+                
+                # Determine if same model and which repo_id to use
+                is_same_model = False
+                source_repo_id = ""
+                
+                if existing_local_path and existing_local_path == current_local_path:
+                    # Overwriting existing template - paths match
+                    is_same_model = True
+                    source_repo_id = existing_repo_id
+                    cstr(f"[SmartLM] Overwriting template, path match: preserving repo_id from existing").msg.print()
+                elif not existing_local_path and existing_repo_id:
+                    # Template had empty local_path but has repo_id - first save after detection
+                    is_same_model = True
+                    source_repo_id = existing_repo_id
+                    cstr(f"[SmartLM] Empty local_path with repo_id, preserving repo_id from existing").msg.print()
+                elif loaded_template_repo_id and current_local_path:
+                    # Creating new template but using same model as loaded template
+                    is_same_model = True
+                    source_repo_id = loaded_template_repo_id
+                    cstr(f"[SmartLM] New template for same model, preserving repo_id from loaded template").msg.print()
+                
+                if is_same_model and source_repo_id:
+                    final_repo_id = source_repo_id
+                    cstr(f"[SmartLM] ✓ Preserving repo_id: {final_repo_id}").msg.print()
+                else:
+                    final_repo_id = ""  # Different model, don't preserve old repo_id
             else:
                 # HuggingFace: use repo_id and optional local_path
                 final_repo_id = repo_id.strip()
@@ -161,6 +225,25 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
             if is_gguf and internal_model_type == "qwenvl":
                 if mmproj_source == "Local":
                     final_mmproj_path = mmproj_local
+                    # Preserve mmproj_url for sharing if:
+                    # 1. Existing template has matching mmproj_path (overwriting)
+                    # 2. Loaded template had mmproj_url but empty mmproj_path (was auto-detected)
+                    existing_mmproj = existing_config.get("mmproj_path", "")
+                    if existing_config and existing_mmproj == mmproj_local:
+                        final_mmproj_url = existing_config.get("mmproj_url", "")
+                    else:
+                        # Check loaded template for auto-detection case
+                        if template_name and template_name != "None":
+                            try:
+                                loaded_template = load_template(template_name)
+                                if loaded_template:
+                                    loaded_mmproj_path = loaded_template.get("mmproj_path", "")
+                                    loaded_mmproj_url = loaded_template.get("mmproj_url", "")
+                                    # If loaded had URL but no path (was auto-detected), preserve URL
+                                    if not loaded_mmproj_path and loaded_mmproj_url:
+                                        final_mmproj_url = loaded_mmproj_url
+                            except:
+                                pass
                 else:
                     final_mmproj_url = mmproj_url.strip()
                     final_mmproj_path = mmproj_path.strip()
@@ -262,7 +345,7 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
             if internal_model_type == "qwenvl":
                 new_config["_available_tasks"] = MODEL_CONFIGS.get("_preset_prompts", [])
             elif internal_model_type == "florence2":
-                new_config["_available_tasks"] = ", ".join(FLORENCE_TASKS.keys())
+                new_config["_available_tasks"] = list(FLORENCE_TASKS.keys())
             elif internal_model_type == "llm":
                 new_config["_available_tasks"] = [
                     "Tags to Natural Language",
@@ -274,9 +357,12 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
             
             # Save template
             try:
-                os.makedirs(TEMPLATE_DIR, exist_ok=True)
+                template_dir = get_template_dir()
+                os.makedirs(template_dir, exist_ok=True)
                 with open(template_path, 'w', encoding='utf-8') as f:
-                    json.dump(new_config, f, indent=2)
+                    # Use indent=2 and ensure arrays are formatted with one item per line
+                    json_str = json.dumps(new_config, indent=2, ensure_ascii=False)
+                    f.write(json_str + '\n')
                 cstr(f"[SmartLM] ✓ Created new template: {new_template_name.strip()}").msg.print()
             except Exception as e:
                 cstr(f"[SmartLM] Failed to create template: {e}").error.print()
@@ -288,8 +374,7 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
         
         elif template_action == "Delete" and template_name and template_name != "None":
             # Delete selected template
-            from ..core.smartlm_base import TEMPLATE_DIR
-            template_path = TEMPLATE_DIR / f"{template_name}.json"
+            template_path = get_template_dir() / f"{template_name}.json"
             
             try:
                 if template_path.exists():
@@ -494,12 +579,12 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
                 self.template_info = template_info
                 
                 # Call load_model_direct or similar - for now use existing load_model by creating temp template
-                from ..core.smartlm_base import TEMPLATE_DIR
+                template_dir = get_template_dir()
                 temp_template_name = "__temp_manual_config__"
-                temp_template_path = TEMPLATE_DIR / f"{temp_template_name}.json"
+                temp_template_path = template_dir / f"{temp_template_name}.json"
                 
                 try:
-                    os.makedirs(TEMPLATE_DIR, exist_ok=True)
+                    os.makedirs(template_dir, exist_ok=True)
                     with open(temp_template_path, 'w', encoding='utf-8') as f:
                         json.dump(template_info, f, indent=2)
                     

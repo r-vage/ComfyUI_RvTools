@@ -109,19 +109,31 @@ if not os.path.exists(eclipse_prompt_dir) and os.path.exists(repo_prompt_dir):
 if not os.path.exists(eclipse_loader_dir) and os.path.exists(repo_loader_dir):
     copy_prompt_files_once(repo_loader_dir, eclipse_loader_dir)
 
-# smartlm_templates: copy on first run OR force update if flag is set
-if force_update or (not os.path.exists(eclipse_smartlm_dir) and os.path.exists(repo_smartlm_dir)):
+# smartlm_templates: copy on first run (folder doesn't exist) OR force update (overwrite existing)
+if not os.path.exists(eclipse_smartlm_dir):
+    # First run: copy templates from repo
+    if os.path.exists(repo_smartlm_dir):
+        copy_prompt_files_once(repo_smartlm_dir, eclipse_smartlm_dir)
+elif force_update:
+    # Force update: clear existing templates and copy fresh from repo
     import shutil
-    if force_update and os.path.exists(eclipse_smartlm_dir):
-        # Force update: overwrite existing smartlm templates
+    try:
+        # Remove all existing JSON files in the templates folder
+        for item in os.listdir(eclipse_smartlm_dir):
+            item_path = os.path.join(eclipse_smartlm_dir, item)
+            if os.path.isfile(item_path) and item.endswith('.json'):
+                os.remove(item_path)
+        
+        # Copy all templates from repo
         for item in os.listdir(repo_smartlm_dir):
             src = os.path.join(repo_smartlm_dir, item)
             dst = os.path.join(eclipse_smartlm_dir, item)
             if os.path.isfile(src):
                 shutil.copy2(src, dst)
-        cstr("[Eclipse] Force updated smartlm_templates").msg.print()
-    else:
-        copy_prompt_files_once(repo_smartlm_dir, eclipse_smartlm_dir)
+        
+        cstr("[Eclipse] Force updated smartlm_templates (cleared old templates)").msg.print()
+    except Exception as e:
+        cstr(f"[Eclipse] Warning: Could not fully clear templates folder: {e}").warning.print()
 
 # Note: smartlm_prompt_defaults.json is always loaded from repo folder
 # Other config files: copy on first run OR force update if flag is set
