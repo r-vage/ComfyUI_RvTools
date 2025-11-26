@@ -72,9 +72,11 @@ _all_context_input_output_data = {
     "any_1": ("any_1", any, "any_1"),
     "any_2": ("any_2", any, "any_2"),
 
-    "path": ("path", "STRING", "path"),}
+    "path": ("path", "STRING", "path"),
+    "purge": ("purge", "BOOLEAN", "purge"),
+}
 
-force_input_types = ["INT", "STRING", "FLOAT"]
+force_input_types = ["INT", "STRING", "FLOAT", "BOOLEAN"]
 force_input_names = ["sampler_name", "scheduler"]
 
 def _create_context_data(input_list=None):
