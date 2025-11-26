@@ -1,6 +1,6 @@
 {
   "repo_id": "MiaoshouAI/Florence-2-base-PromptGen-v2.0",
-  "local_path": "Florence-2-base-PromptGen-v2.0",
+  "local_path": "Florence-2-base-PromptGen-v2.0/",
   "mmproj_path": "",
   "model_type": "florence2",
   "default_task": "prompt_gen_tags",

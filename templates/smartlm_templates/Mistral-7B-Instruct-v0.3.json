@@ -1,18 +1,20 @@
 {
-  "repo_id": "https://huggingface.co/bartowski/Lexi-Llama-3-8B-Uncensored-GGUF/resolve/main/Lexi-Llama-3-8B-Uncensored-Q4_K_M.gguf",
-  "local_path": "Lexi-Llama-3-8B-Uncensored-Q4_K_M/Lexi-Llama-3-8B-Uncensored-Q4_K_M.gguf",
+  "repo_id": "mistralai/Mistral-7B-Instruct-v0.3",
+  "local_path": "Mistral-7B-Instruct-v0.3/",
   "mmproj_path": "",
   "model_type": "llm",
   "default_task": "Tags to Natural Language",
   "default_text_input": "",
-  "max_tokens": 2048,
+  "max_tokens": 512,
   "quantization": "auto",
   "attention_mode": "auto",
-  "quantized": true,
+  "quantized": false,
   "vram_requirement": {
-    "full": 4.6
+    "full": 13.5,
+    "8bit": 6.8,
+    "4bit": 3.4
   },
-  "context_size": 8192,
+  "context_size": 32768,
   "_available_tasks": [
     "Tags to Natural Language",
     "Expand Description",

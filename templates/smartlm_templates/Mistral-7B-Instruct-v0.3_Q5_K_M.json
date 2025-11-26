@@ -1,6 +1,6 @@
 {
   "repo_id": "https://huggingface.co/bartowski/Mistral-7B-Instruct-v0.3-GGUF/resolve/main/Mistral-7B-Instruct-v0.3-Q5_K_M.gguf",
-  "local_path": "Mistral-7B-Instruct-v0.3.Q5_K_M.gguf",
+  "local_path": "Mistral-7B-Instruct-v0.3-Q5_K_M/Mistral-7B-Instruct-v0.3-Q5_K_M.gguf",
   "mmproj_path": "",
   "model_type": "llm",
   "default_task": "Tags to Natural Language",

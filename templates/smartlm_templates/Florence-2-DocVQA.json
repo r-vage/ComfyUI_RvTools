@@ -1,6 +1,6 @@
 {
   "repo_id": "HuggingFaceM4/Florence-2-DocVQA",
-  "local_path": "Florence-2-DocVQA",
+  "local_path": "Florence-2-DocVQA/",
   "mmproj_path": "",
   "model_type": "florence2",
   "default_task": "ocr",

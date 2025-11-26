@@ -1,6 +1,6 @@
 {
   "repo_id": "microsoft/Florence-2-base",
-  "local_path": "Florence-2-base",
+  "local_path": "Florence-2-base/",
   "mmproj_path": "",
   "model_type": "florence2",
   "default_task": "more_detailed_caption",
