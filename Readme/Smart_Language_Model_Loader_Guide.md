@@ -68,7 +68,7 @@ Smart Language Model Loader is a unified framework that supports three types of 
 - Text-to-text processing without vision
 - Prompt refinement and expansion
 - Tags to natural language conversion
-- GGUF format only
+- Supports both transformers and GGUF formats
 
 ---
 
@@ -322,29 +322,28 @@ The Smart Language Model Loader provides four template operation modes. **None**
 1. Set `template_action` to **Load**
 2. Select a template from the `template_name` dropdown
 3. Run workflow - model loads with template settings
-4. Generation parameters (max_tokens, quantization, etc.) and task defaults are applied from template
-5. Configuration widgets (model_type, model_source, etc.) are hidden in Load mode
-6. **Optional:** Switch to **None** mode to customize settings while keeping template as starting point
+4. **Auto-Detection:** If template has URLs but empty local paths, the node automatically searches for matching models in `ComfyUI/models/LLM/` and uses them if found
+5. Generation parameters (max_tokens, quantization, etc.) and task defaults are applied from template
+6. Configuration widgets (model_type, model_source, etc.) are hidden in Load mode - switch to **None** to see detected paths
+7. **Optional:** Switch to **None** mode to customize settings while keeping template as starting point
 
 **Creating New Templates (Save Mode):**
 
 1. Set `template_action` to **None**
 2. Configure all model settings:
-   - `new_model_type`: Select model type (QwenVL/Florence2/LLM, with Transformers/GGUF variants)
-   - `new_model_source`: Choose **HuggingFace** (auto-download) or **Local** (already downloaded)
+   - `model_type`: Select model type - QwenVL, QwenVL (GGUF), Florence2, Florence2 (GGUF), LLM, or LLM (GGUF)
+   - `model_source`: Choose **HuggingFace** (auto-download) or **Local** (already downloaded)
    - For HuggingFace:
-     - `new_repo_id`: HuggingFace repo ID or direct download URL
-     - `new_local_path`: Filename after download (folder for transformers, file for GGUF)
+     - `repo_id`: HuggingFace repo ID or direct download URL
+     - `local_path`: Filename after download (folder for transformers, file for GGUF)
    - For Local:
-     - `new_local_model`: Select from dropdown of models in `ComfyUI/models/LLM/`
+     - `local_model`: Select from dropdown of models in `ComfyUI/models/LLM/`
    - For GGUF QwenVL models:
-     - `new_mmproj_source`: HuggingFace or Local
-     - `new_mmproj_url` / `new_mmproj_local`: MMProj file location
-     - `new_mmproj_path`: MMProj filename
-   - `new_quantized`: Whether model is pre-quantized (auto-set for GGUF)
-   - `new_vram_full`: Model size in GB (auto-calculates 8bit/4bit for transformers)
-   - `new_context_size`: Context window size (GGUF only, default 32768)
+     - `mmproj_source`: HuggingFace or Local
+     - `mmproj_url` / `mmproj_local`: MMProj file location
+     - `mmproj_path`: MMProj filename
    - Generation parameters: `max_tokens`, `quantization`, `attention_mode`
+   - Context window: `context_size` (GGUF only, default 32768)
    - Task defaults: Select default task/preset and text input for your model type
 3. Set `template_action` to **Save**
 4. Enter a unique name in `new_template_name` (auto-filled intelligently based on context)
@@ -368,7 +367,7 @@ When switching from **Load** to **None** or **Save** mode:
 - Generation parameters and task defaults remain unchanged (already set by template)
 
 When switching to **Save** mode:
-- `new_template_name` field auto-fills based on context (loaded template name → local_model path → extracted repo name)
+- `new_template_name` field auto-fills based on context (loaded template name → `local_model` path → extracted repo name)
 - Edit as needed before saving
 
 **Automatic Template Updates:**
@@ -377,6 +376,23 @@ Templates are automatically updated after model download:
 - `local_path` is set after successful download
 - `vram_requirement` is calculated from actual file sizes
 - No user interaction required - happens in background
+
+**Auto-Detection of Local Models:**
+
+When loading templates that have HuggingFace URLs (`repo_id`, `mmproj_url`) but empty local paths, the node automatically searches for matching models in your `ComfyUI/models/LLM/` directory:
+
+- **Model Detection:** Searches by repo name/filename from URL
+- **MMProj Detection:** For GGUF QwenVL models, searches for mmproj files in the model's folder (even with different filenames)
+- **Seamless Usage:** If found locally, uses local files instead of downloading
+- **URL Preservation:** When saving templates after auto-detection, both URLs and local paths are preserved for sharing
+
+**Example Flow:**
+1. Download Qwen2.5-VL-7B model from HuggingFace to `models/LLM/Qwen-VL/Qwen2.5-VL-7B-Abliterated/`
+2. Load template with only `repo_id` URL (empty `local_path`)
+3. Node automatically detects and uses your local files
+4. Save template → both URL (for sharing) and local path (for your use) are saved
+
+This means you can share templates with HuggingFace URLs, and users who already have the model downloaded will use their local copy automatically.
 
 **Multi-Node Workflow Pattern:**
 
@@ -430,10 +446,10 @@ All templates include an `_available_tasks` field that documents the available t
 **Example QwenVL GGUF Template:**
 ```json
 {
-  "repo_id": "https://huggingface.co/.../Qwen2.5-VL-3B-Instruct-Q4_K_M.gguf",
-  "local_path": "Qwen2.5-VL-3B-Instruct-Q4_K_M.gguf",
-  "mmproj_path": "Qwen2.5-VL-3B-Instruct-Q4_K_M.mmproj.gguf",
-  "mmproj_url": "https://huggingface.co/.../mmproj-model-f16.gguf",
+  "repo_id": "https://huggingface.co/.../Qwen2.5-VL-7B-Abliterated-Caption-it.Q8_0.gguf",
+  "local_path": "Qwen-VL/Qwen2.5-VL-7B-Abliterated-Caption-it.Q8_0/Qwen2.5-VL-7B-Abliterated-Caption-it.Q8_0.gguf",
+  "mmproj_path": "Qwen-VL/Qwen2.5-VL-7B-Abliterated-Caption-it.Q8_0/Qwen2.5-VL-7B-Abliterated-Caption-it.mmproj-Q8_0.gguf",
+  "mmproj_url": "https://huggingface.co/.../Qwen2.5-VL-7B-Abliterated-Caption-it.mmproj-Q8_0.gguf",
   "model_type": "qwenvl",
   "default": false,
   "default_task": "Video Summary",
@@ -443,8 +459,9 @@ All templates include an `_available_tasks` field that documents the available t
   "attention_mode": "auto",
   "quantized": true,
   "vram_requirement": {
-    "full": 3.7
+    "full": 7.5
   },
+  "context_size": 32768,
   "_available_tasks": [
     "Custom",
     "Tags",
@@ -459,6 +476,8 @@ All templates include an `_available_tasks` field that documents the available t
   ]
 }
 ```
+
+**Note:** Templates now preserve both URLs and local paths for hybrid use - local files are used when available, URLs enable auto-download when shared with others who don't have the files yet.
 
 **Example Florence-2 Template:**
 ```json
@@ -1089,6 +1108,14 @@ Remove-Item -Recurse -Force "$env:USERPROFILE\.cache\huggingface\modules\transfo
 2. **Structure requests:** Use numbered lists for multiple aspects
 3. **Use examples:** Show desired output format in prompt
 4. **Iterate:** Refine prompts based on outputs
+
+### Template Sharing
+
+1. **Create shareable templates:** Templates with both URLs and local paths work for everyone
+2. **After download:** Save your template to add local paths while keeping URLs
+3. **Share with confidence:** Recipients without local files will auto-download; those with files will use local copy
+4. **Filename flexibility:** MMProj files are detected even if filenames differ from template
+5. **URL preservation:** When saving templates after auto-detection, both repo_id and mmproj_url are preserved automatically
 
 ### Workflow Integration
 
