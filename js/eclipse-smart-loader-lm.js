@@ -517,6 +517,9 @@ app.registerExtension({
                     // None mode: Keep current widget values (no reloading)
                     // Widget values were set by Load mode and user can modify them freely
                     
+                    // Note: Don't reset local_model/mmproj widgets when switching modes
+                    // They're editable COMBOs that can contain template values for auto-download
+                    
                     // Clear new_template_name when switching away from Save mode
                     if (previousTemplateAction === "Save" && templateAction !== "Save") {
                         const newTemplateNameWidget = node.widgets?.find(w => w.name === "new_template_name");
@@ -539,6 +542,14 @@ app.registerExtension({
                     if (originalTypeCallback) {
                         originalTypeCallback.apply(this, arguments);
                     }
+                    
+                    // Reset mmproj widgets when switching away from QwenVL (GGUF)
+                    const newModelType = getWidgetValue("model_type") || "";
+                    const isQwenGGUF = newModelType === "QwenVL (GGUF)";
+                    
+                    // Note: mmproj widgets can contain template values even for non-QwenVL models
+                    // They're simply ignored by Python code when not applicable
+                    
                     updateVisibility();
                 };
             }
@@ -679,17 +690,8 @@ app.registerExtension({
                                             modelPath = modelPath + '/';
                                         }
                                         
-                                        // Check if modelPath exists in dropdown list
-                                        const validPaths = localModelWidget.options?.values || [];
-                                        if (validPaths.includes(modelPath)) {
-                                            localModelWidget.value = modelPath;
-                                        } else {
-                                            // Path not in list - reset to first valid item to avoid validation error
-                                            if (validPaths.length > 0) {
-                                                localModelWidget.value = validPaths[0];
-                                                console.log(`[SmartLM] Template path '${modelPath}' not found, using '${validPaths[0]}'`);
-                                            }
-                                        }
+                                        // Set the value directly (editable COMBO accepts any value)
+                                        localModelWidget.value = modelPath;
                                     }
                                     
                                     // Update stored template info with detected path
@@ -734,11 +736,20 @@ app.registerExtension({
                                     if (repoIdWidget) {
                                         repoIdWidget.value = config.repo_id;
                                     }
-                                    // Reset local_model to first item in list (widgets hidden in Load mode, but validation still checks)
-                                    const localModelWidget = node.widgets?.find(w => w.name === "local_model");
-                                    if (localModelWidget && localModelWidget.options?.values?.length > 0) {
-                                        localModelWidget.value = localModelWidget.options.values[0];
+                                    // Set local_path widget
+                                    const localPathWidget = node.widgets?.find(w => w.name === "local_path");
+                                    if (localPathWidget) {
+                                        localPathWidget.value = config.local_path || "";
                                     }
+                                    // Set local_model from template (editable COMBO, can be any value)
+                                    const localModelWidget = node.widgets?.find(w => w.name === "local_model");
+                                    if (localModelWidget) {
+                                        // Use local_path from template if available
+                                        localModelWidget.value = config.local_path || (localModelWidget.options?.values?.[0] || "");
+                                    }
+                                } else {
+                                    // Neither local_path nor repo_id - keep current values
+                                    modelSourceWidget.value = "Local";
                                 }
                             }
                             
@@ -809,6 +820,8 @@ app.registerExtension({
                                 }
                             }
                         }
+                        // Note: mmproj widgets are editable and can contain template values
+                        // Don't reset them for non-QwenVL models - they'll be ignored by Python code
                         
                         // Load task/preset defaults from template
                         if (config) {
@@ -1101,6 +1114,10 @@ app.registerExtension({
                         currentModelType = "qwenvl";
                         currentIsGGUF = false;
                     }
+                    
+                    // Note: VALIDATE_INPUTS in Python bypasses strict dropdown validation
+                    // This allows template values (like "Florence-2-Flux-Large/") even when
+                    // models don't exist locally yet - they'll auto-download on execution
                     
                     // Always call updateVisibility after configuration
                     updateVisibility();

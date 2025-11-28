@@ -58,11 +58,11 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
                 "model_type": (["QwenVL", "QwenVL (GGUF)", "Florence2", "Florence2 (GGUF)", "LLM", "LLM (GGUF)"], {"default": "QwenVL", "tooltip": "Model type and format: QwenVL/Florence2/LLM (Transformers) or with (GGUF) suffix for llama.cpp models. LLM is text-only (no vision)."}),
                 "model_source": (["HuggingFace", "Local"], {"default": "Local", "tooltip": "Model source - HuggingFace (download) or Local (models/LLM folder)"}),
                 "repo_id": ("STRING", {"default": "", "multiline": False, "tooltip": "HuggingFace: Repo ID or direct download URL"}),
-                "local_model": (llm_models, {"default": llm_models[0] if llm_models else "None", "tooltip": "Local: Select model from models/LLM folder"}),
+                "local_model": (llm_models, {"default": llm_models[0] if llm_models else "None", "tooltip": "Local: Select model from models/LLM folder (models will auto-download from template if not found)"}),
                 "local_path": ("STRING", {"default": "", "tooltip": "HuggingFace: Local filename after download (leave empty to use repo filename)"}),
                 "mmproj_source": (["HuggingFace", "Local"], {"default": "Local", "tooltip": "GGUF vision only: mmproj source"}),
                 "mmproj_url": ("STRING", {"default": "", "multiline": False, "tooltip": "HuggingFace: mmproj download URL"}),
-                "mmproj_local": (mmproj_files, {"default": mmproj_files[0] if mmproj_files else "None", "tooltip": "Local: Select mmproj from models/LLM folder"}),
+                "mmproj_local": (mmproj_files, {"default": mmproj_files[0] if mmproj_files else "None", "tooltip": "Local: Select mmproj from models/LLM folder (will auto-download from template if not found)"}),
                 "mmproj_path": ("STRING", {"default": "", "tooltip": "HuggingFace: mmproj filename after download"}),
                 "quantization": (["auto", "4bit", "8bit", "fp16", "bf16", "fp32"], {"default": "auto", "tooltip": "Model precision/quantization: auto (best for available memory), FP32 (full), BF16 (balanced), FP16 (standard), 8-bit/4-bit (lower VRAM, reduced quality)"}),
                 "attention_mode": (["auto", "flash_attention_2", "sdpa", "eager"], {"default": "auto", "tooltip": "Attention implementation: auto (best available), flash_attention_2 (fastest), sdpa (balanced), eager (fallback)"}),
@@ -91,6 +91,13 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
     RETURN_TYPES = ("IMAGE", "STRING", "JSON")
     RETURN_NAMES = ("image", "text", "data")
     FUNCTION = "execute"
+
+    @classmethod
+    def VALIDATE_INPUTS(cls, **kwargs):
+        # Custom validation to allow template values in local_model and mmproj_local
+        # even when they don't exist in the dropdown yet (for portable workflows)
+        # The models will auto-download from repo_id/mmproj_url when executed
+        return True
 
     def execute(
         self,
@@ -440,9 +447,30 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
         else:
             # None mode: Use direct configuration from widgets
             # Determine repo_id and local_path
+            source_template_name = None  # Track source template for auto-download
+            
             if model_source == "Local":
                 final_repo_id = ""
                 final_local_path = local_model
+                
+                # For portable workflows: if local model doesn't exist, try to find source template
+                # Priority: 1) template_name widget, 2) check if temp template has _source_template
+                if template_name and template_name != "None":
+                    import folder_paths
+                    from pathlib import Path
+                    llm_base = Path(folder_paths.models_dir) / "LLM"
+                    model_exists = (llm_base / local_model).exists()
+                    
+                    if not model_exists:
+                        # Try to load template to get repo_id
+                        template_cfg = load_template(template_name)
+                        if template_cfg and template_cfg.get("repo_id"):
+                            final_repo_id = template_cfg["repo_id"]
+                            source_template_name = template_name
+                            cstr(f"[SmartLM] Local model not found, will download from template '{template_name}': {final_repo_id}").msg.print()
+                        else:
+                            # Template might not exist, will check _source_template later from temp template
+                            pass
             else:
                 final_repo_id = repo_id.strip()
                 final_local_path = local_path.strip()
@@ -453,6 +481,26 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
             if is_gguf and internal_model_type == "qwenvl":
                 if mmproj_source == "Local":
                     final_mmproj_path = mmproj_local
+                    
+                    # For portable workflows: if mmproj doesn't exist, try to find source template
+                    if template_name and template_name != "None" and mmproj_local:
+                        import folder_paths
+                        from pathlib import Path
+                        llm_base = Path(folder_paths.models_dir) / "LLM"
+                        mmproj_exists = (llm_base / mmproj_local).exists()
+                        
+                        if not mmproj_exists:
+                            # Try to load template to get mmproj_url (reuse if already loaded)
+                            if not source_template_name:
+                                template_cfg = load_template(template_name)
+                            else:
+                                template_cfg = load_template(source_template_name)
+                            
+                            if template_cfg and template_cfg.get("mmproj_url"):
+                                final_mmproj_url = template_cfg["mmproj_url"]
+                                if not source_template_name:
+                                    source_template_name = template_name
+                                cstr(f"[SmartLM] Local mmproj not found, will download from template: {final_mmproj_url}").msg.print()
                 else:
                     final_mmproj_url = mmproj_url.strip()
                     final_mmproj_path = mmproj_path.strip()
@@ -557,6 +605,13 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
                 "quantized": auto_quantized,
                 "vram_requirement": vram_req
             }
+            
+            # Store source template name for portable workflows
+            # This allows retrieving repo_id even when user customized settings in None mode
+            if source_template_name:
+                template_info["_source_template"] = source_template_name
+            elif template_name and template_name != "None":
+                template_info["_source_template"] = template_name
             
             if final_mmproj_url:
                 template_info["mmproj_url"] = final_mmproj_url
