@@ -1,7 +1,7 @@
 {
   "repo_id": "https://huggingface.co/cjpais/llava-1.6-mistral-7b-gguf/resolve/main/llava-v1.6-mistral-7b.Q4_K_M.gguf",
-  "local_path": "llava-v1.6-mistral-7b.Q4_K_M/llava-v1.6-mistral-7b.Q4_K_M.gguf",
-  "mmproj_path": "llava-v1.6-mistral-7b.Q4_K_M/llava-v1.6-mistral-7b.Q4_K_M.mmproj.gguf",
+  "local_path": "",
+  "mmproj_path": "",
   "mmproj_url": "https://huggingface.co/cjpais/llava-1.6-mistral-7b-gguf/resolve/main/mmproj-model-f16.gguf",
   "model_type": "qwenvl",
   "default_task": "Detailed Description",

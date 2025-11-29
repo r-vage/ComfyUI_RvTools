@@ -14,7 +14,8 @@
     "device": "cuda",
     "use_torch_compile": true,
     "num_beams": 3,
-    "do_sample": false
+    "do_sample": false,
+    "convert_to_bboxes": false
   },
   "LLM": {
     "temperature": 1.0,

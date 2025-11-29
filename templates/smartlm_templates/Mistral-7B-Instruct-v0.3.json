@@ -1,6 +1,6 @@
 {
   "repo_id": "mistralai/Mistral-7B-Instruct-v0.3",
-  "local_path": "Mistral-7B-Instruct-v0.3/",
+  "local_path": "",
   "mmproj_path": "",
   "model_type": "llm",
   "default_task": "Tags to Natural Language",

@@ -1,10 +1,11 @@
 {
   "repo_id": "microsoft/Florence-2-base",
-  "local_path": "Florence-2-base/",
+  "local_path": "",
   "mmproj_path": "",
   "model_type": "florence2",
   "default_task": "more_detailed_caption",
   "default_text_input": "",
+  "detection_filter_threshold": 0.80,
   "max_tokens": 512,
   "quantization": "auto",
   "attention_mode": "auto",
@@ -14,13 +15,21 @@
     "8bit": 0.3,
     "4bit": 0.2
   },
-  "convert_to_bboxes": false,
   "_available_tasks": [
+    "region_caption",
+    "dense_region_caption",
+    "region_proposal",
     "caption",
     "detailed_caption",
-    "prompt_generation",
-    "grounding",
-    "detection",
-    "ocr"
+    "more_detailed_caption",
+    "caption_to_phrase_grounding",
+    "referring_expression_segmentation",
+    "ocr",
+    "ocr_with_region",
+    "docvqa",
+    "prompt_gen_tags",
+    "prompt_gen_mixed_caption",
+    "prompt_gen_analyze",
+    "prompt_gen_mixed_caption_plus"
   ]
 }

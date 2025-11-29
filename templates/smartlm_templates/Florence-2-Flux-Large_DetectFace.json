@@ -1,11 +1,12 @@
 {
   "repo_id": "gokaygokay/Florence-2-Flux-Large",
-  "local_path": "Florence-2-Flux-Large/",
+  "local_path": "",
   "mmproj_path": "",
   "model_type": "florence2",
   "default_task": "caption_to_phrase_grounding",
   "default_text_input": "face",
-  "max_tokens": 128,
+  "detection_filter_threshold": 0.80,
+  "max_tokens": 512,
   "quantization": "4bit",
   "attention_mode": "auto",
   "quantized": false,
@@ -14,5 +15,21 @@
     "8bit": 1.6,
     "4bit": 0.8
   },
-  "_available_tasks": "caption, detailed_caption, more_detailed_caption, prompt_gen_tags, prompt_gen_mixed_caption, prompt_gen_analyze, prompt_gen_mixed_caption_plus, ocr, ocr_with_region, caption_to_phrase_grounding, region_proposal, dense_region_caption, region_caption"
+  "_available_tasks": [
+    "region_caption",
+    "dense_region_caption",
+    "region_proposal",
+    "caption",
+    "detailed_caption",
+    "more_detailed_caption",
+    "caption_to_phrase_grounding",
+    "referring_expression_segmentation",
+    "ocr",
+    "ocr_with_region",
+    "docvqa",
+    "prompt_gen_tags",
+    "prompt_gen_mixed_caption",
+    "prompt_gen_analyze",
+    "prompt_gen_mixed_caption_plus"
+  ]
 }

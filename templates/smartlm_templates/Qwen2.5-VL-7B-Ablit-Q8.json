@@ -1,7 +1,7 @@
 {
   "repo_id": "https://huggingface.co/mradermacher/Qwen2.5-VL-7B-Abliterated-Caption-it-GGUF/resolve/main/Qwen2.5-VL-7B-Abliterated-Caption-it.Q8_0.gguf",
-  "local_path": "Qwen-VL/Qwen2.5-VL-7B-Abliterated-Caption-it.Q8_0/Qwen2.5-VL-7B-Abliterated-Caption-it.Q8_0.gguf",
-  "mmproj_path": "Qwen-VL/Qwen2.5-VL-7B-Abliterated-Caption-it.Q8_0/Qwen2.5-VL-7B-Abliterated-Caption-it.mmproj-Q8_0.gguf",
+  "local_path": "",
+  "mmproj_path": "",
   "model_type": "qwenvl",
   "default_task": "Video Summary",
   "default_text_input": "",

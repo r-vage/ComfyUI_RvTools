@@ -1,5 +1,5 @@
 {
-    "_force_update": false,
+    "_force_update": true,
     "_preset_prompts": [
         "Custom",
         "Tags",
@@ -22,59 +22,5 @@
         "Video Summary": "Summarize the key events and narrative points in this video.",
         "Short Story": "Write a short, imaginative story inspired by this image or video.",
         "Prompt Refine & Expand": "Refine and enhance the following user prompt for creative text-to-image generation. Keep the meaning and keywords, make it more expressive and visually rich. Output **only the improved prompt text itself**, without any reasoning steps, thinking process, or additional commentary."
-    },
-    "_florence2_tasks": {
-        "caption": {
-            "prompt": "<CAPTION>",
-            "description": "Short single-sentence caption"
-        },
-        "detailed_caption": {
-            "prompt": "<DETAILED_CAPTION>",
-            "description": "Detailed paragraph description"
-        },
-        "more_detailed_caption": {
-            "prompt": "<MORE_DETAILED_CAPTION>",
-            "description": "Very detailed rich description"
-        },
-        "prompt_gen_tags": {
-            "prompt": "<GENERATE_TAGS>",
-            "description": "Generate comma-separated tags (PromptGen models)"
-        },
-        "prompt_gen_mixed_caption": {
-            "prompt": "<MIXED_CAPTION>",
-            "description": "Mixed-style caption for prompt generation"
-        },
-        "prompt_gen_analyze": {
-            "prompt": "<ANALYZE>",
-            "description": "Analytical description"
-        },
-        "prompt_gen_mixed_caption_plus": {
-            "prompt": "<MIXED_CAPTION_PLUS>",
-            "description": "Enhanced mixed caption"
-        },
-        "ocr": {
-            "prompt": "<OCR>",
-            "description": "Extract text from image"
-        },
-        "ocr_with_region": {
-            "prompt": "<OCR_WITH_REGION>",
-            "description": "Extract text with bounding boxes"
-        },
-        "caption_to_phrase_grounding": {
-            "prompt": "<CAPTION_TO_PHRASE_GROUNDING>",
-            "description": "Detect and locate specific objects/phrases in image (e.g., 'face', 'eye')"
-        },
-        "region_proposal": {
-            "prompt": "<REGION_PROPOSAL>",
-            "description": "Generate region proposals for objects"
-        },
-        "dense_region_caption": {
-            "prompt": "<DENSE_REGION_CAPTION>",
-            "description": "Dense captioning with multiple regions"
-        },
-        "region_caption": {
-            "prompt": "<OD>",
-            "description": "Object detection with captions"
-        }
     }
 }

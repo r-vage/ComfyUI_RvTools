@@ -1,6 +1,6 @@
 {
   "repo_id": "https://huggingface.co/bartowski/Lexi-Llama-3-8B-Uncensored-GGUF/resolve/main/Lexi-Llama-3-8B-Uncensored-Q4_K_M.gguf",
-  "local_path": "Lexi-Llama-3-8B-Uncensored-Q4_K_M/Lexi-Llama-3-8B-Uncensored-Q4_K_M.gguf",
+  "local_path": "",
   "mmproj_path": "",
   "model_type": "llm",
   "default_task": "Tags to Natural Language",
