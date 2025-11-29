@@ -1050,17 +1050,26 @@ class SmartLMLBase:
         # Load QwenVL model (supports both transformers and GGUF)
         template_info = load_template(template_name)
         
-        # Check if this is a GGUF model
-        local_path = template_info.get("local_path", "")
-        is_gguf = local_path.lower().endswith(".gguf")
+        # Ensure model path exists first to get actual file path
+        model_path, model_folder, repo_id = self.ensure_model_path(template_name)
+        
+        # Check if this is a GGUF model (check actual model_path, not just local_path from template)
+        model_path_lower = model_path.lower()
+        has_gguf_ext = model_path_lower.endswith(".gguf")
+        
+        # Check for GGUF quantization markers (Q4_K_M, Q5_K_S, Q8_0, etc.)
+        gguf_quant_markers = ["_q4_", "_q5_", "_q6_", "_q8_", "-q4-", "-q5-", "-q6-", "-q8-",
+                              "_k_m", "_k_s", "_k_l", "q4_k", "q5_k", "q6_k", "q8_0", ".q4_", ".q5_", ".q6_", ".q8_"]
+        has_gguf_quant = any(marker in model_path_lower for marker in gguf_quant_markers)
+        
+        is_gguf = has_gguf_ext or has_gguf_quant
         
         if is_gguf:
-            # Load GGUF model with llama-cpp-python (_load_qwenvl_gguf calls ensure_model_path)
+            # Load GGUF model with llama-cpp-python
             self._load_qwenvl_gguf(template_name, template_info, device, context_size)
             return
         
-        # For transformers models, ensure model path exists
-        model_path, model_folder, repo_id = self.ensure_model_path(template_name)
+        # For transformers models, model_path already retrieved above
         
         # Verify model integrity if loading from local cache
         if not verify_model_integrity(Path(model_path), repo_id):
@@ -1339,23 +1348,26 @@ class SmartLMLBase:
     def _load_llm(self, template_name: str, quantization: str, attention: str, device: str, context_size: int = 32768):
         # Load text-only LLM model (supports both transformers and GGUF)
         template_info = load_template(template_name)
-        local_path = template_info.get("local_path", "")
-        repo_id = template_info.get("repo_id", "")
         
-        # Detect GGUF from multiple indicators (for legacy templates compatibility)
+        # Ensure model path exists first to get actual file path
+        model_path, model_folder, repo_id = self.ensure_model_path(template_name)
+        
+        # Detect GGUF from actual model path and template values
+        model_path_lower = model_path.lower()
+        local_path = template_info.get("local_path", "")
         local_lower = local_path.lower()
-        repo_lower = repo_id.lower()
+        repo_lower = repo_id.lower() if repo_id else ""
         
         # Check for .gguf extension
-        has_gguf_ext = local_lower.endswith(".gguf") or repo_lower.endswith(".gguf")
+        has_gguf_ext = model_path_lower.endswith(".gguf") or local_lower.endswith(".gguf") or repo_lower.endswith(".gguf")
         
         # Check for "gguf" in repo/path name (e.g., "model-GGUF" repos)
-        has_gguf_name = "gguf" in local_lower or "gguf" in repo_lower
+        has_gguf_name = "gguf" in model_path_lower or "gguf" in local_lower or "gguf" in repo_lower
         
         # Check for GGUF quantization markers (Q4_K_M, Q5_K_S, Q8_0, etc.)
         gguf_quant_markers = ["_q4_", "_q5_", "_q6_", "_q8_", "-q4-", "-q5-", "-q6-", "-q8-",
-                              "_k_m", "_k_s", "_k_l", "q4_k", "q5_k", "q6_k", "q8_0"]
-        has_gguf_quant = any(marker in local_lower or marker in repo_lower for marker in gguf_quant_markers)
+                              "_k_m", "_k_s", "_k_l", "q4_k", "q5_k", "q6_k", "q8_0", ".q4_", ".q5_", ".q6_", ".q8_"]
+        has_gguf_quant = any(marker in model_path_lower or marker in local_lower or marker in repo_lower for marker in gguf_quant_markers)
         
         is_gguf = has_gguf_ext or has_gguf_name or has_gguf_quant
         
