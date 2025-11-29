@@ -115,25 +115,35 @@ if not os.path.exists(eclipse_smartlm_dir):
     if os.path.exists(repo_smartlm_dir):
         copy_prompt_files_once(repo_smartlm_dir, eclipse_smartlm_dir)
 elif force_update:
-    # Force update: clear existing templates and copy fresh from repo
+    # Force update: only update templates that exist in repo (preserve user templates)
     import shutil
     try:
-        # Remove all existing JSON files in the templates folder
+        # Get list of template files in repo
+        repo_templates = set()
+        if os.path.exists(repo_smartlm_dir):
+            repo_templates = {item for item in os.listdir(repo_smartlm_dir) 
+                            if os.path.isfile(os.path.join(repo_smartlm_dir, item)) and item.endswith('.json')}
+        
+        # Only delete templates that exist in repo (user templates are preserved)
+        deleted_count = 0
         for item in os.listdir(eclipse_smartlm_dir):
-            item_path = os.path.join(eclipse_smartlm_dir, item)
-            if os.path.isfile(item_path) and item.endswith('.json'):
-                os.remove(item_path)
+            if item in repo_templates:
+                item_path = os.path.join(eclipse_smartlm_dir, item)
+                if os.path.isfile(item_path):
+                    os.remove(item_path)
+                    deleted_count += 1
         
         # Copy all templates from repo
-        for item in os.listdir(repo_smartlm_dir):
+        copied_count = 0
+        for item in repo_templates:
             src = os.path.join(repo_smartlm_dir, item)
             dst = os.path.join(eclipse_smartlm_dir, item)
-            if os.path.isfile(src):
-                shutil.copy2(src, dst)
+            shutil.copy2(src, dst)
+            copied_count += 1
         
-        cstr("[Eclipse] Force updated smartlm_templates (cleared old templates)").msg.print()
+        cstr(f"[Eclipse] Force updated {copied_count} repo template(s), preserved user templates").msg.print()
     except Exception as e:
-        cstr(f"[Eclipse] Warning: Could not fully clear templates folder: {e}").warning.print()
+        cstr(f"[Eclipse] Warning: Could not fully update templates: {e}").warning.print()
 
 # Note: smartlm_prompt_defaults.json is always loaded from repo folder
 # Other config files: copy on first run OR force update if flag is set

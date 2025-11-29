@@ -70,7 +70,7 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
                 "qwen_preset_prompt": (qwen_prompts, {"default": default_qwen_prompt, "tooltip": "QwenVL: Pre-configured prompt templates for common tasks. Select 'Custom' to use only your custom prompt"}),
                 "qwen_custom_prompt": ("STRING", {"default": "", "multiline": True, "tooltip": "QwenVL: For 'Custom' preset: main instruction. For other presets: additional hints/context appended to system prompt"}),
                 "florence_task": (florence_tasks, {"default": default_florence_task, "tooltip": "Florence-2: Select task type (caption, detailed_caption, prompt generation, grounding, detection, OCR, etc.)"}),
-                "convert_to_bboxes": ("BOOLEAN", {"default": False, "tooltip": "Florence-2: Convert quad_boxes (OCR) and polygons (segmentation) to normalized bboxes for standard workflows. Disable to preserve original formats."}),
+                "detection_filter_threshold": ("FLOAT", {"default": 0.80, "min": 0.0, "max": 1.0, "step": 0.05, "tooltip": "Florence-2: Filter out detections covering more than this % of image area (0.0-1.0). Default 0.80 = ignore boxes >80% of image. Set to 1.0 to disable filtering."}),
                 "florence_text_input": ("STRING", {"default": "", "tooltip": "Florence-2: Text input for detection tasks (e.g., 'face' for caption_to_phrase_grounding). Leave empty for caption tasks."}),
                 "llm_instruction_mode": (["Tags to Natural Language", "Expand Description", "Refine Prompt", "Custom Instruction", "Direct Chat"], {"default": "Tags to Natural Language", "tooltip": "LLM: Select instruction template mode"}),
                 "llm_custom_instruction": ("STRING", {"default": 'Generate a detailed prompt from "{prompt}"', "multiline": True, "tooltip": 'LLM: Custom instruction template (only used when mode is Custom Instruction). Use {prompt} as placeholder.'}),
@@ -119,7 +119,7 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
         qwen_preset_prompt,
         qwen_custom_prompt,
         florence_task,
-        convert_to_bboxes,
+        detection_filter_threshold,
         florence_text_input,
         llm_instruction_mode,
         llm_custom_instruction,
@@ -173,7 +173,7 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
                 current_local_path = final_local_path.rstrip('/')
                 
                 # Also check if we're using a model that was loaded from a template with repo_id
-                # This handles: Load template → None → Change values → Save as new template
+                # This handles: Load template → switch to None mode → Save as new template
                 loaded_template_repo_id = ""
                 if template_name and template_name != "None":
                     try:
@@ -344,6 +344,9 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
             elif internal_model_type == "florence2":
                 new_config["default_task"] = florence_task
                 new_config["default_text_input"] = florence_text_input
+                # Save Florence-2 detection filter threshold
+                new_config["detection_filter_threshold"] = detection_filter_threshold
+                # Note: convert_to_bboxes is managed by Advanced Options pipe, not saved in template
             elif internal_model_type == "llm":
                 new_config["default_task"] = llm_instruction_mode
                 new_config["default_text_input"] = llm_custom_instruction
@@ -420,11 +423,19 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
             do_sample = pipe_opt.get("do_sample", do_sample)
             repetition_penalty = pipe_opt.get("repetition_penalty", repetition_penalty)
             frame_count = pipe_opt.get("frame_count", frame_count)
+            # Get convert_to_bboxes from pipe if available (for Advanced Options compatibility)
+            convert_to_bboxes = pipe_opt.get("convert_to_bboxes", False)
         else:
             top_k = 50
+            convert_to_bboxes = False
         
         # Determine configuration source: Load template or use direct configuration (None mode)
-        if template_action == "Load" and template_name and template_name != "None":
+        if template_action == "Load" and template_name == "None":
+            # Reset: template_name="None" in Load mode (normally handled by JavaScript)
+            # This path is a fallback for API calls or old workflows
+            self.current_template = None  # Clear template so next load will trigger
+            return ("", {})
+        elif template_action == "Load" and template_name:
             # Load mode: Use template configuration
             template_info = load_template(template_name)
             detected_model_type = detect_model_type(template_info)
@@ -442,8 +453,13 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
                     cstr(f"[SmartLM] Loading template '{template_name}' (type: {detected_model_type.value}, max_tokens: {max_tokens}, context: {context_size})").msg.print()
                 else:
                     cstr(f"[SmartLM] Loading template '{template_name}' (type: {detected_model_type.value}, max_tokens: {max_tokens})").msg.print()
-                self.load_model(template_name, quantization, attention_mode, device=device, context_size=context_size, 
-                              memory_cleanup=memory_cleanup, use_torch_compile=use_torch_compile)
+                try:
+                    self.load_model(template_name, quantization, attention_mode, device=device, context_size=context_size, 
+                                  memory_cleanup=memory_cleanup, use_torch_compile=use_torch_compile)
+                except RuntimeError as e:
+                    # Model loading failed with a clean error message - just return empty result
+                    if "Unsupported model architecture" in str(e):
+                        return ("", {})
         else:
             # None mode: Use direct configuration from widgets
             # Determine repo_id and local_path
@@ -621,21 +637,20 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
             
             detected_model_type = detect_model_type(template_info)
             
-            # Load model from direct configuration (use None as cache key for manual config)
-            config_key = f"manual_{internal_model_type}_{final_repo_id or final_local_path}"
-            if self.current_template != config_key or self.model is None:
+            # Load model from direct configuration (use temp template name as cache key for consistency)
+            # This ensures current_template matches the actual template name used in load_model()
+            temp_template_name = "__temp_manual_config__"
+            if self.current_template != temp_template_name or self.model is None:
                 if is_gguf:
                     cstr(f"[SmartLM] Loading model (type: {detected_model_type.value}, format: GGUF, max_tokens: {max_tokens}, context: {context_size})").msg.print()
                 else:
                     cstr(f"[SmartLM] Loading model (type: {detected_model_type.value}, format: Transformers, max_tokens: {max_tokens})").msg.print()
                 
                 # Use direct loading method (create temporary template-like structure)
-                self.current_template = config_key
                 self.template_info = template_info
                 
                 # Call load_model_direct or similar - for now use existing load_model by creating temp template
                 template_dir = get_template_dir()
-                temp_template_name = "__temp_manual_config__"
                 temp_template_path = template_dir / f"{temp_template_name}.json"
                 
                 try:
@@ -643,8 +658,16 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
                     with open(temp_template_path, 'w', encoding='utf-8') as f:
                         json.dump(template_info, f, indent=2)
                     
-                    self.load_model(temp_template_name, quantization, attention_mode, device=device, context_size=context_size,
-                                  memory_cleanup=memory_cleanup, use_torch_compile=use_torch_compile)
+                    try:
+                        self.load_model(temp_template_name, quantization, attention_mode, device=device, context_size=context_size,
+                                      memory_cleanup=memory_cleanup, use_torch_compile=use_torch_compile)
+                    except RuntimeError as e:
+                        # Model loading failed with a clean error message - just return empty result
+                        if "Unsupported model architecture" in str(e):
+                            # Clean up temp template before returning
+                            if temp_template_path.exists():
+                                os.remove(temp_template_path)
+                            return ("", {})
                     
                     # Clean up temp template
                     if temp_template_path.exists():
@@ -652,6 +675,15 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
                 except Exception as e:
                     cstr(f"[SmartLM] Failed to load model from manual configuration: {e}").error.print()
                     raise
+        
+        # Verify model is loaded before generation
+        if self.model is None or self.model_type == ModelType.UNKNOWN:
+            raise ValueError(
+                "Cannot generate: No model loaded.\n"
+                "Please either:\n"
+                "  1. Select a template and use 'Load' action, OR\n"
+                "  2. Use 'None' action with manual configuration to load a model"
+            )
         
         # Prepare prompt based on model type
         if detected_model_type == ModelType.QWENVL:
@@ -709,6 +741,7 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
                 seed=seed,
                 repetition_penalty=repetition_penalty,
                 convert_to_bboxes=convert_to_bboxes,
+                detection_filter_threshold=detection_filter_threshold,
             )
         
         elif detected_model_type == ModelType.LLM:
@@ -773,15 +806,15 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
                 # Create blank image tensor
                 output_image = torch.zeros((1, 64, 64, 3))
         
-        # Cleanup if requested OR if GGUF model (GGUF models must be unloaded to free VRAM)
-        # llama-cpp-python's vision encoder (mtmd context) holds VRAM that can only be freed by unloading
+        # Cleanup logic:
+        # GGUF models must always unload to prevent VRAM accumulation (llama-cpp-python limitation)
+        # For other models, follow keep_model_loaded flag
         is_gguf_model = hasattr(self, 'is_gguf') and self.is_gguf
         should_cleanup = not keep_model_loaded or is_gguf_model
         
         if should_cleanup:
             if is_gguf_model and keep_model_loaded:
                 cstr("[SmartLM] Note: GGUF models must be unloaded after each run to prevent VRAM accumulation").msg.print()
-            
             self.clear()
             
             # Extra CUDA cleanup for GGUF

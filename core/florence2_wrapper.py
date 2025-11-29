@@ -54,7 +54,7 @@ try:
         fake_package.__file__ = str(florence_path / "__init__.py")
         sys.modules[fake_package_name] = fake_package
         
-        # Import configuration
+        # Import configuration first (needed by modeling)
         config_spec = importlib.util.spec_from_file_location(
             f"{fake_package_name}.configuration_florence2",
             florence_path / "configuration_florence2.py"
@@ -66,7 +66,7 @@ try:
             config_spec.loader.exec_module(config_module)
             Florence2Config = config_module.Florence2Config
         
-        # Import modeling
+        # Import modeling (contains Florence2ForConditionalGeneration)
         modeling_spec = importlib.util.spec_from_file_location(
             f"{fake_package_name}.modeling_florence2",
             florence_path / "modeling_florence2.py"
@@ -75,10 +75,14 @@ try:
             modeling_module = importlib.util.module_from_spec(modeling_spec)
             modeling_module.__package__ = fake_package_name
             sys.modules[f"{fake_package_name}.modeling_florence2"] = modeling_module
+            
+            # Inject the config module reference for relative imports
+            modeling_module.configuration_florence2 = config_module
+            
             modeling_spec.loader.exec_module(modeling_module)
             Florence2ForConditionalGeneration = modeling_module.Florence2ForConditionalGeneration
         
-        # Import processing (if it exists - some extensions may not have it)
+        # Import processing (if it exists - comfyui-florence2 uses AutoProcessor, not custom)
         processing_file = florence_path / "processing_florence2.py"
         if processing_file.exists():
             processing_spec = importlib.util.spec_from_file_location(
@@ -107,9 +111,10 @@ except Exception as e:
     # Suppress the common "attempted relative import" error which is expected when extension isn't installed
     if "attempted relative import" not in error_msg:
         cstr(f"[Florence-2 Wrapper] Could not import custom Florence-2: {e}").warning.print()
+        # Print traceback for debugging
+        cstr("[Florence-2 Wrapper] Error details:").warning.print()
+        traceback.print_exc()
     cstr("[Florence-2 Wrapper] Will fall back to transformers AutoModel").warning.print()
-    # Don't print full traceback unless debugging
-    # traceback.print_exc()
 
 
 def load_florence2_model(model_path: str, **load_kwargs) -> Any:
@@ -125,6 +130,14 @@ def load_florence2_model(model_path: str, **load_kwargs) -> Any:
     # Determine if loading from local path or remote
     is_local = Path(model_path).exists()
     source = "local" if is_local else "remote"
+    
+    # Verify model integrity if loading from local cache
+    if is_local:
+        from .smartlm_base import verify_model_integrity
+        # Try to get repo_id from load_kwargs if available (for hash lookup from HuggingFace)
+        repo_id = load_kwargs.pop('repo_id', '') if isinstance(load_kwargs, dict) else ''
+        if not verify_model_integrity(Path(model_path), repo_id):
+            raise RuntimeError(f"Florence-2 model integrity check failed for {model_path}. The model may be corrupted. Please delete and re-download.")
     
     # CRITICAL: Resolve "auto" attention mode BEFORE trying any loading
     # Florence-2 doesn't support "auto" - must be resolved to specific mode
@@ -158,51 +171,79 @@ def load_florence2_model(model_path: str, **load_kwargs) -> Any:
             cstr(f"[Florence-2 Wrapper] Custom implementation failed: {e}").warning.print()
             cstr(f"[Florence-2 Wrapper] Falling back to AutoModel...").warning.print()
     
-    # Fallback to AutoModel with trust_remote_code
+    # Fallback to AutoModel with trust_remote_code (matching comfyui-florence2 behavior)
     from transformers import AutoModelForCausalLM
+    import transformers
     
     cstr(f"[Florence-2 Wrapper] Loading from {source} with AutoModelForCausalLM: {model_path}").msg.print()
+    
+    # For transformers < 4.51.0, apply flash_attn workaround (matching comfyui-florence2)
+    if transformers.__version__ < '4.51.0':
+        from unittest.mock import patch
+        from transformers.dynamic_module_utils import get_imports
+        
+        def fixed_get_imports(filename):
+            """Workaround for unnecessary flash_attn requirement"""
+            try:
+                if not str(filename).endswith("modeling_florence2.py"):
+                    return get_imports(filename)
+                imports = get_imports(filename)
+                if "flash_attn" in imports:
+                    imports.remove("flash_attn")
+            except:
+                pass
+            return imports
+        
+        cstr(f"[Florence-2 Wrapper] Applying flash_attn workaround for transformers {transformers.__version__}").msg.print()
     
     # Handle flash_attention_2 gracefully with fallback to sdpa
     # Some cached Florence-2 model code may not declare Flash Attention 2 support
     
-    if requested_attn == 'flash_attention_2':
-        try:
-            cstr(f"[Florence-2 Wrapper] Attempting Flash Attention 2...").msg.print()
-            model = AutoModelForCausalLM.from_pretrained(
-                model_path,
-                trust_remote_code=True,
-                local_files_only=is_local,
-                **load_kwargs
-            )
-            cstr(f"[Florence-2 Wrapper] ✓ Loaded with Flash Attention 2").msg.print()
-            return model
-        except (ValueError, ImportError) as e:
-            if "does not support Flash Attention 2.0" in str(e) or "flash_attn" in str(e):
-                cstr(f"[Florence-2 Wrapper] Flash Attention 2 not supported by cached model code").warning.print()
-                cstr(f"[Florence-2 Wrapper] Your Florence-2 model uses outdated cached code from HuggingFace").error.print()
-                
-                # Extract cache path from model_path for user guidance
-                import os
-                cache_hint = os.path.join(os.path.expanduser("~"), ".cache", "huggingface", "modules", "transformers_modules")
-                model_name = Path(model_path).name if is_local else model_path.split('/')[-1]
-                
-                cstr(f"[Florence-2 Wrapper] To update: Delete cached folder and restart ComfyUI:").error.print()
-                cstr(f"[Florence-2 Wrapper]   Location: {cache_hint}\\{model_name.replace('/', '_').replace('-', '_hyphen_')}").error.print()
-                cstr(f"[Florence-2 Wrapper]   Or run: Remove-Item '{cache_hint}\\{model_name.replace('/', '_').replace('-', '_hyphen_')}' -Recurse -Force").error.print()
-                cstr(f"[Florence-2 Wrapper] Falling back to SDPA (still faster than eager mode)").warning.print()
-                
-                load_kwargs['attn_implementation'] = 'sdpa'
-            else:
-                raise
+    # Apply workaround context manager if needed
+    if transformers.__version__ < '4.51.0':
+        load_context = patch("transformers.dynamic_module_utils.get_imports", fixed_get_imports)
+    else:
+        from contextlib import nullcontext
+        load_context = nullcontext()
     
-    # Load with requested attention mode (or fallback to sdpa)
-    model = AutoModelForCausalLM.from_pretrained(
-        model_path,
-        trust_remote_code=True,
-        local_files_only=is_local,  # Prevent online lookup for local models
-        **load_kwargs
-    )
+    with load_context:
+        if requested_attn == 'flash_attention_2':
+            try:
+                cstr(f"[Florence-2 Wrapper] Attempting Flash Attention 2...").msg.print()
+                model = AutoModelForCausalLM.from_pretrained(
+                    model_path,
+                    trust_remote_code=True,
+                    local_files_only=is_local,
+                    **load_kwargs
+                )
+                cstr(f"[Florence-2 Wrapper] ✓ Loaded with Flash Attention 2").msg.print()
+                return model
+            except (ValueError, ImportError) as e:
+                if "does not support Flash Attention 2.0" in str(e) or "flash_attn" in str(e):
+                    cstr(f"[Florence-2 Wrapper] Flash Attention 2 not supported by cached model code").warning.print()
+                    cstr(f"[Florence-2 Wrapper] Your Florence-2 model uses outdated cached code from HuggingFace").error.print()
+                    
+                    # Extract cache path from model_path for user guidance
+                    import os
+                    cache_hint = os.path.join(os.path.expanduser("~"), ".cache", "huggingface", "modules", "transformers_modules")
+                    model_name = Path(model_path).name if is_local else model_path.split('/')[-1]
+                    
+                    cstr(f"[Florence-2 Wrapper] To update: Delete cached folder and restart ComfyUI:").error.print()
+                    cstr(f"[Florence-2 Wrapper]   Location: {cache_hint}\\{model_name.replace('/', '_').replace('-', '_hyphen_')}").error.print()
+                    cstr(f"[Florence-2 Wrapper]   Or run: Remove-Item '{cache_hint}\\{model_name.replace('/', '_').replace('-', '_hyphen_')}' -Recurse -Force").error.print()
+                    cstr(f"[Florence-2 Wrapper] Falling back to SDPA (still faster than eager mode)").warning.print()
+                    
+                    load_kwargs['attn_implementation'] = 'sdpa'
+                else:
+                    raise
+        
+        # Load with requested attention mode (or fallback to sdpa)
+        model = AutoModelForCausalLM.from_pretrained(
+            model_path,
+            trust_remote_code=True,
+            local_files_only=is_local,  # Prevent online lookup for local models
+            **load_kwargs
+        )
     
     # Add _supports_sdpa to model class if not present (custom models from HF may lack it)
     if not hasattr(type(model), '_supports_sdpa'):

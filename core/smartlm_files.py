@@ -11,11 +11,12 @@
 # limitations under the License.
 
 # Smart Language Model File Handling
-# Handles file scanning, model list generation, and download utilities
+# Handles file scanning, model list generation, download utilities, and hash verification
 
 from pathlib import Path
 from typing import List
 from collections import defaultdict
+import hashlib
 
 from . import cstr
 
@@ -254,3 +255,188 @@ def calculate_model_size(target_path: Path) -> float:
     except Exception as e:
         cstr(f"[SmartLM] Error calculating model size: {e}").warning.print()
         return 0.0
+
+
+def calculate_file_hash(file_path: Path, show_progress: bool = True) -> str:
+    """
+    Calculate SHA256 hash of a file with optional progress display.
+    
+    Args:
+        file_path: Path to the file to hash
+        show_progress: Whether to display progress for large files (>100MB)
+        
+    Returns:
+        Hexadecimal SHA256 hash string
+    """
+    import sys
+    
+    sha256_hash = hashlib.sha256()
+    file_size = file_path.stat().st_size
+    bytes_processed = 0
+    last_progress = -1
+    
+    # Show initial message with file size for large files
+    size_mb = file_size / (1024 * 1024)
+    if show_progress and file_size > 100 * 1024 * 1024:
+        cstr(f"[SmartLM] Calculating hash for {file_path.name} ({size_mb:.1f} MB)...").msg.print()
+    elif show_progress:
+        cstr(f"[SmartLM] Calculating hash for {file_path.name}...").msg.print()
+    
+    with open(file_path, "rb") as f:
+        while chunk := f.read(8192 * 1024):  # 8MB chunks for speed
+            sha256_hash.update(chunk)
+            bytes_processed += len(chunk)
+            # Show progress for large files (> 100MB)
+            if show_progress and file_size > 100 * 1024 * 1024:
+                progress = int((bytes_processed / file_size) * 100)
+                # Update every 1% to keep progress smooth
+                if progress != last_progress:
+                    # Use carriage return to overwrite the same line
+                    sys.stdout.write(f"\rEclipse: [SmartLM]   Hashing: {progress}% ({bytes_processed / (1024*1024):.0f}/{size_mb:.0f} MB)")
+                    sys.stdout.flush()
+                    last_progress = progress
+    
+    # Print newline after progress is complete to preserve the final line
+    if show_progress and file_size > 100 * 1024 * 1024:
+        print()  # Move to next line
+    
+    return sha256_hash.hexdigest()
+
+
+def verify_model_integrity(model_path: Path, repo_id: str = None, hf_filename: str = None) -> bool:
+    """
+    Verify model file integrity using SHA256 checksums.
+    Calculates and saves hashes on first load, then verifies on subsequent loads.
+    
+    Args:
+        model_path: Path to model file or directory
+        repo_id: HuggingFace repo_id (user/repo format or full URL)
+        hf_filename: Optional filename to use for HuggingFace lookup (for renamed files)
+        
+    Returns:
+        True if verification passes or hash is newly calculated
+        False if corruption detected
+    """
+    try:
+        # Look for model.safetensors or pytorch_model.bin
+        critical_files = []
+        if model_path.is_dir():
+            safetensors = list(model_path.glob("*.safetensors"))
+            bin_files = list(model_path.glob("pytorch_model*.bin"))
+            critical_files = safetensors if safetensors else bin_files
+        else:
+            critical_files = [model_path] if model_path.suffix in ['.gguf', '.safetensors', '.bin'] else []
+        
+        if not critical_files:
+            cstr(f"[SmartLM] No model files found to verify at {model_path}").warning.print()
+            return True  # Skip verification
+        
+        verified_count = 0
+        failed_count = 0
+        calculated_count = 0
+        
+        for file_path in critical_files:
+            sha_file = file_path.parent / f"{file_path.name}.sha256"
+            expected_hash = None
+            
+            # Check if we have a cached hash file first
+            if sha_file.exists():
+                try:
+                    expected_hash = sha_file.read_text().strip().split()[0]
+                    verified_count += 1
+                    continue  # Skip hash calculation, already verified
+                except:
+                    pass
+            
+            # If no cached hash, try to get it from HuggingFace
+            if not expected_hash and repo_id:
+                try:
+                    from huggingface_hub import hf_hub_url, get_hf_file_metadata
+                    
+                    # Use provided hf_filename if available (for renamed files), otherwise use local filename
+                    lookup_filename = hf_filename if hf_filename else file_path.name
+                    cstr(f"[SmartLM] Fetching hash from HuggingFace for {lookup_filename}...").msg.print()
+                    
+                    # Construct URL and get metadata
+                    url = hf_hub_url(repo_id=repo_id, filename=lookup_filename, repo_type="model")
+                    metadata = get_hf_file_metadata(url=url)
+                    
+                    # ETag is the SHA256 hash for git-lfs files (per HuggingFace docs)
+                    if hasattr(metadata, 'etag') and metadata.etag:
+                        expected_hash = metadata.etag
+                        cstr(f"[SmartLM] Retrieved hash from HuggingFace").msg.print()
+                    else:
+                        cstr(f"[SmartLM] No hash available in HuggingFace metadata for {lookup_filename}").warning.print()
+                except Exception as e:
+                    cstr(f"[SmartLM] Could not retrieve hash from HuggingFace ({repo_id}/{lookup_filename}): {e}").warning.print()
+            
+            # If we still don't have a reference hash, skip verification
+            if not expected_hash:
+                cstr(f"[SmartLM] No reference hash available for {file_path.name}, skipping verification").warning.print()
+                calculated_count += 1
+                continue
+            
+            # Calculate actual hash using centralized function
+            actual_hash = calculate_file_hash(file_path, show_progress=True)
+            
+            # Verify against HuggingFace hash
+            if actual_hash == expected_hash:
+                cstr(f"[SmartLM] ✓ {file_path.name} integrity verified").msg.print()
+                verified_count += 1
+                
+                # Save hash file for future fast verification
+                try:
+                    sha_file.write_text(expected_hash)
+                    cstr(f"[SmartLM] Cached hash to {sha_file.name}").msg.print()
+                except Exception as e:
+                    cstr(f"[SmartLM] Warning: Could not cache hash: {e}").warning.print()
+            else:
+                cstr(f"[SmartLM] ✗ {file_path.name} CORRUPTED! Hash mismatch.").error.print()
+                cstr(f"[SmartLM]   Expected: {expected_hash}").error.print()
+                cstr(f"[SmartLM]   Got:      {actual_hash}").error.print()
+                cstr(f"[SmartLM]   Please delete the model folder and redownload.").error.print()
+                failed_count += 1
+                # Don't save hash file on failure - user needs to redownload
+        
+        if failed_count > 0:
+            cstr(f"[SmartLM] ⚠ Model verification FAILED! {failed_count} corrupted file(s) detected.").error.print()
+            cstr(f"[SmartLM] Please delete the model folder and redownload: {model_path}").error.print()
+            return False
+        elif verified_count > 0:
+            cstr(f"[SmartLM] ✓ Model integrity verified ({verified_count} file(s))").msg.print()
+        elif calculated_count > 0:
+            cstr(f"[SmartLM] ⚠ No reference hash available, skipping verification for {calculated_count} file(s)").warning.print()
+        
+        return True
+        
+    except Exception as e:
+        cstr(f"[SmartLM] Model verification error (non-critical): {e}").warning.print()
+        return True  # Don't block loading on verification errors
+
+
+def extract_repo_id_from_url(repo_id: str) -> str:
+    """
+    Extract actual repo_id (namespace/repo_name) from a HuggingFace URL.
+    
+    Args:
+        repo_id: Either a direct repo_id like "user/repo" or a full HuggingFace URL
+    
+    Returns:
+        Extracted repo_id in format "user/repo", or original string if not a URL
+    
+    Examples:
+        "bartowski/model" -> "bartowski/model"
+        "https://huggingface.co/user/repo/resolve/main/file.gguf" -> "user/repo"
+    """
+    if not repo_id:
+        return ""
+    
+    # If it's a URL, extract the repo_id part
+    if repo_id.startswith("http") and "huggingface.co" in repo_id:
+        parts = repo_id.split('/')
+        if len(parts) >= 5:
+            # URL format: https://huggingface.co/USER/REPO/resolve/main/file
+            return f"{parts[3]}/{parts[4]}"
+    
+    # Already in correct format or not a URL
+    return repo_id

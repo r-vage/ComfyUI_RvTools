@@ -24,6 +24,7 @@ import gc
 import torch
 import numpy as np
 import psutil
+import hashlib
 from pathlib import Path
 from typing import Dict, Optional, Any, List
 from PIL import Image
@@ -31,7 +32,7 @@ from enum import Enum
 
 # Import cstr for logging
 from . import cstr
-from .smartlm_files import download_with_progress, get_llm_model_list, get_mmproj_list, calculate_model_size, search_model_file
+from .smartlm_files import download_with_progress, get_llm_model_list, get_mmproj_list, calculate_model_size, search_model_file, extract_repo_id_from_url, verify_model_integrity, calculate_file_hash
 
 # Model type detection
 class ModelType(Enum):
@@ -76,15 +77,93 @@ LLM_FEW_SHOT_EXAMPLES = {}  # LLM few-shot training examples
 LLAMA_CPP_AVAILABLE = False  # Will be set during initialization
 LLAMA_CPP_MODULE = None  # Will be "llama_cpp_cuda" or "llama_cpp"
 
+def is_model_architecture_supported(repo_id: str) -> bool:
+    """Check if a model architecture is supported by the installed transformers version."""
+    if not repo_id:
+        return True  # No repo_id means likely GGUF or local - assume supported
+    
+    # Known unsupported architectures and their minimum required transformers versions
+    # Format: {pattern: (min_version, description)}
+    architecture_requirements = {
+        'qwen3-vl': ('4.57.1', 'Qwen3-VL'),  # Qwen3-VL requires transformers >= 4.57.1
+        'qwen3_vl': ('4.57.1', 'Qwen3-VL'),
+    }
+    
+    # Check if repo contains known unsupported architecture markers
+    repo_lower = repo_id.lower()
+    unsupported_arch = None
+    
+    for pattern, (min_version, arch_name) in architecture_requirements.items():
+        # More specific pattern matching
+        if pattern in repo_lower:
+            unsupported_arch = (pattern, min_version, arch_name)
+            break
+    
+    if not unsupported_arch:
+        return True  # Not a known problematic architecture
+    
+    # Check transformers version
+    try:
+        import transformers
+        from packaging import version
+        
+        current_version = version.parse(transformers.__version__)
+        required_version = version.parse(unsupported_arch[1])
+        
+        return current_version >= required_version
+    except:
+        # If we can't check version, assume supported to avoid false positives
+        return True
+
+
 def get_template_list() -> List[str]:
-    # Get list of available Smart LML templates
-    templates = []
+    """Get list of available Smart LML templates, filtering out unsupported architectures."""
+    templates = []  # Start with empty list, will add "None" at the top after sorting
+    filtered_templates = []
     template_dir = get_template_dir()
     if template_dir.exists():
         for f in template_dir.iterdir():
             if f.suffix == '.json' and not f.name.startswith('_'):
-                templates.append(f.stem)
-    return sorted(templates) if templates else ["Qwen2.5-VL-3B-Instruct"]
+                # Check if template's model architecture is supported
+                try:
+                    with open(f, 'r') as file:
+                        template_data = json.load(file)
+                        repo_id = template_data.get('repo_id', '')
+                        
+                        # Filter out unsupported architectures
+                        is_supported = is_model_architecture_supported(repo_id)
+                        if is_supported:
+                            templates.append(f.stem)
+                        else:
+                            filtered_templates.append(f.stem)
+                except Exception as e:
+                    # If we can't read the template, include it anyway
+                    templates.append(f.stem)
+    
+    # Log filtered templates summary at startup (only once)
+    if filtered_templates and not hasattr(get_template_list, '_logged'):
+        get_template_list._logged = True
+        
+        # Group templates by base model to reduce output clutter
+        # Extract base model names (e.g., "Qwen3-VL-2B-Instruct" -> "Qwen3-VL")
+        base_models = set()
+        for template in filtered_templates:
+            # Common patterns: Model-Size-Variant, Model-Variant-Size
+            template_lower = template.lower()
+            if 'qwen3-vl' in template_lower or 'qwen3_vl' in template_lower:
+                base_models.add('Qwen3-VL')
+            # Add more patterns as needed
+        
+        if base_models:
+            models_str = ', '.join(sorted(base_models))
+            cstr(f"[SmartLM] {len(filtered_templates)} template(s) hidden (require transformers >= 4.57.1): {models_str} variants").warning.print()
+        else:
+            # Fallback to listing all if grouping fails
+            cstr(f"[SmartLM] {len(filtered_templates)} template(s) hidden (require newer transformers): {', '.join(filtered_templates)}").warning.print()
+    
+    # Sort templates alphabetically, then add "None" at the top for reset functionality
+    sorted_templates = sorted(templates) if templates else ["Qwen2.5-VL-3B-Instruct"]
+    return ["None"] + sorted_templates
 
 
 
@@ -144,6 +223,28 @@ def update_template_vram_requirement(name: str, vram_req: dict) -> bool:
                 return True
     except Exception as e:
         cstr(f"[SmartLM] Warning: Could not update template {name} vram_requirement: {e}").warning.print()
+    return False
+
+def update_template_mmproj_path(name: str, mmproj_path: str) -> bool:
+    # Update template's mmproj_path field after successful download
+    if not name or name == "None" or name == "__temp_manual_config__":
+        return False
+    template_path = get_template_dir() / f"{name}.json"
+    try:
+        if template_path.exists():
+            with open(template_path, 'r') as f:
+                template_data = json.load(f)
+            
+            current_path = template_data.get("mmproj_path") or ""
+            
+            # Only update if different
+            if current_path != mmproj_path:
+                template_data["mmproj_path"] = mmproj_path
+                with open(template_path, 'w') as f:
+                    json.dump(template_data, f, indent=2)
+                return True
+    except Exception as e:
+        cstr(f"[SmartLM] Warning: Could not update template {name} mmproj_path: {e}").warning.print()
     return False
 
 def update_template_settings(name: str, settings: dict, auto_save: bool = True) -> bool:
@@ -219,15 +320,23 @@ def load_prompt_configs():
             SYSTEM_PROMPTS = config_data.get("_system_prompts", {})
             MODEL_CONFIGS["_preset_prompts"] = config_data.get("_preset_prompts", [])
             
-            # Florence-2 tasks
+            # Florence-2 tasks (for dropdown population - actual prompts are hardcoded in generation)
             FLORENCE_TASKS = config_data.get("_florence2_tasks", {
-                "caption": "<CAPTION>",
-                "detailed_caption": "<DETAILED_CAPTION>",
-                "more_detailed_caption": "<MORE_DETAILED_CAPTION>",
-                "prompt_gen_tags": "<GENERATE_TAGS>",
-                "prompt_gen_mixed_caption": "<MIXED_CAPTION>",
-                "prompt_gen_analyze": "<ANALYZE>",
-                "prompt_gen_mixed_caption_plus": "<MIXED_CAPTION_PLUS>",
+                "region_caption": {"prompt": "<OD>", "description": "Object detection with captions"},
+                "dense_region_caption": {"prompt": "<DENSE_REGION_CAPTION>", "description": "Dense captioning with multiple regions"},
+                "region_proposal": {"prompt": "<REGION_PROPOSAL>", "description": "Generate region proposals for objects"},
+                "caption": {"prompt": "<CAPTION>", "description": "Short single-sentence caption"},
+                "detailed_caption": {"prompt": "<DETAILED_CAPTION>", "description": "Detailed paragraph description"},
+                "more_detailed_caption": {"prompt": "<MORE_DETAILED_CAPTION>", "description": "Very detailed rich description"},
+                "caption_to_phrase_grounding": {"prompt": "<CAPTION_TO_PHRASE_GROUNDING>", "description": "Detect and locate specific objects/phrases in image"},
+                "referring_expression_segmentation": {"prompt": "<REFERRING_EXPRESSION_SEGMENTATION>", "description": "Segment objects based on text description"},
+                "ocr": {"prompt": "<OCR>", "description": "Extract text from image"},
+                "ocr_with_region": {"prompt": "<OCR_WITH_REGION>", "description": "Extract text with bounding boxes"},
+                "docvqa": {"prompt": "<DocVQA>", "description": "Document visual question answering"},
+                "prompt_gen_tags": {"prompt": "<GENERATE_TAGS>", "description": "Generate comma-separated tags (PromptGen models)"},
+                "prompt_gen_mixed_caption": {"prompt": "<MIXED_CAPTION>", "description": "Mixed-style caption for prompt generation"},
+                "prompt_gen_analyze": {"prompt": "<ANALYZE>", "description": "Analytical description"},
+                "prompt_gen_mixed_caption_plus": {"prompt": "<MIXED_CAPTION_PLUS>", "description": "Enhanced mixed caption"},
             })
             
         cstr(f"[SmartLM] Loaded {len(SYSTEM_PROMPTS)} QwenVL prompts, {len(FLORENCE_TASKS)} Florence-2 tasks").msg.print()
@@ -586,8 +695,8 @@ class SmartLMLBase:
         
         return selected
     
-    def ensure_model_path(self, template_name: str) -> tuple[str, str]:
-        # Download model if needed and return (model_path, model_folder_path)
+    def ensure_model_path(self, template_name: str) -> tuple[str, str, str]:
+        # Download model if needed and return (model_path, model_folder_path, repo_id)
         # Handles legacy templates by searching LLM folder and auto-fixing paths
         template_info = load_template(template_name)
         if not template_info:
@@ -631,17 +740,22 @@ class SmartLMLBase:
                 # Non-GGUF: use specified local path as-is
                 target = models_base / local_path
             
-            # If constructed target doesn't exist, search for the file
+            # If constructed target doesn't exist, search for the file (ONLY for GGUF files)
+            # Do NOT search for transformers models as multiple models use the same filename (model.safetensors)
             if not target.exists():
                 filename = Path(local_path).name  # Extract just the filename
-                cstr(f"[SmartLM] Searching for existing file: {filename}...").msg.print()
-                found_path = search_model_file(filename, models_base)
-                if found_path:
-                    target = found_path
-                    cstr(f"[SmartLM] ✓ Found existing file at {target}").msg.print()
-                else:
-                    # File not found, but local_path is set - will download below
-                    needs_search = False
+                
+                # Only search for unique filenames (GGUF models have unique names)
+                # Skip search for generic names like model.safetensors, pytorch_model.bin
+                generic_names = {'model.safetensors', 'pytorch_model.bin', 'model.bin', 'adapter_model.bin'}
+                
+                if filename.lower() not in generic_names and filename.lower().endswith('.gguf'):
+                    cstr(f"[SmartLM] Searching for existing GGUF file: {filename}...").msg.print()
+                    found_path = search_model_file(filename, models_base)
+                    if found_path:
+                        target = found_path
+                        cstr(f"[SmartLM] ✓ Found existing file at {target}").msg.print()
+                # If generic name or not GGUF, don't search - will download to correct location below
         else:
             # No local_path - construct from repo_id
             model_name = repo_id.split("/")[-1]
@@ -656,9 +770,9 @@ class SmartLMLBase:
                 else:
                     target = models_base / folder_name / filename
                 
-                # Search for existing file if target doesn't exist
-                if not target.exists():
-                    cstr(f"[SmartLM] Searching for existing file: {filename}...").msg.print()
+                # Search for existing GGUF file if target doesn't exist
+                if not target.exists() and filename.lower().endswith('.gguf'):
+                    cstr(f"[SmartLM] Searching for existing GGUF file: {filename}...").msg.print()
                     found_path = search_model_file(filename, models_base)
                     if found_path:
                         target = found_path
@@ -671,7 +785,39 @@ class SmartLMLBase:
         # Download if not exists
         downloaded = False
         if not target.exists():
-            if is_direct_url:
+            # For transformers models, check if this repo_id is already downloaded elsewhere
+            if repo_id and not is_direct_url and not target.name.lower().endswith('.gguf') and models_base.exists():
+                # Search for existing model with same repo_id
+                for existing_dir in models_base.iterdir():
+                    if existing_dir.is_dir():
+                        # Check if this directory contains the same model by looking for matching files
+                        model_files = list(existing_dir.glob("*.safetensors")) or list(existing_dir.glob("pytorch_model*.bin"))
+                        if model_files:
+                            # Check if config.json exists and has matching _name_or_path
+                            config_file = existing_dir / "config.json"
+                            if config_file.exists():
+                                try:
+                                    import json
+                                    config = json.loads(config_file.read_text())
+                                    # Check if this is the EXACT same model by comparing repo path
+                                    config_model_name = config.get("_name_or_path", "")
+                                    # Match if _name_or_path matches repo_id (handles user/repo format)
+                                    # Also handle case where config has full path vs just repo name
+                                    repo_name = repo_id.split('/')[-1] if '/' in repo_id else repo_id
+                                    config_name = config_model_name.split('/')[-1] if '/' in config_model_name else config_model_name
+                                    
+                                    if config_model_name == repo_id or (repo_name and config_name == repo_name):
+                                        cstr(f"[SmartLM] ✓ Found existing {repo_id} model at {existing_dir}").msg.print()
+                                        target = existing_dir
+                                        # Update template with correct local_path
+                                        relative_path = (target.relative_to(models_base).as_posix() + '/')
+                                        if local_path != relative_path:
+                                            update_template_local_path(template_name, relative_path)
+                                        break
+                                except:
+                                    pass
+            
+            if not target.exists() and is_direct_url:
                 # Single file download from direct URL
                 cstr(f"[SmartLM] Downloading single file from {repo_id}").msg.print()
                 target.parent.mkdir(parents=True, exist_ok=True)
@@ -702,6 +848,11 @@ class SmartLMLBase:
             else:
                 raise ValueError(f"Template '{template_name}' local_path '{local_path}' not found at {target}")
         
+        # Verify model integrity after download
+        if downloaded and target.exists():
+            if not verify_model_integrity(target, extract_repo_id_from_url(repo_id)):
+                raise RuntimeError(f"Model verification failed for {target}. Please delete and re-download.")
+        
         # Update template with local_path after download/verification for offline usage
         # Always calculate relative path and update if different from template
         # Use forward slashes for cross-platform compatibility (JSON standard)
@@ -720,6 +871,21 @@ class SmartLMLBase:
         if downloaded or target.exists():
             try:
                 total_size_gb = calculate_model_size(target)
+                
+                # For Qwen-VL models, add mmproj file size if it exists
+                mmproj_path = template_info.get("mmproj_path")
+                if mmproj_path:
+                    # Construct mmproj path to check if it exists
+                    if '/' in mmproj_path or '\\' in mmproj_path:
+                        import folder_paths
+                        llm_dir = Path(folder_paths.models_dir) / "LLM"
+                        mmproj_file = llm_dir / mmproj_path
+                    else:
+                        mmproj_file = target.parent / mmproj_path
+                    
+                    if mmproj_file.exists():
+                        mmproj_size_gb = calculate_model_size(mmproj_file)
+                        total_size_gb += mmproj_size_gb
                 
                 if total_size_gb > 0.1:  # Only update if we found significant files (>100MB)
                     vram_full = round(total_size_gb, 1)
@@ -745,10 +911,10 @@ class SmartLMLBase:
             except Exception as e:
                 cstr(f"[SmartLM] Could not calculate model size after download: {e}").warning.print()
         
-        # Return both the model file path and its parent folder
-        return (str(target), str(target.parent))
+        # Return tuple: (model_path, model_folder, repo_id)
+        return (str(target), str(target.parent), repo_id or "")
     
-    def ensure_mmproj_path(self, template_info: dict, model_folder: str) -> Optional[str]:
+    def ensure_mmproj_path(self, template_info: dict, model_folder: str, template_name: str = None) -> Optional[str]:
         # Download mmproj file if needed and return local path. Downloads into model folder.
         mmproj_path = template_info.get("mmproj_path")
         mmproj_url = template_info.get("mmproj_url")
@@ -758,8 +924,27 @@ class SmartLMLBase:
         
         model_folder_path = Path(model_folder)
         
-        # Determine if mmproj_path is a full relative path from LLM folder or just a filename
-        if mmproj_path:
+        # Extract original filename from URL first (needed for both cases)
+        original_filename = None
+        if mmproj_url:
+            original_filename = mmproj_url.split('/')[-1]
+        
+        # Prioritize generating name from URL to include precision info
+        if mmproj_url:
+            # Preserve precision info (fp16, bf16, f16, etc.) when renaming
+            # Extract precision marker from original filename
+            import re
+            precision_match = re.search(r'(fp16|bf16|f16|f32)', original_filename.lower())
+            precision_suffix = f"-{precision_match.group(1)}" if precision_match else ""
+            
+            # Get model base name from folder
+            model_base = model_folder_path.name
+            
+            # Construct renamed filename with precision info preserved
+            target_filename = f"{model_base}{precision_suffix}.mmproj.gguf"
+            target = model_folder_path / target_filename
+        elif mmproj_path:
+            # Fallback: use mmproj_path if no URL available (offline mode)
             # Check if mmproj_path contains subdirectories (local mmproj from different folder)
             if '/' in mmproj_path or '\\' in mmproj_path:
                 # Full relative path from LLM folder (e.g., "Qwen-VL/Model/file.mmproj.gguf")
@@ -769,10 +954,7 @@ class SmartLMLBase:
             else:
                 # Just a filename - should be in the model's folder
                 target = model_folder_path / mmproj_path
-        elif mmproj_url:
-            # Fallback: use original filename from URL if no mmproj_path specified
-            target_filename = mmproj_url.split('/')[-1]
-            target = model_folder_path / target_filename
+            target_filename = target.name
         else:
             return None
         
@@ -796,6 +978,17 @@ class SmartLMLBase:
                 # Download directly to target with renamed filename
                 download_with_progress(mmproj_url, str(target), target_filename)
                 cstr(f"[SmartLM] ✓ MMProj downloaded as {target_filename}").msg.print()
+                
+                # Verify mmproj file integrity after download using original filename
+                if target.exists():
+                    # Pass original filename from URL so HuggingFace can find the hash
+                    if not verify_model_integrity(target, extract_repo_id_from_url(mmproj_url), original_filename):
+                        cstr(f"[SmartLM] Warning: MMProj verification failed for {target_filename}").warning.print()
+                        # Don't raise error - allow usage but warn user
+                    
+                    # Update template with the new mmproj filename (just the filename, not full path)
+                    if template_name:
+                        update_template_mmproj_path(template_name, target_filename)
             else:
                 cstr(f"[SmartLM] Warning: Invalid mmproj_url format: {mmproj_url}").warning.print()
                 return None
@@ -867,7 +1060,11 @@ class SmartLMLBase:
             return
         
         # For transformers models, ensure model path exists
-        model_path, model_folder = self.ensure_model_path(template_name)
+        model_path, model_folder, repo_id = self.ensure_model_path(template_name)
+        
+        # Verify model integrity if loading from local cache
+        if not verify_model_integrity(Path(model_path), repo_id):
+            raise RuntimeError(f"Model integrity check failed for {model_path}. The model may be corrupted. Please delete and re-download.")
         
         # Load transformers model
         from transformers import AutoModelForVision2Seq, AutoProcessor, AutoTokenizer
@@ -946,7 +1143,25 @@ class SmartLMLBase:
             load_kwargs["device_map"] = None
             cstr(f"[SmartLM] Loading {template_name} ({quantization}, attn={attention}) [non-quantized, ComfyUI offload]").msg.print()
         
-        self.model = AutoModelForVision2Seq.from_pretrained(model_path, **load_kwargs).eval()
+        try:
+            self.model = AutoModelForVision2Seq.from_pretrained(model_path, **load_kwargs).eval()
+        except ValueError as e:
+            if "does not recognize this architecture" in str(e) or "model type" in str(e):
+                model_type = "unknown"
+                if "model type `" in str(e):
+                    # Extract model type from error message
+                    import re
+                    match = re.search(r"model type `([^`]+)`", str(e))
+                    if match:
+                        model_type = match.group(1)
+                
+                cstr(f"[SmartLM] ✗ Model architecture '{model_type}' not supported by installed transformers version").error.print()
+                cstr(f"[SmartLM] This model is too new for your transformers library").error.print()
+                cstr(f"[SmartLM] Update with: pip install --upgrade transformers").error.print()
+                # Raise without 'from e' to suppress the original traceback
+                raise RuntimeError(f"Unsupported model architecture '{model_type}'. Please update transformers library.") from None
+            else:
+                raise
         
         # Post-loading device placement
         if is_prequantized and device == "cuda" and torch.cuda.is_available():
@@ -980,6 +1195,9 @@ class SmartLMLBase:
         
         self.processor = AutoProcessor.from_pretrained(model_path, trust_remote_code=True)
         self.tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+        
+        # Mark as non-GGUF model
+        self.is_gguf = False
     
     def _load_qwenvl_gguf(self, template_name: str, template_info: dict, device: str, context_size: int = 32768):
         # Load QwenVL GGUF model with llama-cpp-python
@@ -992,11 +1210,16 @@ class SmartLMLBase:
             )
         
         # Get model path first to detect model type from actual filename
-        model_path, model_folder = self.ensure_model_path(template_name)
+        model_path, model_folder, repo_id = self.ensure_model_path(template_name)
         model_file = Path(model_path)
         
         if not model_file.exists():
             raise FileNotFoundError(f"GGUF model file not found: {model_file}")
+        
+        # Verify model integrity (will use cached hash if available)
+        if repo_id:
+            if not verify_model_integrity(model_file, extract_repo_id_from_url(repo_id)):
+                raise RuntimeError(f"Model integrity verification failed for {model_file.name}. File may be corrupted.")
         
         # Detect model type from actual model filename to choose appropriate chat handler
         model_name_lower = model_file.name.lower()
@@ -1047,8 +1270,17 @@ class SmartLMLBase:
             )
         
         # MMProj is required for vision support - use helper to download if needed
-        mmproj_file_path = self.ensure_mmproj_path(template_info, model_folder)
+        mmproj_file_path = self.ensure_mmproj_path(template_info, model_folder, template_name)
         mmproj_file = Path(mmproj_file_path) if mmproj_file_path else None
+        
+        # Verify mmproj integrity if it exists and we have a repo_id
+        if mmproj_file and mmproj_file.exists():
+            mmproj_url = template_info.get("mmproj_url")
+            if mmproj_url:
+                # Extract original filename from URL for hash lookup
+                original_mmproj_filename = mmproj_url.split('/')[-1]
+                if not verify_model_integrity(mmproj_file, extract_repo_id_from_url(mmproj_url), original_mmproj_filename):
+                    cstr(f"[SmartLM] Warning: MMProj integrity verification failed. File may be corrupted.").warning.print()
         
         if not mmproj_file:
             cstr(f"[SmartLM] Warning: No MMProj available. Vision features may not work.").warning.print()
@@ -1153,11 +1385,16 @@ class SmartLMLBase:
             )
         
         # Get model path - ensure_model_path handles auto-download
-        model_path, model_folder = self.ensure_model_path(template_name)
+        model_path, model_folder, repo_id = self.ensure_model_path(template_name)
         model_file = Path(model_path)
         
         if not model_file.exists():
             raise FileNotFoundError(f"GGUF model file not found: {model_file}")
+        
+        # Verify model integrity (will use cached hash if available)
+        if repo_id:
+            if not verify_model_integrity(model_file, extract_repo_id_from_url(repo_id)):
+                raise RuntimeError(f"Model integrity verification failed for {model_file.name}. File may be corrupted.")
         
         cstr(f"[SmartLM] Loading text-only LLM GGUF model: {model_file.name}").msg.print()
         
@@ -1187,6 +1424,11 @@ class SmartLMLBase:
         
         # Ensure model path exists
         model_path, model_folder = self.ensure_model_path(template_name)
+        
+        # Verify model integrity if loading from local cache
+        repo_id = template_info.get("repo_id", "")
+        if not verify_model_integrity(Path(model_path), repo_id):
+            raise RuntimeError(f"Model integrity check failed for {model_path}. The model may be corrupted. Please delete and re-download.")
         
         # Load transformers model
         from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -1264,7 +1506,7 @@ class SmartLMLBase:
         from transformers import BitsAndBytesConfig
         from .florence2_wrapper import load_florence2_model, load_florence2_processor
         
-        model_path, model_folder = self.ensure_model_path(template_name)
+        model_path, model_folder, repo_id = self.ensure_model_path(template_name)
         
         # Determine quantization config and dtype (same as QwenVL)
         if quantization == "4bit":
@@ -1290,6 +1532,7 @@ class SmartLMLBase:
             "attn_implementation": attention,
             "use_safetensors": True,
             "low_cpu_mem_usage": True,
+            "repo_id": repo_id,  # For HuggingFace hash verification
         }
         
         # HYBRID APPROACH: quantized vs non-quantized
@@ -1338,13 +1581,13 @@ class SmartLMLBase:
                  top_k: int = 50, num_beams: int = 3, do_sample: bool = True, seed: Optional[int] = None,
                  repetition_penalty: float = 1.0, frame_count: int = 8,
                  llm_mode: str = "direct_chat", instruction_template: str = "",
-                 convert_to_bboxes: bool = True) -> tuple[str, dict]:
+                 convert_to_bboxes: bool = True, detection_filter_threshold: float = 0.80) -> tuple[str, dict]:
         # Unified generation method for all model types - returns (text, data_dict)
         if self.model_type == ModelType.QWENVL:
             text = self._generate_qwenvl(image, prompt, max_tokens, temperature, top_p, top_k, num_beams, do_sample, seed, repetition_penalty, frame_count)
             return (text, {})
         elif self.model_type == ModelType.FLORENCE2:
-            return self._generate_florence2(image, task or prompt, max_tokens, num_beams, do_sample, seed, repetition_penalty, text_input, convert_to_bboxes)
+            return self._generate_florence2(image, task or prompt, max_tokens, num_beams, do_sample, seed, repetition_penalty, text_input, convert_to_bboxes, detection_filter_threshold)
         elif self.model_type == ModelType.LLM:
             text = self._generate_llm(prompt, max_tokens, temperature, top_p, top_k, seed, repetition_penalty, llm_mode, instruction_template)
             return (text, {})
@@ -1680,7 +1923,7 @@ class SmartLMLBase:
     def _generate_florence2(self, image: Any, task_or_prompt: str, max_tokens: int,
                             num_beams: int, do_sample: bool, seed: Optional[int], 
                             repetition_penalty: float = 1.0, text_input: Optional[str] = None,
-                            convert_to_bboxes: bool = True) -> tuple[str, dict]:
+                            convert_to_bboxes: bool = True, detection_filter_threshold: float = 0.80) -> tuple[str, dict]:
         # Generate with Florence-2 - returns (text, parsed_data)
         import re
         import torchvision.transforms.functional as F
@@ -1713,16 +1956,32 @@ class SmartLMLBase:
         if not image_pil:
             return ("", {})
         
-        # Get Florence-2 task prompt (just the task token like <CAPTION_TO_PHRASE_GROUNDING>)
-        florence_task = FLORENCE_TASKS.get(task_or_prompt, {})
-        if florence_task:
-            task_prompt = florence_task.get("prompt", task_or_prompt)
-        else:
-            task_prompt = task_or_prompt
+        # Hardcoded Florence-2 task prompts (matching official implementation)
+        FLORENCE_PROMPTS = {
+            'region_caption': '<OD>',
+            'dense_region_caption': '<DENSE_REGION_CAPTION>',
+            'region_proposal': '<REGION_PROPOSAL>',
+            'caption': '<CAPTION>',
+            'detailed_caption': '<DETAILED_CAPTION>',
+            'more_detailed_caption': '<MORE_DETAILED_CAPTION>',
+            'caption_to_phrase_grounding': '<CAPTION_TO_PHRASE_GROUNDING>',
+            'referring_expression_segmentation': '<REFERRING_EXPRESSION_SEGMENTATION>',
+            'ocr': '<OCR>',
+            'ocr_with_region': '<OCR_WITH_REGION>',
+            'docvqa': '<DocVQA>',
+            'prompt_gen_tags': '<GENERATE_TAGS>',
+            'prompt_gen_mixed_caption': '<MIXED_CAPTION>',
+            'prompt_gen_analyze': '<ANALYZE>',
+            'prompt_gen_mixed_caption_plus': '<MIXED_CAPTION_PLUS>',
+        }
+        
+        # Get task prompt token
+        task_prompt = FLORENCE_PROMPTS.get(task_or_prompt, task_or_prompt)
         
         # Tasks that require text input after the task token
         tasks_requiring_text = [
             "caption_to_phrase_grounding",
+            "referring_expression_segmentation",
             "docvqa"
         ]
         
@@ -1762,121 +2021,146 @@ class SmartLMLBase:
             max_new_tokens=max_tokens,
             do_sample=do_sample,
             num_beams=num_beams,
+            repetition_penalty=repetition_penalty if repetition_penalty and repetition_penalty > 0 else 1.0,
             use_cache=False,
         )
         
+        # Decode with skip_special_tokens=True to get clean text first
+        results_clean = self.processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
+        # Also decode with skip_special_tokens=False for spatial tasks that need location tokens
         results = self.processor.batch_decode(generated_ids, skip_special_tokens=False)[0]
         
-        # Parse structured output (bounding boxes, labels, etc.) BEFORE cleaning
+        # Define tasks that produce spatial data (bboxes, polygons, etc.)
+        spatial_tasks = [
+            "region_caption",  # <OD>
+            "dense_region_caption",
+            "region_proposal",
+            "caption_to_phrase_grounding",
+            "ocr_with_region",
+            "referring_expression_segmentation"
+        ]
+        
+        # Parse structured output (bounding boxes, labels, etc.) ONLY for spatial tasks
         parsed_data = {}
-        try:
-            W, H = image_pil.size
-            # IMPORTANT: Use task_prompt (just the task token) for post-processing, NOT the full prompt
-            parsed_answer = self.processor.post_process_generation(
-                results, 
-                task=task_prompt, 
-                image_size=(W, H)
-            )
-            
-            # Extract data for the specific task - Florence-2 returns dict with task token as key
-            if isinstance(parsed_answer, dict) and task_prompt in parsed_answer:
-                parsed_data = parsed_answer[task_prompt]
+        is_spatial_task = task_or_prompt in spatial_tasks
+        
+        if is_spatial_task:
+            try:
+                W, H = image_pil.size
+                # IMPORTANT: Use task_prompt (just the task token) for post-processing, NOT the full prompt
+                parsed_answer = self.processor.post_process_generation(
+                    results, 
+                    task=task_prompt, 
+                    image_size=(W, H)
+                )
                 
-                # Check if processor returned proper dict with bboxes or just a string
-                if isinstance(parsed_data, str):
-                    # Custom models may not parse properly, do manual parsing
-                    parsed_data = self._parse_florence_location_tokens(parsed_data, W, H)
-                
-                # Optionally convert quad_boxes and polygons to normalized bboxes
-                if isinstance(parsed_data, dict):
-                    if convert_to_bboxes:
-                        # Convert quad_boxes (8 coords) to bboxes (4 coords) using min/max
-                        if 'quad_boxes' in parsed_data and parsed_data['quad_boxes']:
-                            bboxes = []
-                            for quad in parsed_data['quad_boxes']:
-                                # Extract x and y coordinates
-                                x_coords = [quad[i] for i in range(0, 8, 2)]
-                                y_coords = [quad[i] for i in range(1, 8, 2)]
-                                # Get bounding box
-                                bbox = [min(x_coords), min(y_coords), max(x_coords), max(y_coords)]
-                                bboxes.append(bbox)
-                            # Preserve key order: remove quad_boxes first, then add bboxes at the same position
-                            labels = parsed_data.pop('labels', None)
-                            parsed_data.pop('quad_boxes')
-                            parsed_data['bboxes'] = bboxes
-                            if labels is not None:
-                                parsed_data['labels'] = labels
-                            cstr(f"[SmartLM] Converted {len(bboxes)} quad_boxes to bboxes").msg.print()
-                        
-                        # Convert polygons to bboxes using min/max
-                        elif 'polygons' in parsed_data and parsed_data['polygons']:
-                            bboxes = []
-                            for polygon in parsed_data['polygons']:
-                                # polygon can be flat list [x1, y1, x2, y2, ...] or list of points [[x1, y1], ...]
-                                if polygon and isinstance(polygon[0], (int, float)):
-                                    # Flat list format
-                                    x_coords = [polygon[j] for j in range(0, len(polygon), 2)]
-                                    y_coords = [polygon[j] for j in range(1, len(polygon), 2)]
-                                else:
-                                    # List of points format
-                                    x_coords = [pt[0] for pt in polygon]
-                                    y_coords = [pt[1] for pt in polygon]
-                                bbox = [min(x_coords), min(y_coords), max(x_coords), max(y_coords)]
-                                bboxes.append(bbox)
-                            # Preserve key order: remove polygons first, then add bboxes at the same position
-                            labels = parsed_data.pop('labels', None)
-                            parsed_data.pop('polygons')
-                            parsed_data['bboxes'] = bboxes
-                            if labels is not None:
-                                parsed_data['labels'] = labels
-                            cstr(f"[SmartLM] Converted {len(bboxes)} polygons to bboxes").msg.print()
+                # Extract data for the specific task - Florence-2 returns dict with task token as key
+                if isinstance(parsed_answer, dict) and task_prompt in parsed_answer:
+                    parsed_data = parsed_answer[task_prompt]
                     
-                    # Filter out oversized detections (likely detecting whole image instead of specific objects)
-                    # Remove boxes that cover >95% of image area
-                    if 'bboxes' in parsed_data and parsed_data['bboxes']:
-                        image_area = W * H
-                        filtered_bboxes = []
-                        filtered_labels = []
-                        labels = parsed_data.get('labels', [])
-                        
-                        for i, bbox in enumerate(parsed_data['bboxes']):
-                            x1, y1, x2, y2 = bbox
-                            bbox_width = abs(x2 - x1)
-                            bbox_height = abs(y2 - y1)
-                            bbox_area = bbox_width * bbox_height
-                            area_ratio = bbox_area / image_area
+                    # Check if processor returned proper dict with bboxes or just a string
+                    if isinstance(parsed_data, str):
+                        # Custom models may not parse properly, do manual parsing
+                        parsed_data = self._parse_florence_location_tokens(parsed_data, W, H)
+                    
+                    # Optionally convert quad_boxes and polygons to normalized bboxes
+                    if isinstance(parsed_data, dict):
+                        if convert_to_bboxes:
+                            # Convert quad_boxes (8 coords) to bboxes (4 coords) using min/max
+                            if 'quad_boxes' in parsed_data and parsed_data['quad_boxes']:
+                                bboxes = []
+                                for quad in parsed_data['quad_boxes']:
+                                    # Extract x and y coordinates
+                                    x_coords = [quad[i] for i in range(0, 8, 2)]
+                                    y_coords = [quad[i] for i in range(1, 8, 2)]
+                                    # Get bounding box
+                                    bbox = [min(x_coords), min(y_coords), max(x_coords), max(y_coords)]
+                                    bboxes.append(bbox)
+                                # Preserve key order: remove quad_boxes first, then add bboxes at the same position
+                                labels = parsed_data.pop('labels', None)
+                                parsed_data.pop('quad_boxes')
+                                parsed_data['bboxes'] = bboxes
+                                if labels is not None:
+                                    parsed_data['labels'] = labels
+                                cstr(f"[SmartLM] Converted {len(bboxes)} quad_boxes to bboxes").msg.print()
                             
-                            # Keep boxes that are <95% of image area
-                            if area_ratio < 0.95:
-                                filtered_bboxes.append(bbox)
-                                if i < len(labels):
-                                    filtered_labels.append(labels[i])
-                            else:
-                                cstr(f"[SmartLM] Filtered out oversized detection ({area_ratio:.1%} of image)").warning.print()
+                            # Convert polygons to bboxes using min/max
+                            elif 'polygons' in parsed_data and parsed_data['polygons']:
+                                bboxes = []
+                                for polygon in parsed_data['polygons']:
+                                    # polygon can be flat list [x1, y1, x2, y2, ...] or list of points [[x1, y1], ...]
+                                    if polygon and isinstance(polygon[0], (int, float)):
+                                        # Flat list format
+                                        x_coords = [polygon[j] for j in range(0, len(polygon), 2)]
+                                        y_coords = [polygon[j] for j in range(1, len(polygon), 2)]
+                                    else:
+                                        # List of points format
+                                        x_coords = [pt[0] for pt in polygon]
+                                        y_coords = [pt[1] for pt in polygon]
+                                    bbox = [min(x_coords), min(y_coords), max(x_coords), max(y_coords)]
+                                    bboxes.append(bbox)
+                                # Preserve key order: remove polygons first, then add bboxes at the same position
+                                labels = parsed_data.pop('labels', None)
+                                parsed_data.pop('polygons')
+                                parsed_data['bboxes'] = bboxes
+                                if labels is not None:
+                                    parsed_data['labels'] = labels
+                                cstr(f"[SmartLM] Converted {len(bboxes)} polygons to bboxes").msg.print()
                         
-                        parsed_data['bboxes'] = filtered_bboxes
-                        if filtered_labels:
-                            parsed_data['labels'] = filtered_labels
-                    
-                    # Log detection count after filtering
-                    if 'bboxes' in parsed_data:
-                        cstr(f"[SmartLM] Detected {len(parsed_data['bboxes'])} bboxes").msg.print()
-                    elif 'quad_boxes' in parsed_data:
-                        cstr(f"[SmartLM] Detected {len(parsed_data['quad_boxes'])} quad_boxes").msg.print()
-                    elif 'polygons' in parsed_data:
-                        cstr(f"[SmartLM] Detected {len(parsed_data['polygons'])} polygons").msg.print()
-        except Exception as e:
-            cstr(f"[SmartLM] Could not parse Florence-2 output: {e}").error.print()
-            parsed_data = {}
+                        # Filter out oversized detections (likely detecting whole image instead of specific objects)
+                        # Remove boxes that cover more than detection_filter_threshold of image area
+                        if 'bboxes' in parsed_data and parsed_data['bboxes'] and detection_filter_threshold < 1.0:
+                            image_area = W * H
+                            filtered_bboxes = []
+                            filtered_labels = []
+                            labels = parsed_data.get('labels', [])
+                            
+                            for i, bbox in enumerate(parsed_data['bboxes']):
+                                x1, y1, x2, y2 = bbox
+                                bbox_width = abs(x2 - x1)
+                                bbox_height = abs(y2 - y1)
+                                bbox_area = bbox_width * bbox_height
+                                area_ratio = bbox_area / image_area
+                                
+                                # Keep boxes that are below the threshold
+                                if area_ratio < detection_filter_threshold:
+                                    filtered_bboxes.append(bbox)
+                                    if i < len(labels):
+                                        filtered_labels.append(labels[i])
+                                else:
+                                    cstr(f"[SmartLM] Filtered out oversized detection ({area_ratio:.1%} of image, threshold: {detection_filter_threshold:.1%})").warning.print()
+                            
+                            parsed_data['bboxes'] = filtered_bboxes
+                            if filtered_labels:
+                                parsed_data['labels'] = filtered_labels
+                        
+                        # Log detection count after filtering
+                        if 'bboxes' in parsed_data:
+                            cstr(f"[SmartLM] Detected {len(parsed_data['bboxes'])} bboxes").msg.print()
+                        elif 'quad_boxes' in parsed_data:
+                            cstr(f"[SmartLM] Detected {len(parsed_data['quad_boxes'])} quad_boxes").msg.print()
+                        elif 'polygons' in parsed_data:
+                            cstr(f"[SmartLM] Detected {len(parsed_data['polygons'])} polygons").msg.print()
+            except Exception as e:
+                cstr(f"[SmartLM] Could not parse Florence-2 output: {e}").error.print()
+                parsed_data = {}
         
         # Clean up special tokens for text output
         # Special handling for ocr_with_region to preserve line breaks
         if task_or_prompt == 'ocr_with_region':
             clean_results = re.sub(r'</?s>|<[^>]*>', '\n', results)
             clean_results = re.sub(r'\n+', '\n', clean_results).strip()
-        else:
-            # For all other tasks including plain ocr: just remove <s> and </s>
+        elif is_spatial_task:
+            # Spatial tasks: keep location tokens but remove <s> and </s>
             clean_results = results.replace('</s>', '').replace('<s>', '')
+        else:
+            # Non-spatial tasks (caption, tags, etc.): use clean decoded output
+            # Start with skip_special_tokens=True output which already has most tokens removed
+            clean_results = results_clean
+            
+            # Remove the task prompt if it appears at the start (Florence-2 sometimes echoes it)
+            if task_prompt and clean_results.startswith(task_prompt):
+                clean_results = clean_results[len(task_prompt):].lstrip('> -.:;, ')
         
         # HYBRID APPROACH: Offload non-quantized models back
         if hasattr(self, 'is_quantized') and not self.is_quantized and offload_device != device:

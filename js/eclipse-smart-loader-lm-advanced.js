@@ -17,7 +17,8 @@ const DEFAULT_PARAMS = {
         "device": "cuda",
         "use_torch_compile": false,
         "num_beams": 3,
-        "do_sample": true
+        "do_sample": true,
+        "convert_to_bboxes": false
     },
     "LLM": {
         "temperature": 1.0,
@@ -65,7 +66,8 @@ app.registerExtension({
                         "num_beams": true,
                         "do_sample": true,
                         "repetition_penalty": true,
-                        "frame_count": true
+                        "frame_count": true,
+                        "convert_to_bboxes": false
                     },
                     "Florence2": {
                         "device": true,
@@ -76,7 +78,8 @@ app.registerExtension({
                         "num_beams": true,
                         "do_sample": true,
                         "repetition_penalty": false,  // Not used by Florence2
-                        "frame_count": false
+                        "frame_count": false,
+                        "convert_to_bboxes": true
                     },
                     "LLM": {
                         "device": false,  // LLM is GGUF-only, no device selection
@@ -87,7 +90,8 @@ app.registerExtension({
                         "num_beams": false,
                         "do_sample": false,
                         "repetition_penalty": true,
-                        "frame_count": false
+                        "frame_count": false,
+                        "convert_to_bboxes": false
                     }
                 };
                 
@@ -243,7 +247,7 @@ app.registerExtension({
                 // Hook into all parameter widgets to trigger auto-save
                 const paramWidgets = [
                     "device", "use_torch_compile", "temperature", "top_p", "top_k",
-                    "num_beams", "do_sample", "repetition_penalty", "frame_count"
+                    "num_beams", "do_sample", "repetition_penalty", "frame_count", "convert_to_bboxes"
                 ];
                 
                 paramWidgets.forEach(widgetName => {

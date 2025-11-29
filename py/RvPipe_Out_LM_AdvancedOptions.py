@@ -37,7 +37,8 @@ DEFAULT_PARAMS = {
         "device": "cuda",
         "use_torch_compile": False,
         "num_beams": 3,
-        "do_sample": True
+        "do_sample": True,
+        "convert_to_bboxes": False
     },
     "LLM": {
         "temperature": 1.0,
@@ -93,6 +94,7 @@ class RvPipe_Out_smartlml_AdvancedOptions:
                 "do_sample": ("BOOLEAN", {"default": True, "tooltip": "Use sampling instead of greedy decoding (All models)"}),
                 "repetition_penalty": ("FLOAT", {"default": 1.0, "min": 1.0, "max": 2.0, "step": 0.05, "tooltip": "Penalize repeated tokens, 1.0 = no penalty (QwenVL transformers, Florence2, QwenVL GGUF, LLM)"}),
                 "frame_count": ("INT", {"default": 8, "min": 1, "max": 32, "tooltip": "Number of frames to sample from video (QwenVL only, ignored by Florence2/LLM)"}),
+                "convert_to_bboxes": ("BOOLEAN", {"default": False, "tooltip": "Florence-2: Convert quad_boxes (OCR) and polygons (segmentation) to normalized bboxes for standard workflows. Disable to preserve original formats."}),
             },
         }
 
@@ -115,6 +117,7 @@ class RvPipe_Out_smartlml_AdvancedOptions:
         do_sample,
         repetition_penalty,
         frame_count,
+        convert_to_bboxes,
     ):
         # Package advanced options into a pipe dictionary and save user preferences
         # Note: model_type is for UI filtering only, all parameters are passed through
@@ -129,6 +132,7 @@ class RvPipe_Out_smartlml_AdvancedOptions:
             "do_sample": do_sample,
             "repetition_penalty": repetition_penalty,
             "frame_count": frame_count,
+            "convert_to_bboxes": convert_to_bboxes,
         }
         
         # Note: Parameter saving is handled by JavaScript via POST endpoint

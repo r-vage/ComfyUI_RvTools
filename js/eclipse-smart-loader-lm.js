@@ -283,10 +283,12 @@ app.registerExtension({
             
             const updateVisibility = () => {
                 const templateAction = getWidgetValue("template_action");
+                const templateName = getWidgetValue("template_name");
                 const isSaveMode = (templateAction === "Save");
                 const isLoadMode = (templateAction === "Load");
                 const isDeleteMode = (templateAction === "Delete");
                 const isNoneMode = (templateAction === "None");
+                const isTemplateNone = (isLoadMode && templateName === "None");
                 
                 // Check if text input is connected
                 const textInput = node.inputs?.find(input => input.name === "text");
@@ -296,13 +298,13 @@ app.registerExtension({
                 let widgetModelType = "qwenvl"; // Default
                 let isGGUF = false;
                 
-                if (isLoadMode) {
-                    // Load mode: use detected model type from template
+                if (isLoadMode && !isTemplateNone) {
+                    // Load mode with template: use detected model type from template
                     widgetModelType = currentModelType || "qwenvl";
                     // currentIsGGUF is already set from template detection
                     isGGUF = currentIsGGUF;
                 } else {
-                    // None/Save modes: extract from combined model_type widget
+                    // None/Save modes or template_name=None: extract from combined model_type widget
                     const modelTypeValue = getWidgetValue("model_type") || "QwenVL";
                     isGGUF = modelTypeValue.includes("(GGUF)");
                     const baseType = modelTypeValue.replace(" (GGUF)", "").trim();
@@ -341,8 +343,8 @@ app.registerExtension({
                 // Update button visibility
                 updateTemplateButton();
                 
-                // Generation/runtime parameters (visible in all modes except Delete)
-                const showGeneration = !isDeleteMode;
+                // Generation/runtime parameters (visible in all modes except Delete and template_name=None)
+                const showGeneration = !isDeleteMode && !isTemplateNone;
                 setWidgetVisible("quantization", showGeneration && !isGGUF);
                 setWidgetVisible("attention_mode", showGeneration && !isGGUF);
                 setWidgetVisible("context_size", showGeneration && isGGUF); // Only for GGUF - Transformers auto-handles context
@@ -351,7 +353,7 @@ app.registerExtension({
                 setWidgetVisible("keep_model_loaded", showGeneration && !isGGUF);
                 setWidgetVisible("seed", showGeneration);
                 
-                // Model-specific widgets (visible in all modes except Delete)
+                // Model-specific widgets (visible in all modes except Delete and template_name=None)
                 setWidgetVisible("qwen_preset_prompt", showGeneration && isQwenVL);
                 setWidgetVisible("qwen_custom_prompt", showGeneration && isQwenVL && !isTextConnected);
                 
@@ -370,16 +372,16 @@ app.registerExtension({
                     setWidgetVisible("florence_text_input", false);
                 }
                 
-                // Florence convert_to_bboxes visibility
+                // Florence detection_filter_threshold visibility
                 if (showGeneration && isFlorence2) {
                     const florenceTask = getWidgetValue("florence_task") || "";
-                    const showConversion = florenceTask.includes("grounding") || 
-                                          florenceTask.includes("detection") || 
-                                          florenceTask.includes("ocr") || 
-                                          florenceTask.includes("region");
-                    setWidgetVisible("convert_to_bboxes", showConversion);
+                    const showFilter = florenceTask.includes("grounding") || 
+                                      florenceTask.includes("detection") || 
+                                      florenceTask.includes("ocr") || 
+                                      florenceTask.includes("region");
+                    setWidgetVisible("detection_filter_threshold", showFilter);
                 } else {
-                    setWidgetVisible("convert_to_bboxes", false);
+                    setWidgetVisible("detection_filter_threshold", false);
                 }
                 
                 setWidgetVisible("llm_instruction_mode", showGeneration && isLLM);
@@ -436,6 +438,52 @@ app.registerExtension({
                     const templateAction = getWidgetValue("template_action");
                     const templateName = getWidgetValue("template_name");
                     const wasLoadMode = previousTemplateAction === "Load";
+                    
+                    // Reset values when switching from Load to None mode with template_name="None"
+                    // This allows users to clear state without executing the node
+                    if (wasLoadMode && templateAction === "None" && templateName === "None") {
+                        console.log("[SmartLM] Reset triggered: Load → None with template_name='None'");
+                        
+                        // Reset model configuration to defaults
+                        setWidgetValue("model_source", "Local");
+                        setWidgetValue("repo_id", "");
+                        setWidgetValue("local_path", "");
+                        
+                        // Reset local_model to first available option
+                        const localModelWidget = node.widgets?.find(w => w.name === "local_model");
+                        if (localModelWidget && localModelWidget.options?.values?.length > 0) {
+                            localModelWidget.value = localModelWidget.options.values[0];
+                        }
+                        
+                        // Reset mmproj settings
+                        setWidgetValue("mmproj_source", "Local");
+                        setWidgetValue("mmproj_url", "");
+                        setWidgetValue("mmproj_path", "");
+                        const mmprojLocalWidget = node.widgets?.find(w => w.name === "mmproj_local");
+                        if (mmprojLocalWidget && mmprojLocalWidget.options?.values?.length > 0) {
+                            mmprojLocalWidget.value = mmprojLocalWidget.options.values[0];
+                        }
+                        
+                        // Reset model type to default
+                        setWidgetValue("model_type", "QwenVL");
+                        
+                        // Reset generation parameters to defaults
+                        setWidgetValue("quantization", "auto");
+                        setWidgetValue("attention_mode", "auto");
+                        setWidgetValue("context_size", 32768);
+                        setWidgetValue("max_tokens", 512);
+                        
+                        // Reset model-specific prompts to defaults
+                        setWidgetValue("qwen_custom_prompt", "");
+                        setWidgetValue("florence_text_input", "");
+                        setWidgetValue("llm_prompt", "");
+                        setWidgetValue("llm_custom_instruction", 'Generate a detailed prompt from "{prompt}"');
+                        
+                        // Clear loaded template cache
+                        delete nodeLoadedTemplates[node.id];
+                        
+                        console.log("[SmartLM] ✓ Values reset to defaults");
+                    }
                     
                     // Helper: Check if current config matches the loaded template
                     const matchesLoadedTemplate = () => {
@@ -593,7 +641,7 @@ app.registerExtension({
                 };
             }
             
-            // Hook into florence_task to show/hide convert_to_bboxes
+            // Hook into florence_task to show/hide detection_filter_threshold
             const florenceTaskWidget = node.widgets?.find(w => w.name === "florence_task");
             if (florenceTaskWidget) {
                 const originalTaskCallback = florenceTaskWidget.callback;
@@ -838,6 +886,18 @@ app.registerExtension({
                                     florenceTextWidget.value = config.default_text_input;
                                 }
                             }
+                            
+                            // Florence-2: Load detection_filter_threshold if saved in template
+                            if (config.detection_filter_threshold !== undefined && detectedType === "florence2") {
+                                const detectionThresholdWidget = node.widgets?.find(w => w.name === "detection_filter_threshold");
+                                if (detectionThresholdWidget) {
+                                    detectionThresholdWidget.value = config.detection_filter_threshold;
+                                    console.log(`[SmartLM] Loaded detection_filter_threshold=${config.detection_filter_threshold} from template`);
+                                }
+                            }
+                            
+                            // Note: convert_to_bboxes is in Advanced Options pipe, not a main widget
+                            // It will be loaded via the pipe if user connects Advanced Options node
                             
                             // QwenVL: Load default_task and default_text_input (same as Florence-2)
                             if (config.default_task !== undefined && detectedType === "qwenvl") {
@@ -1091,6 +1151,19 @@ app.registerExtension({
             node.onConfigure = function(info) {
                 if (onConfigure) {
                     onConfigure.apply(this, arguments);
+                }
+                
+                // Migration: Fix old workflows that had convert_to_bboxes widget before detection_filter_threshold
+                // Old widget order had convert_to_bboxes at position where detection_filter_threshold now is
+                // This causes detection_filter_threshold to get value 0.00 (false) from old convert_to_bboxes
+                if (info && info.widgets_values) {
+                    const detectionThresholdWidget = node.widgets?.find(w => w.name === "detection_filter_threshold");
+                    if (detectionThresholdWidget && (detectionThresholdWidget.value === 0 || detectionThresholdWidget.value === false)) {
+                        // If detection_filter_threshold is 0 or false, it likely came from old convert_to_bboxes
+                        // Reset to default value
+                        detectionThresholdWidget.value = 0.80;
+                        console.log("[SmartLM] Migrated old workflow: Reset detection_filter_threshold from 0.00 to 0.80");
+                    }
                 }
                 
                 // After workflow is configured, detect model type and update visibility
