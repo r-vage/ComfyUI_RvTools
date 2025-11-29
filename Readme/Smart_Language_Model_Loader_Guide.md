@@ -312,11 +312,27 @@ Simply select a template from the `template_name` dropdown in the node. Each tem
 
 Models download automatically when first selected. Templates are automatically updated with `local_path` and actual `vram_requirement` after models are downloaded.
 
+**Transformers Version Filtering:**
+
+The node automatically filters templates based on your installed transformers version:
+- Templates requiring newer transformers (e.g., Qwen3-VL requires ≥4.46) are hidden if unsupported
+- Unsupported templates are listed in console on startup (grouped by base model)
+- No manual configuration needed - only compatible templates appear in dropdown
+- Upgrade transformers to access newer model templates: `pip install --upgrade transformers`
+
 **Need a model repository URL?** See [MODEL_REPOS_REFERENCE.md](MODEL_REPOS_REFERENCE.md) for a complete list of HuggingFace repository IDs you can copy-paste when creating templates manually.
 
 ### Template System Modes
 
 The Smart Language Model Loader provides four template operation modes. **None** is the default mode - the node does NOT auto-load templates on startup. This gives you full flexibility to work with templates exactly when and how you need them.
+
+**Template Reset Feature:**
+Selecting `template_name = "None"` provides an instant reset:
+- In Load mode: Returns empty output (no model loading)
+- Switching to None mode: JavaScript instantly resets all widgets to defaults
+- Clears cached template state
+- Provides clean slate for manual configuration
+- No Python execution needed - reset happens in UI immediately
 
 **Template Actions:**
 - **None** (default) - Manual configuration mode. Configure model settings directly without using a template. Node always starts in None mode - you decide if and when to load a template.
@@ -344,6 +360,8 @@ The Smart Language Model Loader provides four template operation modes. **None**
 1. Set `template_action` to **None**
 2. Configure all model settings:
    - `model_type`: Select model type - QwenVL, QwenVL (GGUF), Florence2, Florence2 (GGUF), LLM, or LLM (GGUF)
+   - Model source and paths (HuggingFace or Local)
+   - Generation parameters (quantization, attention, max_tokens, etc.)
    - `model_source`: Choose **HuggingFace** (auto-download) or **Local** (already downloaded)
    - For HuggingFace:
      - `repo_id`: HuggingFace repo ID or direct download URL
@@ -378,16 +396,35 @@ When switching from **Load** to **None** or **Save** mode:
 - Falls back to "HuggingFace" source if model not yet downloaded (only `repo_id` exists)
 - Generation parameters and task defaults remain unchanged (already set by template)
 
+When switching from **Load** with `template_name="None"` to **None** mode:
+- JavaScript instantly resets all widgets to defaults
+- Clears model configuration, generation parameters, and prompts
+- Provides clean slate without requiring Python execution
+- Backend fallback exists for API calls
+
 When switching to **Save** mode:
 - `new_template_name` field auto-fills based on context (loaded template name → `local_model` path → extracted repo name)
 - Edit as needed before saving
+- Current widget values (including any changes) are captured when saved
 
 **Automatic Template Updates:**
 
 Templates are automatically updated after model download:
 - `local_path` is set after successful download
 - `vram_requirement` is calculated from actual file sizes
+- `mmproj_path` is set after mmproj download (GGUF QwenVL models)
 - No user interaction required - happens in background
+- Force update (`_force_update` flag) only updates templates that exist in repo, preserving user-created templates
+
+**SHA256 Verification & Hash Caching:**
+
+All model downloads are automatically verified for integrity:
+- **Automatic Verification**: SHA256 hash calculated and compared against HuggingFace metadata after download
+- **Hash Caching**: First verification saves `.sha256` file for instant verification on subsequent loads
+- **Progress Display**: Hash calculation shows single-line progress updates for large files
+- **Corruption Detection**: Detects incomplete/corrupted downloads automatically
+- **MMProj Verification**: GGUF vision models verify both model and MMProj files
+- No user interaction needed - happens automatically in background
 
 **Auto-Detection of Local Models:**
 
@@ -405,6 +442,15 @@ When loading templates that have HuggingFace URLs (`repo_id`, `mmproj_url`) but 
 4. Save template → both URL (for sharing) and local path (for your use) are saved
 
 This means you can share templates with HuggingFace URLs, and users who already have the model downloaded will use their local copy automatically.
+
+**Template Portability:**
+
+All bundled templates are designed for cross-system portability:
+- Templates ship with empty `local_path=""` and `mmproj_path=""` fields
+- Paths are automatically populated on first model discovery or download
+- When you save templates after auto-detection, both URLs (for sharing) and local paths (for your use) are preserved
+- Share templates with confidence - recipients without local files auto-download, those with files use local copies
+- **MMProj Flexibility**: MMProj files are detected even if filenames differ from template specification
 
 **Multi-Node Workflow Pattern:**
 
@@ -1082,6 +1128,26 @@ Use **Pipe Out LM Advanced Options [Eclipse]** node to provide advanced generati
 Remove-Item -Recurse -Force "$env:USERPROFILE\.cache\huggingface\modules\transformers_modules\*florence*"
 ```
 
+### Wrong Model Detected
+
+**Problem:** Template loads wrong model (e.g., Florence-2-base used instead of Florence-2-Flux-Large).
+
+**Solution:** Node performs exact repo_id matching
+- Validates `config.json` `_name_or_path` field against template `repo_id`
+- Error message shows mismatch details in console
+- Delete wrong model folder from `models/LLM/` and re-download
+- Ensures correct model is always used
+
+### Corrupted Model Download
+
+**Problem:** Model file corrupted or incomplete (wrong file size).
+
+**Solution:** Node automatically detects via SHA256 verification
+- Delete corrupted model from `models/LLM/`
+- Delete associated `.sha256` cache file if present
+- Re-run workflow - model downloads and verifies automatically
+- Console shows verification progress and results
+
 ### Poor Quality Output
 
 **Problem:** Generated text is low quality or nonsensical.
@@ -1142,6 +1208,7 @@ Remove-Item -Recurse -Force "$env:USERPROFILE\.cache\huggingface\modules\transfo
 3. **Share with confidence:** Recipients without local files will auto-download; those with files will use local copy
 4. **Filename flexibility:** MMProj files are detected even if filenames differ from template
 5. **URL preservation:** When saving templates after auto-detection, both repo_id and mmproj_url are preserved automatically
+6. **Precision preservation:** MMProj files automatically preserve precision markers (fp16/bf16/f16) in renamed filenames for clarity
 
 ### Workflow Integration
 
@@ -1153,11 +1220,6 @@ Remove-Item -Recurse -Force "$env:USERPROFILE\.cache\huggingface\modules\transfo
 **Prompt refinement loop:**
 ```
 [Text] → [Image Generator] → [Smart LML (QwenVL)] → [Merge] → [Regenerate]
-```
-
-**Batch analysis:**
-```
-[Load Images] → [Smart LML (keep_model_loaded=True)] → [Save text]
 ```
 
 **Video summarization:**
@@ -1194,6 +1256,35 @@ Remove-Item -Recurse -Force "$env:USERPROFILE\.cache\huggingface\modules\transfo
 
 ## Advanced Topics
 
+### Reliability Features
+
+**The node includes several automatic reliability mechanisms:**
+
+1. **SHA256 Verification**: All downloads verified against HuggingFace metadata
+   - Hash cached in `.sha256` files for instant subsequent verification
+   - Detects corrupted or incomplete downloads automatically
+   - Progress display during hash calculation
+
+2. **Model Validation**: Exact repo_id matching prevents wrong model usage
+   - Compares `config.json` `_name_or_path` with template `repo_id`
+   - Error messages show mismatch details
+   - Ensures correct model always loaded
+
+3. **Version Filtering**: Templates filtered by transformers version requirements
+   - Hides unsupported templates (e.g., Qwen3-VL if transformers <4.57.1)
+   - Console shows grouped list of unsupported templates on startup
+   - Prevents errors from loading incompatible models
+
+4. **Template Portability**: Empty paths enable cross-system sharing
+   - Bundled templates have empty `local_path`/`mmproj_path`
+   - Auto-populated on first discovery/download
+   - Preserved URLs enable auto-download for recipients
+
+5. **Auto-Update Protection**: Selective template updates preserve user creations
+   - Force update only modifies templates existing in repo folder
+   - User-created templates are never deleted
+   - Safe to update ComfyUI_Eclipse without losing custom templates
+
 ### Using GGUF Models
 
 **Requirements:**
@@ -1213,11 +1304,6 @@ Remove-Item -Recurse -Force "$env:USERPROFILE\.cache\huggingface\modules\transfo
 
 Models load from `ComfyUI/models/LLM/` first, then HuggingFace Hub.
 
-**To use offline:**
-1. Download model to `ComfyUI/models/LLM/<model_name>/`
-2. Create template with `local_path` pointing to folder
-3. Disconnect internet
-4. Model loads from local cache
 
 ### Integration with ComfyUI-Florence2
 
