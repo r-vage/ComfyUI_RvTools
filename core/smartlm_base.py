@@ -1080,7 +1080,7 @@ class SmartLMLBase:
         from transformers import BitsAndBytesConfig
         
         # Auto-detect if model is pre-quantized (FP8 models usually have it in name/folder)
-        repo_id = template_info.get("repo_id", "")
+        local_path = template_info.get("local_path", "")
         has_quant_markers = any(marker in local_path.lower() or marker in repo_id.lower() or marker in model_path.lower()
                                 for marker in ["fp8", "int8", "int4", "q4", "q5", "q6", "q8", "_q4_", "_q5_", "_q8_"])
         
@@ -1155,9 +1155,34 @@ class SmartLMLBase:
         try:
             self.model = AutoModelForVision2Seq.from_pretrained(model_path, **load_kwargs).eval()
         except ValueError as e:
-            if "does not recognize this architecture" in str(e) or "model type" in str(e):
+            error_str = str(e)
+            
+            # Check for configuration class mismatch (wrong model type selected)
+            if "Unrecognized configuration class" in error_str and "Florence2Config" in error_str:
+                cstr(f"[SmartLM] ✗ Model type mismatch detected").error.print()
+                cstr(f"[SmartLM] You selected 'QwenVL' model type but the model at {model_path} is a Florence-2 model").error.print()
+                cstr(f"[SmartLM] Please change 'model_type' to 'Florence2' or select a different model").error.print()
+                raise RuntimeError(f"Model type mismatch: Selected QwenVL but model is Florence-2. Please change model_type to 'Florence2'.") from None
+            
+            # Check for other configuration mismatches
+            if "Unrecognized configuration class" in error_str:
+                # Try to extract actual model type from error
+                if "Qwen2_5_VLConfig" in error_str or "Qwen2VLConfig" in error_str:
+                    actual_type = "QwenVL"
+                elif "Florence2Config" in error_str:
+                    actual_type = "Florence2"
+                else:
+                    actual_type = "unknown"
+                
+                cstr(f"[SmartLM] ✗ Model type mismatch detected").error.print()
+                cstr(f"[SmartLM] The selected model type doesn't match the actual model architecture (detected: {actual_type})").error.print()
+                cstr(f"[SmartLM] Please select the correct 'model_type' for your model").error.print()
+                raise RuntimeError(f"Model type mismatch. Detected model type: {actual_type}. Please change model_type accordingly.") from None
+            
+            # Check for architecture version issues
+            if "does not recognize this architecture" in error_str or "model type" in error_str:
                 model_type = "unknown"
-                if "model type `" in str(e):
+                if "model type `" in error_str:
                     # Extract model type from error message
                     import re
                     match = re.search(r"model type `([^`]+)`", str(e))
@@ -1167,7 +1192,6 @@ class SmartLMLBase:
                 cstr(f"[SmartLM] ✗ Model architecture '{model_type}' not supported by installed transformers version").error.print()
                 cstr(f"[SmartLM] This model is too new for your transformers library").error.print()
                 cstr(f"[SmartLM] Update with: pip install --upgrade transformers").error.print()
-                # Raise without 'from e' to suppress the original traceback
                 raise RuntimeError(f"Unsupported model architecture '{model_type}'. Please update transformers library.") from None
             else:
                 raise
