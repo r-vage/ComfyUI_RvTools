@@ -8,7 +8,7 @@ authors = [
 	{ name = "r-vage" }
 ]
 
-keywords = ["ComfyUI","custom_nodes","workflow","conversion","combo","checkpoint loader","pipeline","save_generation_data","Eclipse"]
+keywords = ["ComfyUI","custom_nodes","workflow","conversion","checkpoint loader","smart loader","smart prompt","smart lml","llm","pipeline","save_generation_data","Eclipse"]
 
 readme = "README.md"
 
