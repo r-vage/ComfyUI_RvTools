@@ -339,12 +339,26 @@ def get_sha256(file_path: str) -> Optional[str]:
         if not Path(file_path).exists():
             cstr(f"Source file not found: {file_path}").error.print()
             return None
-        cstr(f"Calculating SHA-256 for: {Path(file_path).name}").msg.print()
-        hash_obj = hashlib.sha256()
-        with open(file_path, "rb") as f:
-            while chunk := f.read(CHUNK_SIZE):
-                hash_obj.update(chunk)
-        hash_value = hash_obj.hexdigest()
+        
+        # Calculate hash using centralized function (with custom progress prefix)
+        from ..core.smartlm_files import calculate_file_hash
+        import sys
+        
+        # Temporarily override the progress prefix for this context
+        file_size = Path(file_path).stat().st_size
+        size_mb = file_size / (1024 * 1024)
+        
+        if file_size > 100 * 1024 * 1024:
+            cstr(f"Calculating SHA-256 for: {Path(file_path).name} ({size_mb:.1f} MB)").msg.print()
+        else:
+            cstr(f"Calculating SHA-256 for: {Path(file_path).name}").msg.print()
+        
+        # Use centralized hash calculation
+        hash_value = calculate_file_hash(Path(file_path), show_progress=False)
+        
+        # Show completion message for large files
+        if file_size > 100 * 1024 * 1024:
+            cstr(f"✓ Hash calculated for {Path(file_path).name}").msg.print()
         HASH_CACHE[cache_key] = hash_value
         try:
             with open(hash_file, "w") as f:
