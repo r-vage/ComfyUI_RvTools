@@ -1423,10 +1423,11 @@ class SmartLMLBase:
         template_info = load_template(template_name)
         
         # Ensure model path exists
-        model_path, model_folder = self.ensure_model_path(template_name)
+        model_path, model_folder, repo_id = self.ensure_model_path(template_name)
         
         # Verify model integrity if loading from local cache
-        repo_id = template_info.get("repo_id", "")
+        if not repo_id:
+            repo_id = template_info.get("repo_id", "")
         if not verify_model_integrity(Path(model_path), repo_id):
             raise RuntimeError(f"Model integrity check failed for {model_path}. The model may be corrupted. Please delete and re-download.")
         
