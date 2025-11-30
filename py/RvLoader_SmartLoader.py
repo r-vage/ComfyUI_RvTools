@@ -727,6 +727,7 @@ class RvLoader_SmartLoader:
                 "gguf_dequant_dtype": (["default", "target", "float32", "float16", "bfloat16"], {"default": "default", "tooltip": "Dequantization dtype"}),
                 "gguf_patch_dtype": (["default", "target", "float32", "float16", "bfloat16"], {"default": "default", "tooltip": "LoRA patch dtype"}),
                 "gguf_patch_on_device": ("BOOLEAN", {"default": False, "label_on": "yes", "label_off": "no", "tooltip": "Apply patches on GPU"}),
+                "model_device": (["auto", "cpu"], {"default": "auto", "tooltip": "Device for model loading (auto: ComfyUI automatic, cpu: force CPU)"}),
                 "configure_clip": ("BOOLEAN", {"default": True, "label_on": "yes", "label_off": "no", "tooltip": "Enable CLIP configuration"}),
                 "configure_vae": ("BOOLEAN", {"default": True, "label_on": "yes", "label_off": "no", "tooltip": "Enable VAE configuration"}),
                 "configure_model_only_lora": ("BOOLEAN", {"default": False, "label_on": "yes", "label_off": "no", "tooltip": "Enable model-only LoRA configuration"}),
@@ -750,8 +751,10 @@ class RvLoader_SmartLoader:
                 "clip_type": (["flux", "sd3", "sdxl", "stable_cascade", "stable_audio", "hunyuan_dit", "mochi", "ltxv", "hunyuan_video", "pixart", "cosmos", "lumina2", "wan", "hidream", "chroma", "ace", "omnigen2", "qwen_image", "hunyuan_image"], {"default": "flux", "tooltip": "CLIP architecture type"}),
                 "enable_clip_layer": ("BOOLEAN", {"default": True, "label_on": "yes", "label_off": "no", "tooltip": "Trim CLIP to specific layer"}),
                 "stop_at_clip_layer": ("INT", {"default": -2, "min": -24, "max": -1, "step": 1, "tooltip": "CLIP layer to stop at"}),
+                "clip_device": (["auto", "cpu"], {"default": "auto", "tooltip": "Device for CLIP loading (auto: ComfyUI automatic, cpu: force CPU)"}),
                 "vae_source": (["Baked", "External"], {"default": "Baked", "tooltip": "VAE source"}),
                 "vae_name": (["None"] + folder_paths.get_filename_list("vae"), {"default": "None", "tooltip": "External VAE file"}),
+                "vae_device": (["auto", "cpu"], {"default": "auto", "tooltip": "Device for VAE loading (auto: ComfyUI automatic, cpu: force CPU)"}),
                 "lora_count": (["1", "2", "3"], {"default": "1", "tooltip": "Number of LoRA slots to configure"}),
                 "lora_switch_1": ("BOOLEAN", {"default": False, "label_on": "ON", "label_off": "OFF", "tooltip": "Enable LoRA 1"}),
                 "lora_name_1": (loras, {"default": "None", "tooltip": "LoRA 1 file"}),
@@ -806,6 +809,15 @@ class RvLoader_SmartLoader:
         gguf_dequant_dtype = kwargs.get('gguf_dequant_dtype', 'default')
         gguf_patch_dtype = kwargs.get('gguf_patch_dtype', 'default')
         gguf_patch_on_device = kwargs.get('gguf_patch_on_device', False)
+        
+        model_device = kwargs.get('model_device', 'auto')
+        clip_device = kwargs.get('clip_device', 'auto')
+        vae_device = kwargs.get('vae_device', 'auto')
+        
+        # Resolve device selections
+        resolved_model_device = mm.get_torch_device() if model_device == "auto" else torch.device("cpu")
+        resolved_clip_device = mm.text_encoder_device() if clip_device == "auto" else torch.device("cpu")
+        resolved_vae_device = mm.vae_device() if vae_device == "auto" else torch.device("cpu")
         
         configure_clip = kwargs.get('configure_clip', True)
         configure_vae = kwargs.get('configure_vae', True)
@@ -1021,12 +1033,30 @@ class RvLoader_SmartLoader:
                 raise RuntimeError(f"Checkpoint file not readable: {ckpt_path}")
             
             # Load checkpoint with conditional outputs
-            loaded_ckpt = comfy.sd.load_checkpoint_guess_config(
-                ckpt_path,
-                output_vae=use_baked_vae if configure_vae else False,
-                output_clip=use_baked_clip if configure_clip else False,
-                embedding_directory=folder_paths.get_folder_paths("embeddings"),
-            )
+            # Temporarily override device settings if forcing CPU
+            original_unet_device = mm.unet_offload_device
+            original_text_device = mm.text_encoder_device
+            original_vae_device = mm.vae_device
+            
+            if model_device == "cpu":
+                mm.unet_offload_device = lambda: torch.device("cpu")
+            if clip_device == "cpu" and (configure_clip and use_baked_clip):
+                mm.text_encoder_device = lambda: torch.device("cpu")
+            if vae_device == "cpu" and (configure_vae and use_baked_vae):
+                mm.vae_device = lambda: torch.device("cpu")
+            
+            try:
+                loaded_ckpt = comfy.sd.load_checkpoint_guess_config(
+                    ckpt_path,
+                    output_vae=use_baked_vae if configure_vae else False,
+                    output_clip=use_baked_clip if configure_clip else False,
+                    embedding_directory=folder_paths.get_folder_paths("embeddings"),
+                )
+            finally:
+                # Restore original device functions
+                mm.unet_offload_device = original_unet_device
+                mm.text_encoder_device = original_text_device
+                mm.vae_device = original_vae_device
             
             checkpoint_name = ckpt_name
             ckpt_parts = loaded_ckpt[:3] if hasattr(loaded_ckpt, '__len__') and len(loaded_ckpt) >= 3 else None
@@ -1302,11 +1332,19 @@ class RvLoader_SmartLoader:
                 }
                 resolved_clip_type = clip_type_map.get(clip_type, comfy.sd.CLIPType.STABLE_DIFFUSION)
                 
-                loaded_clip = comfy.sd.load_clip(
-                    ckpt_paths=clip_paths,
-                    embedding_directory=folder_paths.get_folder_paths("embeddings"),
-                    clip_type=resolved_clip_type,
-                )
+                # Temporarily override device function if forcing CPU
+                original_text_device = mm.text_encoder_device
+                if clip_device == "cpu":
+                    mm.text_encoder_device = lambda: torch.device("cpu")
+                
+                try:
+                    loaded_clip = comfy.sd.load_clip(
+                        ckpt_paths=clip_paths,
+                        embedding_directory=folder_paths.get_folder_paths("embeddings"),
+                        clip_type=resolved_clip_type,
+                    )
+                finally:
+                    mm.text_encoder_device = original_text_device
         
         # ============================================================
         # STEP 3: Load VAE (if configured)
@@ -1336,8 +1374,16 @@ class RvLoader_SmartLoader:
                 else:
                     vae_path = folder_paths.get_full_path("vae", vae_name)
                     if vae_path and os.path.isfile(vae_path):
-                        vae_sd = comfy.utils.load_torch_file(vae_path)
-                        loaded_vae = comfy.sd.VAE(sd=vae_sd)
+                        # Temporarily override device function if forcing CPU
+                        original_vae_device = mm.vae_device
+                        if vae_device == "cpu":
+                            mm.vae_device = lambda: torch.device("cpu")
+                        
+                        try:
+                            vae_sd = comfy.utils.load_torch_file(vae_path)
+                            loaded_vae = comfy.sd.VAE(sd=vae_sd)
+                        finally:
+                            mm.vae_device = original_vae_device
                     else:
                         cstr(f"Warning: VAE file '{vae_name}' not found").warning.print()
         

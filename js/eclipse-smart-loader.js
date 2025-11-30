@@ -462,6 +462,11 @@ app.registerExtension({
                 setWidgetVisible("gguf_patch_dtype", isGGUF);
                 setWidgetVisible("gguf_patch_on_device", isGGUF);
                 
+                // Device Selection
+                setWidgetVisible("model_device", true); // Always visible
+                setWidgetVisible("clip_device", configureClip);
+                setWidgetVisible("vae_device", configureVae);
+                
                 // CLIP Configuration
                 setWidgetVisible("clip_source", configureClip);
                 setWidgetVisible("clip_count", configureClip && useExternalClip);
