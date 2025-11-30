@@ -186,14 +186,8 @@ app.registerExtension({
                                 const seedWidget = node.widgets?.find(w => w.name === "seed");
                                 const populatedWidget = node.widgets?.find(w => w.name === "populated_text");
                                 
-                                const modeIndex = node.widgets.indexOf(modeWidget);
                                 const seedIndex = node.widgets.indexOf(seedWidget);
                                 const populatedIndex = node.widgets.indexOf(populatedWidget);
-                                
-                                // If in populate mode, save as fixed mode with actual values for reproducibility
-                                if (modeIndex >= 0 && modeWidget?.value === "populate") {
-                                    workflowNode.widgets_values[modeIndex] = "fixed";
-                                }
                                 
                                 // Save the actual seed used (not the special seed value)
                                 if (seedIndex >= 0) {
@@ -836,21 +830,21 @@ app.registerExtension({
             }
             
             // Apply correct UI state based on mode
-            const currentMode = modeWidget?.value;
-            
-            if (currentMode === "fixed" && populatedWidget) {
-                populatedWidget.disabled = false;
-                if (populatedWidget.element) {
-                    populatedWidget.element.style.opacity = "1.0";
-                    populatedWidget.element.style.cursor = "text";
-                }
-            } else if (currentMode === "populate" && populatedWidget) {
-                populatedWidget.disabled = true;
-                if (populatedWidget.element) {
-                    populatedWidget.element.style.opacity = "0.85";
-                    populatedWidget.element.style.cursor = "not-allowed";
-                }
-            }
+            // const currentMode = modeWidget?.value;
+            // 
+            // if (currentMode === "fixed" && populatedWidget) {
+            //     populatedWidget.disabled = false;
+            //     if (populatedWidget.element) {
+            //         populatedWidget.element.style.opacity = "1.0";
+            //         populatedWidget.element.style.cursor = "text";
+            //     }
+            // } else if (currentMode === "populate" && populatedWidget) {
+            //     populatedWidget.disabled = true;
+            //     if (populatedWidget.element) {
+            //         populatedWidget.element.style.opacity = "0.85";
+            //         populatedWidget.element.style.cursor = "not-allowed";
+            //     }
+            // }
             
             // Update seed button states
             if (node.updateSeedButtonStates) {
