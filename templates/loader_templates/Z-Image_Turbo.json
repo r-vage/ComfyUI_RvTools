@@ -1,0 +1,22 @@
+{
+  "model_type": "UNet Model",
+  "configure_clip": true,
+  "configure_vae": true,
+  "configure_latent": true,
+  "configure_sampler": true,
+  "configure_model_only_lora": false,
+  "configure_model_sampling": false,
+  "unet_name": "z_image_turbo_bf16.safetensors",
+  "weight_dtype": "default",
+  "clip_source": "External",
+  "clip_count": "1",
+  "clip_type": "lumina2",
+  "clip_name1": "qwen_3_4b.safetensors",
+  "vae_source": "External",
+  "vae_name": "zImage_vae.safetensors",
+  "resolution": "832x1216 (2:3 Flux, SDXL)",
+  "sampler_name": "euler",
+  "scheduler": "simple",
+  "steps": 9,
+  "cfg": 1.0
+}
