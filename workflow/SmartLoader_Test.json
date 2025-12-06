@@ -2,7 +2,7 @@
   "id": "ca9f482b-6095-4963-8406-dc8d9a75a650",
   "revision": 0,
   "last_node_id": 24,
-  "last_link_id": 32,
+  "last_link_id": 34,
   "nodes": [
     {
       "id": 12,
@@ -194,14 +194,14 @@
           "localized_name": "pipe",
           "name": "pipe",
           "type": "pipe",
-          "link": 29
+          "link": 34
         },
         {
           "localized_name": "latent",
           "name": "latent",
           "shape": 7,
           "type": "LATENT",
-          "link": 32
+          "link": 33
         }
       ],
       "outputs": [
@@ -1051,6 +1051,320 @@
       "shape": 1
     },
     {
+      "id": 8,
+      "type": "VAEDecode",
+      "pos": [
+        1209,
+        188
+      ],
+      "size": [
+        210,
+        46
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "samples",
+          "name": "samples",
+          "type": "LATENT",
+          "link": 7
+        },
+        {
+          "localized_name": "vae",
+          "name": "vae",
+          "type": "VAE",
+          "link": 14
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "IMAGE",
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "slot_index": 0,
+          "links": [
+            27
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.75",
+        "Node name for S&R": "VAEDecode"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 22,
+      "type": "Any Passer Purge [Eclipse]",
+      "pos": [
+        1212,
+        288
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "input",
+          "name": "input",
+          "type": "IMAGE",
+          "link": 27
+        },
+        {
+          "localized_name": "Purge_VRAM",
+          "name": "Purge_VRAM",
+          "type": "BOOLEAN",
+          "widget": {
+            "name": "Purge_VRAM"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "*",
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            28
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "ComfyUI_Eclipse",
+        "ver": "3c906c05eaee7bfb085cb2b6a5c2f516f71c9c7d",
+        "Node name for S&R": "Any Passer Purge [Eclipse]"
+      },
+      "widgets_values": [
+        true
+      ],
+      "color": "#4e4e4e",
+      "bgcolor": "#3a3a3a",
+      "shape": 1
+    },
+    {
+      "id": 23,
+      "type": "ConditioningZeroOut",
+      "pos": [
+        606,
+        75
+      ],
+      "size": [
+        197.66666412353516,
+        26
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "conditioning",
+          "name": "conditioning",
+          "type": "CONDITIONING",
+          "link": 30
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "CONDITIONING",
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            31
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.75",
+        "Node name for S&R": "ConditioningZeroOut"
+      },
+      "widgets_values": []
+    },
+    {
+      "id": 7,
+      "type": "CLIPTextEncode",
+      "pos": [
+        413,
+        389
+      ],
+      "size": [
+        425.27801513671875,
+        180.6060791015625
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 4,
+      "inputs": [
+        {
+          "localized_name": "clip",
+          "name": "clip",
+          "type": "CLIP",
+          "link": 12
+        },
+        {
+          "localized_name": "text",
+          "name": "text",
+          "type": "STRING",
+          "widget": {
+            "name": "text"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "CONDITIONING",
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "slot_index": 0,
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.75",
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        "text, watermark"
+      ]
+    },
+    {
+      "id": 24,
+      "type": "EmptyFlux2LatentImage",
+      "pos": [
+        51,
+        799
+      ],
+      "size": [
+        210,
+        106
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "width",
+          "name": "width",
+          "type": "INT",
+          "widget": {
+            "name": "width"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "height",
+          "name": "height",
+          "type": "INT",
+          "widget": {
+            "name": "height"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "batch_size",
+          "name": "batch_size",
+          "type": "INT",
+          "widget": {
+            "name": "batch_size"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "LATENT",
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": []
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.75",
+        "Node name for S&R": "EmptyFlux2LatentImage"
+      },
+      "widgets_values": [
+        832,
+        1248,
+        1
+      ]
+    },
+    {
+      "id": 5,
+      "type": "EmptyLatentImage",
+      "pos": [
+        48,
+        633
+      ],
+      "size": [
+        214,
+        106
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "localized_name": "width",
+          "name": "width",
+          "type": "INT",
+          "widget": {
+            "name": "width"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "height",
+          "name": "height",
+          "type": "INT",
+          "widget": {
+            "name": "height"
+          },
+          "link": null
+        },
+        {
+          "localized_name": "batch_size",
+          "name": "batch_size",
+          "type": "INT",
+          "widget": {
+            "name": "batch_size"
+          },
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "localized_name": "LATENT",
+          "name": "LATENT",
+          "type": "LATENT",
+          "slot_index": 0,
+          "links": [
+            33
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.3.75",
+        "Node name for S&R": "EmptyLatentImage"
+      },
+      "widgets_values": [
+        832,
+        1248,
+        1
+      ]
+    },
+    {
       "id": 20,
       "type": "Smart Loader [Eclipse]",
       "pos": [
@@ -1062,7 +1376,7 @@
         495
       ],
       "flags": {},
-      "order": 1,
+      "order": 3,
       "mode": 0,
       "inputs": [
         {
@@ -1602,7 +1916,9 @@
           "localized_name": "pipe",
           "name": "pipe",
           "type": "pipe",
-          "links": []
+          "links": [
+            34
+          ]
         }
       ],
       "properties": {
@@ -1676,105 +1992,6 @@
       "shape": 1
     },
     {
-      "id": 8,
-      "type": "VAEDecode",
-      "pos": [
-        1209,
-        188
-      ],
-      "size": [
-        210,
-        46
-      ],
-      "flags": {},
-      "order": 10,
-      "mode": 0,
-      "inputs": [
-        {
-          "localized_name": "samples",
-          "name": "samples",
-          "type": "LATENT",
-          "link": 7
-        },
-        {
-          "localized_name": "vae",
-          "name": "vae",
-          "type": "VAE",
-          "link": 14
-        }
-      ],
-      "outputs": [
-        {
-          "localized_name": "IMAGE",
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "slot_index": 0,
-          "links": [
-            27
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.3.75",
-        "Node name for S&R": "VAEDecode"
-      },
-      "widgets_values": []
-    },
-    {
-      "id": 22,
-      "type": "Any Passer Purge [Eclipse]",
-      "pos": [
-        1212,
-        288
-      ],
-      "size": [
-        210,
-        58
-      ],
-      "flags": {},
-      "order": 11,
-      "mode": 0,
-      "inputs": [
-        {
-          "localized_name": "input",
-          "name": "input",
-          "type": "IMAGE",
-          "link": 27
-        },
-        {
-          "localized_name": "Purge_VRAM",
-          "name": "Purge_VRAM",
-          "type": "BOOLEAN",
-          "widget": {
-            "name": "Purge_VRAM"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "localized_name": "*",
-          "name": "IMAGE",
-          "type": "IMAGE",
-          "links": [
-            28
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "ComfyUI_Eclipse",
-        "ver": "3c906c05eaee7bfb085cb2b6a5c2f516f71c9c7d",
-        "Node name for S&R": "Any Passer Purge [Eclipse]"
-      },
-      "widgets_values": [
-        true
-      ],
-      "color": "#4e4e4e",
-      "bgcolor": "#3a3a3a",
-      "shape": 1
-    },
-    {
       "id": 16,
       "type": "Smart Loader Basic [Eclipse]",
       "pos": [
@@ -1783,10 +2000,10 @@
       ],
       "size": [
         308,
-        471
+        567
       ],
       "flags": {},
-      "order": 2,
+      "order": 4,
       "mode": 0,
       "inputs": [
         {
@@ -2119,9 +2336,7 @@
           "localized_name": "pipe",
           "name": "pipe",
           "type": "pipe",
-          "links": [
-            29
-          ]
+          "links": []
         }
       ],
       "properties": {
@@ -2141,7 +2356,7 @@
         false,
         true,
         true,
-        false,
+        true,
         "External",
         "1",
         "mistral_3_small_flux2_fp8.safetensors",
@@ -2156,9 +2371,9 @@
         "flux2-vae.safetensors",
         "cpu",
         "1",
-        false,
-        "None",
-        1,
+        true,
+        "flux\\Flux__Semi-realistic_art_style-000004.safetensors",
+        0.45,
         false,
         "None",
         1,
@@ -2170,69 +2385,6 @@
       "color": "#4e4e4e",
       "bgcolor": "#3a3a3a",
       "shape": 1
-    },
-    {
-      "id": 5,
-      "type": "EmptyLatentImage",
-      "pos": [
-        48,
-        633
-      ],
-      "size": [
-        214,
-        106
-      ],
-      "flags": {},
-      "order": 3,
-      "mode": 0,
-      "inputs": [
-        {
-          "localized_name": "width",
-          "name": "width",
-          "type": "INT",
-          "widget": {
-            "name": "width"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "height",
-          "name": "height",
-          "type": "INT",
-          "widget": {
-            "name": "height"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "batch_size",
-          "name": "batch_size",
-          "type": "INT",
-          "widget": {
-            "name": "batch_size"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "localized_name": "LATENT",
-          "name": "LATENT",
-          "type": "LATENT",
-          "slot_index": 0,
-          "links": []
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.3.75",
-        "Node name for S&R": "EmptyLatentImage"
-      },
-      "widgets_values": [
-        832,
-        1248,
-        1
-      ]
     },
     {
       "id": 6,
@@ -2283,158 +2435,7 @@
         "Node name for S&R": "CLIPTextEncode"
       },
       "widgets_values": [
-        "beautiful scenery nature glass bottle landscape, , purple galaxy bottle,"
-      ]
-    },
-    {
-      "id": 23,
-      "type": "ConditioningZeroOut",
-      "pos": [
-        606,
-        75
-      ],
-      "size": [
-        197.66666412353516,
-        26
-      ],
-      "flags": {},
-      "order": 8,
-      "mode": 0,
-      "inputs": [
-        {
-          "localized_name": "conditioning",
-          "name": "conditioning",
-          "type": "CONDITIONING",
-          "link": 30
-        }
-      ],
-      "outputs": [
-        {
-          "localized_name": "CONDITIONING",
-          "name": "CONDITIONING",
-          "type": "CONDITIONING",
-          "links": [
-            31
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.3.75",
-        "Node name for S&R": "ConditioningZeroOut"
-      }
-    },
-    {
-      "id": 7,
-      "type": "CLIPTextEncode",
-      "pos": [
-        413,
-        389
-      ],
-      "size": [
-        425.27801513671875,
-        180.6060791015625
-      ],
-      "flags": {},
-      "order": 7,
-      "mode": 4,
-      "inputs": [
-        {
-          "localized_name": "clip",
-          "name": "clip",
-          "type": "CLIP",
-          "link": 12
-        },
-        {
-          "localized_name": "text",
-          "name": "text",
-          "type": "STRING",
-          "widget": {
-            "name": "text"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "localized_name": "CONDITIONING",
-          "name": "CONDITIONING",
-          "type": "CONDITIONING",
-          "slot_index": 0,
-          "links": []
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.3.75",
-        "Node name for S&R": "CLIPTextEncode"
-      },
-      "widgets_values": [
-        "text, watermark"
-      ]
-    },
-    {
-      "id": 24,
-      "type": "EmptyFlux2LatentImage",
-      "pos": [
-        51,
-        799
-      ],
-      "size": [
-        210,
-        106
-      ],
-      "flags": {},
-      "order": 4,
-      "mode": 0,
-      "inputs": [
-        {
-          "localized_name": "width",
-          "name": "width",
-          "type": "INT",
-          "widget": {
-            "name": "width"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "height",
-          "name": "height",
-          "type": "INT",
-          "widget": {
-            "name": "height"
-          },
-          "link": null
-        },
-        {
-          "localized_name": "batch_size",
-          "name": "batch_size",
-          "type": "INT",
-          "widget": {
-            "name": "batch_size"
-          },
-          "link": null
-        }
-      ],
-      "outputs": [
-        {
-          "localized_name": "LATENT",
-          "name": "LATENT",
-          "type": "LATENT",
-          "links": [
-            32
-          ]
-        }
-      ],
-      "properties": {
-        "cnr_id": "comfy-core",
-        "ver": "0.3.75",
-        "Node name for S&R": "EmptyFlux2LatentImage"
-      },
-      "widgets_values": [
-        832,
-        1248,
-        1
+        "a beautiful woman, "
       ]
     }
   ],
@@ -2512,14 +2513,6 @@
       "IMAGE"
     ],
     [
-      29,
-      16,
-      0,
-      11,
-      0,
-      "pipe"
-    ],
-    [
       30,
       6,
       0,
@@ -2536,22 +2529,30 @@
       "CONDITIONING"
     ],
     [
-      32,
-      24,
+      33,
+      5,
       0,
       11,
       1,
       "LATENT"
+    ],
+    [
+      34,
+      20,
+      0,
+      11,
+      0,
+      "pipe"
     ]
   ],
   "groups": [],
   "config": {},
   "extra": {
     "ds": {
-      "scale": 0.9090909090909091,
+      "scale": 1.331000000000001,
       "offset": [
-        1116.0071280115094,
-        305.8692462421461
+        -310.8700230132647,
+        16.123618879774995
       ]
     }
   },
