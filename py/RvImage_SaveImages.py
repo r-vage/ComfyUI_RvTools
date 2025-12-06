@@ -340,25 +340,12 @@ def get_sha256(file_path: str) -> Optional[str]:
             cstr(f"Source file not found: {file_path}").error.print()
             return None
         
-        # Calculate hash using centralized function (with custom progress prefix)
+        # Calculate hash using centralized function with progress display
         from ..core.smartlm_files import calculate_file_hash
-        import sys
         
-        # Temporarily override the progress prefix for this context
-        file_size = Path(file_path).stat().st_size
-        size_mb = file_size / (1024 * 1024)
+        # Use centralized hash calculation with progress enabled
+        hash_value = calculate_file_hash(Path(file_path), show_progress=True)
         
-        if file_size > 100 * 1024 * 1024:
-            cstr(f"Calculating SHA-256 for: {Path(file_path).name} ({size_mb:.1f} MB)").msg.print()
-        else:
-            cstr(f"Calculating SHA-256 for: {Path(file_path).name}").msg.print()
-        
-        # Use centralized hash calculation
-        hash_value = calculate_file_hash(Path(file_path), show_progress=False)
-        
-        # Show completion message for large files
-        if file_size > 100 * 1024 * 1024:
-            cstr(f"✓ Hash calculated for {Path(file_path).name}").msg.print()
         HASH_CACHE[cache_key] = hash_value
         try:
             with open(hash_file, "w") as f:
@@ -634,6 +621,8 @@ def save_json(image_info, filename):
 class RvImage_SaveImages:
     def __init__(self):
         self.output_dir = folder_paths.output_directory
+        self._search_dirs_cache = None
+        self._upscale_dirs_cache = None
         self.civitai_sampler_map = {
             'euler_ancestral': 'Euler a',
             'euler': 'Euler',
@@ -656,6 +645,34 @@ class RvImage_SaveImages:
         }
         self.type = 'output'
 
+    def _deduplicate_models(self, model_string):
+        """Deduplicate comma-separated model list while preserving order."""
+        if not model_string or model_string in (None, '', 'undefined', 'none'):
+            return []
+        models = model_string.split(', ')
+        seen = set()
+        unique_models = []
+        for model in models:
+            model_stripped = model.strip()
+            model_normalized = return_filename_without_extension(model_stripped).lower()
+            if model_normalized and model_normalized not in seen:
+                seen.add(model_normalized)
+                unique_models.append(model_stripped)
+        return unique_models
+
+    def _get_search_directories(self):
+        """Cache and return model search directories."""
+        if self._search_dirs_cache is None:
+            self._search_dirs_cache = []
+            for key in ["checkpoints", "diffusion_models", "unet", "upscale_models"]:
+                self._search_dirs_cache.extend(folder_paths.get_folder_paths(key))
+        return self._search_dirs_cache
+
+    def _get_upscale_directories(self):
+        """Cache and return upscale model directories."""
+        if self._upscale_dirs_cache is None:
+            self._upscale_dirs_cache = set(folder_paths.get_folder_paths("upscale_models"))
+        return self._upscale_dirs_cache
 
     def get_civitai_sampler_name(self, sampler_name, scheduler):
         # based on: https://github.com/civitai/civitai/blob/main/src/server/common/constants.ts#L122
@@ -855,27 +872,13 @@ class RvImage_SaveImages:
             modelhash: Optional[str] = ""
             vae_hash: Optional[str] = ""
 
-            if not model_name in (None, '', 'undefined', 'none'):
-                if model_name is not None:
-                    # Split and deduplicate models while preserving order
-                    models = model_name.split(', ')
-                    seen = set()
-                    unique_models = []
-                    for model in models:
-                        model_stripped = model.strip()
-                        # Use normalized name (without extension) for dedup comparison
-                        model_normalized = return_filename_without_extension(model_stripped).lower()
-                        if model_normalized and model_normalized not in seen:
-                            seen.add(model_normalized)
-                            unique_models.append(model_stripped)
-                    
-                    models = unique_models
-                    
-                    # Get first model for basemodel
-                    if models and models[0]:
-                        first_model = models[0].strip()
-                        global_values['basemodel'] = return_filename_without_extension(first_model)
-                        global_values['model'] = first_model
+            # Process model names
+            models = self._deduplicate_models(model_name)
+            if models:
+                # Set global values from first model
+                first_model = models[0]
+                global_values['basemodel'] = return_filename_without_extension(first_model)
+                global_values['model'] = first_model
 
                 import glob
 
@@ -885,7 +888,7 @@ class RvImage_SaveImages:
                             pattern = os.path.join(search_dir, '**', model if model.lower().endswith(ext) else model + ext)
                             matches = glob.glob(pattern, recursive=True)
                             if matches:
-                                return matches[0], search_dir  # Return both path and directory
+                                return matches[0], search_dir
                     if os.path.exists(model):
                         return model, None
                     for ext in extensions:
@@ -894,60 +897,37 @@ class RvImage_SaveImages:
                             return candidate, None
                     return None, None
 
-                search_dirs = []
-                for key in ["checkpoints", "diffusion_models", "unet", "upscale_models"]:
-                    search_dirs.extend(folder_paths.get_folder_paths(key))
+                search_dirs = self._get_search_directories()
                 extensions = ['.safetensors', '.pt', '.pth', '.ckpt', '.bin', '.gguf']
-
-                # Get upscale model directories for accurate detection
-                upscale_model_dirs = set(folder_paths.get_folder_paths("upscale_models"))
+                upscale_model_dirs = self._get_upscale_directories()
 
                 for model in models:
-                    if not model in (None, '', 'undefined', 'none'):
-                        model_path, model_dir = find_model_file(model, search_dirs, extensions)
-                        modelhash = None
-                        if model_path and os.path.exists(model_path):
-                            modelhash = get_sha256(model_path)
-                            if modelhash:
-                                modelhash = modelhash[:10]
-                        else:
-                            cstr(f"Model file not found for hash: {model} (path: {model_path}, dir: {model_dir})").warning.print()
-                        if modelhash not in (None, '', 'undefined', 'none'):
+                    model_path, model_dir = find_model_file(model, search_dirs, extensions)
+                    if model_path and os.path.exists(model_path):
+                        modelhash = get_sha256(model_path)
+                        if modelhash:
+                            modelhash = modelhash[:10]
                             # Determine key format based on model type
                             if model_dir and model_dir in upscale_model_dirs:
-                                # Upscale models use filename without extension as key
                                 model_key = return_filename_without_extension(model)
                                 cstr(f"Processing upscale model: {model} -> key: {model_key}, hash: {modelhash}").debug.print()
                             else:
-                                # Checkpoints/diffusion models use Civitai format
                                 model_key = civitai_model_key_name(return_filename_without_extension(model))
                                 cstr(f"Processing checkpoint model: {model} -> key: {model_key}, hash: {modelhash}").debug.print()
                             model_string[model_key] = modelhash
+                    else:
+                        cstr(f"Model file not found for hash: {model} (path: {model_path}, dir: {model_dir})").warning.print()
 
-            if not vae_name in (None, '', 'undefined', 'none'):
-                if vae_name is not None:
-                    # Split and deduplicate VAE models while preserving order
-                    models = vae_name.split(', ')
-                    seen = set()
-                    unique_models = []
-                    for model in models:
-                        model_stripped = model.strip()
-                        model_normalized = return_filename_without_extension(model_stripped).lower()
-                        if model_normalized and model_normalized not in seen:
-                            seen.add(model_normalized)
-                            unique_models.append(model_stripped)
-                    
-                    models = unique_models
-                    
-                    for model in models:
-                        if not model in (None, '', 'undefined', 'none'):
-                            vae_full_path = folder_paths.get_full_path("vae", model)
-                            if not vae_full_path in (None, '', 'undefined', 'none'):
-                                sha_result = get_sha256(vae_full_path)
-                                vae_hash = sha_result[:10] if sha_result else None
-                            if not vae_hash in (None, '', 'undefined', 'none'):
-                                vae_file = return_filename_without_extension(model)
-                                model_string[vae_file] = vae_hash
+            # Process VAE names
+            vae_models = self._deduplicate_models(vae_name)
+            for model in vae_models:
+                vae_full_path = folder_paths.get_full_path("vae", model)
+                if vae_full_path:
+                    sha_result = get_sha256(vae_full_path)
+                    if sha_result:
+                        vae_hash = sha_result[:10]
+                        vae_file = return_filename_without_extension(model)
+                        model_string[vae_file] = vae_hash
 
             # Build positive_for_meta and metadata extractor
             if not lora_names in (None, '', 'undefined', 'none'):
@@ -968,11 +948,9 @@ class RvImage_SaveImages:
             embeddings = metadata_extractor.get_embeddings()
             loras = metadata_extractor.get_loras()
 
-            if not sampler_name in (None, '', 'undefined', 'none'):
-                if sampler_name is not None:
-                    civitai_sampler_name = self.get_civitai_sampler_name(sampler_name.replace('_gpu', ''), scheduler)
-                else:
-                    civitai_sampler_name = "Euler Simple"
+            # Get civitai sampler name
+            if sampler_name and sampler_name not in (None, '', 'undefined', 'none'):
+                civitai_sampler_name = self.get_civitai_sampler_name(sampler_name.replace('_gpu', ''), scheduler)
             else:
                 civitai_sampler_name = "Euler Simple"
 
@@ -1012,73 +990,52 @@ class RvImage_SaveImages:
                     pass
                 return str(v)
             
+            # Build A1111 parameters string
+            steps_str = _val_to_str(steps)
+            cfg_str = _val_to_str(cfg)
+            seed_str = _val_to_str(seed_value)
+            
             if not remove_prompts:
-                positive_a111_params = handle_whitespace(positive_for_meta)
-                negative_a111_params = f"\nNegative prompt: {handle_whitespace(negative)}"
-
-                steps_str = _val_to_str(steps)
-                cfg_str = _val_to_str(cfg)
-                seed_str = _val_to_str(seed_value)
-
-                a111_params = f"{positive_a111_params}{negative_a111_params}\nSteps: {steps_str}, Sampler: {civitai_sampler_name}, CFG scale: {cfg_str}, Seed: {seed_str}, Size: {width}x{height}{clip_skip_segment}, Hashes: {extension_hashes}, Version: ComfyUI"
+                a111_params = f"{handle_whitespace(positive_for_meta)}\nNegative prompt: {handle_whitespace(negative)}\nSteps: {steps_str}, Sampler: {civitai_sampler_name}, CFG scale: {cfg_str}, Seed: {seed_str}, Size: {width}x{height}{clip_skip_segment}, Hashes: {extension_hashes}, Version: ComfyUI"
             else:
-                positive_a111_params = ''
-                negative_a111_params = f"\nNegative prompt: "
-                steps_str = _val_to_str(steps)
-                cfg_str = _val_to_str(cfg)
-                seed_str = _val_to_str(seed_value)
-                a111_params = f"{positive_a111_params}{negative_a111_params}\nSteps: {steps_str}, Sampler: {civitai_sampler_name}, CFG scale: {cfg_str}, Seed: {seed_str}, Size: {width}x{height}, Clip skip: {clip_skip_meta}, Hashes: {extension_hashes}, Version: ComfyUI"
+                a111_params = f"\nNegative prompt: \nSteps: {steps_str}, Sampler: {civitai_sampler_name}, CFG scale: {cfg_str}, Seed: {seed_str}, Size: {width}x{height}, Clip skip: {clip_skip_meta}, Hashes: {extension_hashes}, Version: ComfyUI"
 
         delimiter = filename_delimiter
 
-        # Store original images tensor for return value
-        original_images_tensor = images
-
-        # If no images were passed directly, require the pipe to supply images
+        # Handle image source (direct or from pipe)
         if images is None and pipe_opt is not None:
-            # ctx should be set earlier when pipe_opt is processed
             try:
                 pipe_images = ctx.get("images") if isinstance(ctx, dict) else None
             except Exception:
                 pipe_images = None
 
-            # Explicit emptiness checks to avoid ambiguous truthiness on tensors/arrays
             if pipe_images is None:
                 raise RuntimeError("RvImage_SaveImages: pipe_opt provided but contains no 'images' data. Provide images via the 'images' input or include an 'images' key in the pipe.")
 
-            # Store the original tensor for return value
-            original_images_tensor = pipe_images
-
-            # Normalize common container types into a list of per-image objects
+            # Normalize to list of images
             if isinstance(pipe_images, torch.Tensor):
-                # Tensor may be (N, C, H, W) or (C, H, W)
                 if pipe_images.numel() == 0:
                     raise RuntimeError("RvImage_SaveImages: pipe_opt provided but contains an empty tensor for 'images'.")
-                if pipe_images.dim() == 4:
-                    images = [pipe_images[i] for i in range(pipe_images.size(0))]
-                else:
-                    images = [pipe_images]
+                images = [pipe_images[i] for i in range(pipe_images.size(0))] if pipe_images.dim() == 4 else [pipe_images]
+                original_images_tensor = pipe_images
             elif isinstance(pipe_images, np.ndarray):
                 if pipe_images.size == 0:
                     raise RuntimeError("RvImage_SaveImages: pipe_opt provided but contains an empty numpy array for 'images'.")
-                if pipe_images.ndim == 4:
-                    images = [pipe_images[i] for i in range(pipe_images.shape[0])]
-                else:
-                    images = [pipe_images]
+                images = [pipe_images[i] for i in range(pipe_images.shape[0])] if pipe_images.ndim == 4 else [pipe_images]
+                original_images_tensor = pipe_images
             elif isinstance(pipe_images, (list, tuple)):
                 if len(pipe_images) == 0:
                     raise RuntimeError("RvImage_SaveImages: pipe_opt provided but contains no 'images' data. Provide images via the 'images' input or include an 'images' key in the pipe.")
                 images = list(pipe_images)
-                # For lists/tuples, we need to stack them back into a tensor for return
                 try:
                     original_images_tensor = torch.stack(images) if len(images) > 1 else images[0]
                 except Exception:
-                    # If stacking fails, keep as list but this may cause issues
                     original_images_tensor = images
             else:
-                # Accept single PIL Image or other single-image objects and wrap into a list
                 images = [pipe_images]
                 original_images_tensor = pipe_images
+        else:
+            original_images_tensor = images
         
         number_padding = filename_number_padding
         lossless_webp = (lossless_webp == True)

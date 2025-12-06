@@ -49,16 +49,9 @@ export { ComfyWidgets } from '../../../scripts/widgets.js';
 // DEPRECATED - Find alternatives before v1.34
 // ============================================================================
 
-/**
- * 🔶 DEPRECATED - Will be removed in v1.34
- * DOM element creation helper
- * 
- * Alternative: Use native DOM methods
- * - document.createElement()
- * - element.classList.add()
- * - element.textContent = "text"
- */
-export { $el } from '../../../scripts/ui.js';
+// No deprecated APIs currently in use!
+// Previously exported $el but it was unused across all Eclipse files.
+// Removed to maintain v1.34+ compatibility.
 
 
 // ============================================================================

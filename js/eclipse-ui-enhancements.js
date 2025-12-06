@@ -14,7 +14,7 @@
 * Includes: Settings, Reroutes, Groups, and Colors
 */
 
-import { app, $el } from './comfy/index.js';
+import { app } from './comfy/index.js';
 
 // ============================================================================
 // COLOR UTILITIES
