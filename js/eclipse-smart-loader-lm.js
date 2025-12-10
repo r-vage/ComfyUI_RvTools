@@ -355,24 +355,31 @@ app.registerExtension({
                 
                 // Model-specific widgets (visible in all modes except Delete and template_name=None)
                 setWidgetVisible("qwen_preset_prompt", showGeneration && isQwenVL);
-                setWidgetVisible("qwen_custom_prompt", showGeneration && isQwenVL && !isTextConnected);
                 
                 setWidgetVisible("florence_task", showGeneration && isFlorence2);
                 
-                // Florence text input visibility
-                if (showGeneration && isFlorence2 && !isTextConnected) {
-                    const florenceTask = getWidgetValue("florence_task") || "";
-                    const taskNeedsTextInput = florenceTask.includes("grounding") || 
-                                              florenceTask.includes("detection") || 
-                                              florenceTask.includes("ocr") || 
-                                              florenceTask.includes("region") ||
-                                              florenceTask.includes("docvqa");
-                    setWidgetVisible("florence_text_input", taskNeedsTextInput);
+                // Universal user_prompt visibility (replaces qwen_custom_prompt, florence_text_input, llm_prompt)
+                if (showGeneration && !isTextConnected) {
+                    if (isQwenVL) {
+                        setWidgetVisible("user_prompt", true);
+                    } else if (isFlorence2) {
+                        const florenceTask = getWidgetValue("florence_task") || "";
+                        const taskNeedsTextInput = florenceTask.includes("grounding") || 
+                                                  florenceTask.includes("detection") || 
+                                                  florenceTask.includes("ocr") || 
+                                                  florenceTask.includes("region") ||
+                                                  florenceTask.includes("docvqa");
+                        setWidgetVisible("user_prompt", taskNeedsTextInput);
+                    } else if (isLLM) {
+                        setWidgetVisible("user_prompt", true);
+                    } else {
+                        setWidgetVisible("user_prompt", false);
+                    }
                 } else {
-                    setWidgetVisible("florence_text_input", false);
+                    setWidgetVisible("user_prompt", false);
                 }
                 
-                // Florence detection_filter_threshold visibility
+                // Florence detection_filter_threshold and nms_iou_threshold visibility
                 if (showGeneration && isFlorence2) {
                     const florenceTask = getWidgetValue("florence_task") || "";
                     const showFilter = florenceTask.includes("grounding") || 
@@ -380,12 +387,13 @@ app.registerExtension({
                                       florenceTask.includes("ocr") || 
                                       florenceTask.includes("region");
                     setWidgetVisible("detection_filter_threshold", showFilter);
+                    setWidgetVisible("nms_iou_threshold", showFilter);
                 } else {
                     setWidgetVisible("detection_filter_threshold", false);
+                    setWidgetVisible("nms_iou_threshold", false);
                 }
                 
                 setWidgetVisible("llm_instruction_mode", showGeneration && isLLM);
-                setWidgetVisible("llm_prompt", showGeneration && isLLM && !isTextConnected);
                 
                 // LLM custom instruction visibility
                 const llmMode = getWidgetValue("llm_instruction_mode") || "";
@@ -474,9 +482,7 @@ app.registerExtension({
                         setWidgetValue("max_tokens", 512);
                         
                         // Reset model-specific prompts to defaults
-                        setWidgetValue("qwen_custom_prompt", "");
-                        setWidgetValue("florence_text_input", "");
-                        setWidgetValue("llm_prompt", "");
+                        setWidgetValue("user_prompt", "");
                         setWidgetValue("llm_custom_instruction", 'Generate a detailed prompt from "{prompt}"');
                         
                         // Clear loaded template cache
@@ -582,7 +588,39 @@ app.registerExtension({
                 };
             }
             
-            // Hook into model_type widget to update visibility
+            // Function to update local_model dropdown based on model_type filter
+            const updateLocalModelList = async function() {
+                const modelSource = getWidgetValue("model_source");
+                if (modelSource !== "Local") return;
+                
+                const modelType = getWidgetValue("model_type") || "";
+                const localModelWidget = node.widgets?.find(w => w.name === "local_model");
+                if (!localModelWidget) return;
+                
+                try {
+                    const response = await fetch(`/eclipse/smartlm/local_models?model_type=${encodeURIComponent(modelType)}`);
+                    const data = await response.json();
+                    
+                    if (data.models && data.models.length > 0) {
+                        // Store current value
+                        const currentValue = localModelWidget.value;
+                        
+                        // Update options
+                        localModelWidget.options.values = data.models;
+                        
+                        // Restore value if it still exists in filtered list, otherwise use first option
+                        if (data.models.includes(currentValue)) {
+                            localModelWidget.value = currentValue;
+                        } else {
+                            localModelWidget.value = data.models[0];
+                        }
+                    }
+                } catch (error) {
+                    console.error("[SmartLM] Error fetching filtered local models:", error);
+                }
+            };
+            
+            // Hook into model_type widget to update visibility and filter local models
             const modelTypeWidget = node.widgets?.find(w => w.name === "model_type");
             if (modelTypeWidget) {
                 const originalTypeCallback = modelTypeWidget.callback;
@@ -599,10 +637,11 @@ app.registerExtension({
                     // They're simply ignored by Python code when not applicable
                     
                     updateVisibility();
+                    updateLocalModelList();
                 };
             }
             
-            // Hook into model_source widget to show/hide model input fields
+            // Hook into model_source widget to show/hide model input fields and update list
             const modelSourceWidget = node.widgets?.find(w => w.name === "model_source");
             if (modelSourceWidget) {
                 const originalSourceCallback = modelSourceWidget.callback;
@@ -611,6 +650,7 @@ app.registerExtension({
                         originalSourceCallback.apply(this, arguments);
                     }
                     updateVisibility();
+                    updateLocalModelList();
                 };
             }
             
@@ -881,9 +921,9 @@ app.registerExtension({
                                 }
                             }
                             if (config.default_text_input !== undefined && detectedType === "florence2") {
-                                const florenceTextWidget = node.widgets?.find(w => w.name === "florence_text_input");
-                                if (florenceTextWidget) {
-                                    florenceTextWidget.value = config.default_text_input;
+                                const userPromptWidget = node.widgets?.find(w => w.name === "user_prompt");
+                                if (userPromptWidget) {
+                                    userPromptWidget.value = config.default_text_input;
                                 }
                             }
                             
@@ -893,6 +933,15 @@ app.registerExtension({
                                 if (detectionThresholdWidget) {
                                     detectionThresholdWidget.value = config.detection_filter_threshold;
                                     console.log(`[SmartLM] Loaded detection_filter_threshold=${config.detection_filter_threshold} from template`);
+                                }
+                            }
+                            
+                            // Florence-2: Load nms_iou_threshold if saved in template
+                            if (config.nms_iou_threshold !== undefined && detectedType === "florence2") {
+                                const nmsThresholdWidget = node.widgets?.find(w => w.name === "nms_iou_threshold");
+                                if (nmsThresholdWidget) {
+                                    nmsThresholdWidget.value = config.nms_iou_threshold;
+                                    console.log(`[SmartLM] Loaded nms_iou_threshold=${config.nms_iou_threshold} from template`);
                                 }
                             }
                             
@@ -908,9 +957,9 @@ app.registerExtension({
                                 }
                             }
                             if (config.default_text_input !== undefined && detectedType === "qwenvl") {
-                                const qwenCustomWidget = node.widgets?.find(w => w.name === "qwen_custom_prompt");
-                                if (qwenCustomWidget) {
-                                    qwenCustomWidget.value = config.default_text_input;
+                                const userPromptWidget = node.widgets?.find(w => w.name === "user_prompt");
+                                if (userPromptWidget) {
+                                    userPromptWidget.value = config.default_text_input;
                                     console.log(`[SmartLM] Loaded default_text_input from template`);
                                 }
                             }

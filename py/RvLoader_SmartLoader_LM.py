@@ -19,10 +19,10 @@ import nodes
 import torch
 import gc
 from ..core import CATEGORY, cstr
+from ..core.smartlm_florence2 import get_florence_tasks
 from ..core.smartlm_base import (
     SmartLMLBase,
     MODEL_CONFIGS,
-    FLORENCE_TASKS,
     get_template_list,
     load_template,
     detect_model_type,
@@ -31,7 +31,6 @@ from ..core.smartlm_base import (
     get_mmproj_list,
     get_template_dir,
 )
-
 
 class RvLoader_SmartLoader_LM(SmartLMLBase):
     # Smart Language Model Loader - Auto-detects model type (QwenVL, Florence-2, LLM) from template
@@ -45,7 +44,7 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
         qwen_prompts = MODEL_CONFIGS.get("_preset_prompts", ["Describe this image in detail."])
         preferred_qwen = "Detailed Description"
         default_qwen_prompt = preferred_qwen if preferred_qwen in qwen_prompts else qwen_prompts[0]
-        florence_tasks = list(FLORENCE_TASKS.keys())
+        florence_tasks = list(get_florence_tasks().keys())
         default_florence_task = "detailed_caption"
         llm_models = get_llm_model_list()
         mmproj_files = get_mmproj_list()
@@ -68,13 +67,12 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
                 "attention_mode": (["auto", "flash_attention_2", "sdpa", "eager"], {"default": "auto", "tooltip": "Attention implementation: auto (best available), flash_attention_2 (fastest), sdpa (balanced), eager (fallback)"}),
                 "context_size": ("INT", {"default": 32768, "min": 2048, "max": 131072, "step": 1024, "tooltip": "Context window size. Transformers: auto | GGUF: Controls total input+output token capacity. Text-only LLM: 2048-4096, Vision models: 16384-32768 for images, 32768-65536 for videos."}),
                 "qwen_preset_prompt": (qwen_prompts, {"default": default_qwen_prompt, "tooltip": "QwenVL: Pre-configured prompt templates for common tasks. Select 'Custom' to use only your custom prompt"}),
-                "qwen_custom_prompt": ("STRING", {"default": "", "multiline": True, "tooltip": "QwenVL: For 'Custom' preset: main instruction. For other presets: additional hints/context appended to system prompt"}),
                 "florence_task": (florence_tasks, {"default": default_florence_task, "tooltip": "Florence-2: Select task type (caption, detailed_caption, prompt generation, grounding, detection, OCR, etc.)"}),
                 "detection_filter_threshold": ("FLOAT", {"default": 0.80, "min": 0.0, "max": 1.0, "step": 0.05, "tooltip": "Florence-2: Filter out detections covering more than this % of image area (0.0-1.0). Default 0.80 = ignore boxes >80% of image. Set to 1.0 to disable filtering."}),
-                "florence_text_input": ("STRING", {"default": "", "tooltip": "Florence-2: Text input for detection tasks (e.g., 'face' for caption_to_phrase_grounding). Leave empty for caption tasks."}),
+                "nms_iou_threshold": ("FLOAT", {"default": 0.50, "min": 0.0, "max": 1.0, "step": 0.05, "tooltip": "Florence-2: NMS IoU threshold for removing overlapping detections (0.0-1.0). Default 0.50 = merge boxes with >50% overlap. Set to 1.0 to disable NMS."}),
                 "llm_instruction_mode": (["Tags to Natural Language", "Expand Description", "Refine Prompt", "Custom Instruction", "Direct Chat"], {"default": "Tags to Natural Language", "tooltip": "LLM: Select instruction template mode"}),
                 "llm_custom_instruction": ("STRING", {"default": 'Generate a detailed prompt from "{prompt}"', "multiline": True, "tooltip": 'LLM: Custom instruction template (only used when mode is Custom Instruction). Use {prompt} as placeholder.'}),
-                "llm_prompt": ("STRING", {"default": "", "multiline": True, "tooltip": "LLM: Your input text/tags/description to process (used when text input is not connected)"}),
+                "user_prompt": ("STRING", {"default": "", "multiline": True, "tooltip": "Universal text input: QwenVL (custom prompt/hints), Florence-2 (detection text like 'face'), LLM (input text/tags). Used when text input is not connected."}),
                 "max_tokens": ("INT", {"default": 512, "min": 64, "max": 2048, "tooltip": "Maximum number of tokens to generate in the output. Larger values allow longer responses but take more time. QwenVL: 512-1024, Florence-2: 512-1024, LLM: 512-2048"}),
                 "memory_cleanup": ("BOOLEAN", {"default": True, "tooltip": "Clear unused memory cache before loading LM model (safe, won't unload generation models). Disable if LM model is already loaded for faster reload."}),
                 "keep_model_loaded": ("BOOLEAN", {"default": False, "tooltip": "Keep model in VRAM between generations (faster, uses more VRAM)"}),
@@ -117,13 +115,12 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
         attention_mode,
         context_size,
         qwen_preset_prompt,
-        qwen_custom_prompt,
         florence_task,
         detection_filter_threshold,
-        florence_text_input,
+        nms_iou_threshold,
         llm_instruction_mode,
         llm_custom_instruction,
-        llm_prompt,
+        user_prompt,
         max_tokens,
         memory_cleanup,
         keep_model_loaded,
@@ -340,12 +337,13 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
             # Set default_task based on model type
             if internal_model_type == "qwenvl":
                 new_config["default_task"] = qwen_preset_prompt
-                new_config["default_text_input"] = qwen_custom_prompt
+                new_config["default_text_input"] = user_prompt
             elif internal_model_type == "florence2":
                 new_config["default_task"] = florence_task
-                new_config["default_text_input"] = florence_text_input
+                new_config["default_text_input"] = user_prompt
                 # Save Florence-2 detection filter threshold
                 new_config["detection_filter_threshold"] = detection_filter_threshold
+                new_config["nms_iou_threshold"] = nms_iou_threshold
                 # Note: convert_to_bboxes is managed by Advanced Options pipe, not saved in template
             elif internal_model_type == "llm":
                 new_config["default_task"] = llm_instruction_mode
@@ -355,7 +353,7 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
             if internal_model_type == "qwenvl":
                 new_config["_available_tasks"] = MODEL_CONFIGS.get("_preset_prompts", [])
             elif internal_model_type == "florence2":
-                new_config["_available_tasks"] = list(FLORENCE_TASKS.keys())
+                new_config["_available_tasks"] = list(get_florence_tasks().keys())
             elif internal_model_type == "llm":
                 new_config["_available_tasks"] = [
                     "Tags to Natural Language",
@@ -668,10 +666,16 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
                             if temp_template_path.exists():
                                 os.remove(temp_template_path)
                             return ("", {})
+                        # Re-raise other RuntimeErrors
+                        raise
                     
                     # Clean up temp template
                     if temp_template_path.exists():
                         os.remove(temp_template_path)
+                    
+                    # Verify model loaded successfully
+                    if self.model is None:
+                        raise RuntimeError("Model loading completed but model is None - check logs for errors")
                 except Exception as e:
                     cstr(f"[SmartLM] Failed to load model from manual configuration: {e}").error.print()
                     raise
@@ -695,15 +699,15 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
                 prompt_text = text
             # Handle Custom preset: use custom prompt as main instruction
             elif qwen_preset_prompt == "Custom":
-                prompt_text = qwen_custom_prompt.strip() if qwen_custom_prompt.strip() else "Describe this image in detail."
+                prompt_text = user_prompt.strip() if user_prompt.strip() else "Describe this image in detail."
             else:
                 # Build prompt: system instruction + preset name + optional custom hints
                 system_prompt = SYSTEM_PROMPTS.get(qwen_preset_prompt, "")
                 prompt_text = f"{system_prompt}\n\n{qwen_preset_prompt}" if system_prompt else qwen_preset_prompt
                 
                 # Append custom prompt as additional hints/context
-                if qwen_custom_prompt.strip():
-                    prompt_text = f"{prompt_text}\n\nAdditional context: {qwen_custom_prompt.strip()}"
+                if user_prompt.strip():
+                    prompt_text = f"{prompt_text}\n\nAdditional context: {user_prompt.strip()}"
             
             result, data = self.generate(
                 image=images,
@@ -726,8 +730,8 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
                 cstr("[SmartLM] Warning - Florence-2 doesn't support video, using first frame").warning.print()
                 input_image = images[0:1]
             
-            # Use text input if connected, otherwise use florence_text_input widget
-            florence_text = text if text is not None else florence_text_input
+            # Use text input if connected, otherwise use user_prompt widget
+            florence_text = text if text is not None else user_prompt
             
             result, data = self.generate(
                 image=input_image,
@@ -742,6 +746,7 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
                 repetition_penalty=repetition_penalty,
                 convert_to_bboxes=convert_to_bboxes,
                 detection_filter_threshold=detection_filter_threshold,
+                nms_iou_threshold=nms_iou_threshold,
             )
         
         elif detected_model_type == ModelType.LLM:
@@ -763,8 +768,8 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
             else:
                 instruction_template = ""  # Will use template from config
             
-            # Use text input if connected, otherwise use llm_prompt widget
-            prompt_text = text if text is not None else llm_prompt
+            # Use text input if connected, otherwise use user_prompt widget
+            prompt_text = text if text is not None else user_prompt
             
             result, data = self.generate(
                 image=None,  # Text-only
@@ -793,7 +798,8 @@ class RvLoader_SmartLoader_LM(SmartLMLBase):
         if detected_model_type == ModelType.FLORENCE2 and data and ("bboxes" in data or "quad_boxes" in data or "polygons" in data):
             try:
                 # Draw visualization with bboxes
-                output_image = self._draw_bboxes(input_image if detected_model_type == ModelType.FLORENCE2 else images, data)
+                from ..core.smartlm_florence2 import draw_bboxes
+                output_image = draw_bboxes(input_image if detected_model_type == ModelType.FLORENCE2 else images, data)
             except Exception as e:
                 cstr(f"[SmartLM] Could not draw bounding boxes: {e}").warning.print()
                 # Return original image if drawing fails
