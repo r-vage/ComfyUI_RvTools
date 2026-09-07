@@ -25,7 +25,8 @@ Smart Folder configures output paths and generation parameters for downstream no
 - **Dual mode** — Image or Video, toggled via radio chips (mutually exclusive)
 - **Dynamic path construction** — root folder → date/time subfolder → batch subfolder
 - **Image settings** — resolution presets, custom dimensions, latent type selection
-- **Video settings** — frame rate, context length, loop count, overlap, skip calculations
+- **Video settings** — optional VHS, loop, context, and duration groups around an always-on frame rate
+- **Aligned custom sizes** — one Image Size chip controls both modes, with a configurable divisor
 - **Seed control** — optional seed with randomize/increment/decrement modes
 - **Pipe output** — all settings passed as a single pipe to downstream nodes
 
@@ -37,25 +38,25 @@ Smart Folder configures output paths and generation parameters for downstream no
 
 ![Smart Folder overview with Pipe Out Smart Folder](assets/smart-folder-overview.png)
 
-Smart Folder keeps the destination and generation-specific settings in one reusable `PIPE`. Image and video are mutually exclusive modes, while optional date/time, batch, size, and seed chips control which settings participate. **Pipe Out Smart Folder** can then expose individual values for branches that need regular sockets.
+Smart Folder keeps the destination and generation-specific settings in one reusable `PIPE`. Image and video are mutually exclusive modes, while optional date/time, batch, Image Size, VHS, Loop, Context, Duration, and seed chips control which settings participate. **Pipe Out Smart Folder** can then expose individual values for branches that need regular sockets.
 
 ### Image paths, dimensions, and latent format
 
 ![Smart Folder image-mode controls](assets/smart-folder-image-mode.png)
 
-In image mode, the root folder can be extended with date/time and numbered batch subfolders. Enabling `image_size` adds a preset or custom width and height plus the latent format; these values travel in the pipe for compatible downstream latent creation. The optional seed controls are included only when the `seed` chip is active.
+In image mode, the root folder can be extended with date/time and numbered batch subfolders. Enabling `image_size` adds a preset or custom width and height plus the latent format; custom values align to `divisible_by`. These values travel in the pipe for compatible downstream latent creation. The optional seed controls are included only when the `seed` chip is active.
 
 ### Video frame budgets and sequential skips
 
 ![Smart Folder video-mode controls](assets/smart-folder-video-mode.png)
 
-Video mode replaces the image controls with resolution, frame cadence, context, loop, overlap, and skip settings. When `loop_count` is greater than zero, `context_length × loop_count` becomes the effective frame-load cap. Calculated skips add whole context-length blocks, and `increment` advances the block on each queued run.
+Video mode always exposes frame cadence and can independently add resolution, VHS loading, loop, context, and duration metadata. Loop automatically enables and locks Context. When VHS, Loop, and Context are enabled, a positive `loop_count` makes `context_length × loop_count` the effective frame-load cap. Context-based skips likewise run only with VHS and Context enabled.
 
 ---
 
 ## Combo-Chip Features
 
-The node uses a combo-chip widget to toggle feature groups. Default enabled: `image`, `date_time`.
+The node uses a combo-chip widget to toggle feature groups. Default enabled: `image`, `date_time`, and `context`.
 
 | Chip | Default | Controls |
 |------|---------|----------|
@@ -63,7 +64,11 @@ The node uses a combo-chip widget to toggle feature groups. Default enabled: `im
 | `video` | off | Video Mode — shows video-specific settings |
 | `date_time` | **on** | Date/time subfolder creation |
 | `batch` | off | Batch subfolder configuration |
-| `image_size` | off | Image resolution and latent type (Image Mode only) |
+| `image_size` | off | Resolution in both modes; latent type in Image Mode |
+| `vhs` | off | `frame_load_cap`, skip controls, and `select_every_nth` |
+| `loop` | off | `loop_count` and `overlap`; automatically enables Context |
+| `context` | **on** | `context_length`; cannot be disabled while Loop is on |
+| `duration` | off | Optional duration metadata in seconds |
 | `seed` | off | Seed widget with mode buttons |
 
 `image` and `video` are **radio-exclusive** — selecting one deselects the other. This switches the node between Image Mode and Video Mode.
@@ -122,9 +127,10 @@ Enabled when the `image` chip is selected. Shows image-specific settings.
 | `image_size` | COMBO | `832x1216 (2:3 Flux, SDXL)` | Resolution preset |
 | `width` | INT | 832 | Custom width (visible when preset is "Custom") |
 | `height` | INT | 1216 | Custom height (visible when preset is "Custom") |
+| `divisible_by` | INT | 8 | Custom-size multiple (1–512) |
 | `latent_type` | COMBO | `SD3 / Flux / Wan 2.1 / HunyuanVideo` | Latent format (sets channels + spatial downscale) |
 
-The latent type determines the correct empty latent dimensions for the model architecture. Each preset maps to specific channel count and downscale ratio values passed through the pipe.
+Changing `divisible_by` snaps active custom dimensions to the nearest valid multiple and changes typed, button, keyboard, and scrub increments. Named presets are not modified and the divisor itself is not added to the pipe. The latent type determines the correct empty latent dimensions for the model architecture.
 
 ### Always Visible (Image Mode)
 
@@ -138,36 +144,38 @@ The latent type determines the correct empty latent dimensions for the model arc
 
 Enabled when the `video` chip is selected. Shows video-specific settings.
 
-### Resolution
+### Resolution (`image_size` chip required)
 
 | Input | Type | Default | Description |
 |-------|------|---------|-------------|
 | `video_size` | COMBO | *(presets)* | Video resolution preset |
 | `video_width` | INT | 576 | Custom width (visible when preset is "Custom") |
 | `video_height` | INT | 1024 | Custom height (visible when preset is "Custom") |
+| `divisible_by` | INT | 8 | Custom-size multiple (1–512) |
 
 ### Frame Settings
 
 | Input | Type | Default | Description |
 |-------|------|---------|-------------|
 | `frame_rate` | FLOAT | 30.0 | Frames per second (8–240) |
-| `frame_load_cap` | INT | 162 | Max frames to load per batch (0 = no limit) |
-| `context_length` | INT | 81 | Context length for WAN/video models |
-| `loop_count` | INT | 0 | Overrides `frame_load_cap` with `context_length × loop_count` when > 0 |
-| `overlap` | INT | 0 | Overlap frames between clips |
+| `frame_load_cap` | INT | 162 | VHS chip: max frames to load per batch (0 = no limit) |
+| `context_length` | INT | 81 | Context chip: context length for WAN/video models |
+| `loop_count` | INT | 0 | Loop chip: derives `frame_load_cap` when VHS and Context are also enabled |
+| `overlap` | INT | 0 | Loop chip: overlap frames between clips |
+| `duration` | FLOAT | 15.0 | Duration chip: optional seconds metadata (0.5–180.0, step 0.5) |
 
 ### Skip Settings
 
 | Input | Type | Default | Description |
 |-------|------|---------|-------------|
-| `skip_first_frames` | INT | 0 | Number of initial frames to skip |
-| `skip_calculation` | INT | 0 | Additional skip: `context_length × value` added to skip_first_frames |
-| `skip_calculation_control` | COMBO | `fixed` | `fixed` or `increment` (auto-increments each queue) |
-| `select_every_nth` | INT | 1 | Select every Nth frame from input |
+| `skip_first_frames` | INT | 0 | VHS chip: number of initial frames to skip |
+| `skip_calculation` | INT | 0 | VHS + Context: additional `context_length × value` skip |
+| `skip_calculation_control` | COMBO | `fixed` | VHS + Context: `fixed` or per-queue `increment` |
+| `select_every_nth` | INT | 1 | VHS chip: select every Nth frame from input |
 
 ### Loop Count Override
 
-When `loop_count` > 0, the effective `frame_load_cap` becomes:
+When VHS, Loop, and Context are enabled and `loop_count` > 0, the effective `frame_load_cap` becomes:
 ```
 frame_load_cap = context_length × loop_count
 ```
@@ -179,7 +187,7 @@ The total frames skipped is:
 ```
 total_skip = skip_first_frames + (context_length × skip_calculation)
 ```
-With `skip_calculation_control` set to `increment`, the `skip_calculation` value increases by 1 after each queue — useful for processing sequential segments of a long video.
+With VHS and Context enabled and `skip_calculation_control` set to `increment`, the `skip_calculation` value increases by 1 after each queue — useful for processing sequential segments of a long video.
 
 ---
 
@@ -218,19 +226,18 @@ The node outputs a single **PIPE** containing all configured values. Downstream 
 
 ### Video Mode Pipe Keys
 
-| Key | Always | Description |
-|-----|--------|-------------|
-| `path` | Yes | Full output directory path |
-| `width` | Yes | Video width |
-| `height` | Yes | Video height |
-| `frame_rate` | Yes | Frames per second |
-| `frame_load_cap` | Yes | Max frames (after loop_count override) |
-| `context_length` | Yes | Context length |
-| `overlap` | Yes | Overlap frames |
-| `skip_first_frames` | Yes | Total frames to skip (after calculation) |
-| `select_every_nth` | Yes | Frame selection interval |
-| `batch_size` | Yes | Batch size |
-| `seed` | If chip on | Generation seed |
+| Key | Condition | Description |
+|-----|-----------|-------------|
+| `path` | Always | Full output directory path |
+| `width`, `height` | `image_size` chip on | Video resolution |
+| `frame_rate` | Always | Frames per second |
+| `frame_load_cap` | VHS chip on | Max frames, including the conditional loop override |
+| `skip_first_frames`, `select_every_nth` | VHS chip on | Frame skip and selection settings |
+| `context_length` | Context chip on | Context length |
+| `loop_count`, `overlap` | Loop chip on | Loop metadata |
+| `duration` | Duration chip on | Independent duration metadata in seconds |
+| `batch_size` | Always | Batch size |
+| `seed` | Seed chip on | Generation seed |
 
 ### Connecting the Pipe
 
@@ -238,7 +245,7 @@ Use these dedicated nodes to extract values from the Smart Folder pipe:
 
 | Node | Type | Description |
 |------|------|-------------|
-| **Pipe Out Smart Folder** | Extract-only | Extracts path, width, height, batch_size, latent, frame_rate, frame_load_cap, context_length, overlap, skip_first_frames, select_every_nth, seed, and loop_count as individual outputs |
+| **Pipe Out Smart Folder** | Extract-only | Extracts path, width, height, batch_size, latent, frame_rate, frame_load_cap, context_length, overlap, skip_first_frames, select_every_nth, seed, loop_count, and duration as individual outputs |
 | **Concat Pipe Multi** | Merge | Combine the folder pipe with other pipes (e.g., Smart Model Loader pipe + Smart Sampler Settings pipe) |
 
 **Pipe Out Smart Folder** is extract-only — it outputs individual values but does not pass through a combined pipe. Use **Concat Pipe Multi** when you need to merge Smart Folder settings with other pipe sources into a single pipe.
@@ -260,7 +267,7 @@ Output path: `output/images/2025-09-27/`
 
 ### Video Workflow — Batch Processing
 
-1. Select `video` + `date_time` + `batch` chips
+1. Select `video` + `date_time` + `batch` + `image_size` + `vhs` + `loop` chips (Loop enables Context)
 2. Set `root_folder_video` to `videos`
 3. Enable batch: `batch_{}`, `batch_number_control` = `increment`
 4. Set `context_length` = 81, `loop_count` = 2 → `frame_load_cap` = 162
@@ -282,7 +289,8 @@ Output path: `output/videos/2025-09-27/batch_1/` (auto-increments)
 - **Image vs Video** chips are radio-exclusive — only one mode is active at a time
 - **Date/time folders** prevent overwriting between sessions — enable `date_time` chip by default
 - **Batch increment** auto-advances `batch_number` each queue — useful for multi-run experiments
-- **Skip calculation increment** auto-advances for sequential video segment processing
+- **Skip calculation increment** auto-advances only while VHS and Context are enabled
+- **Duration is metadata** — it is independent of the integer Context value
 - **Latent type** must match your model — wrong latent dimensions cause generation errors
 - **Pipe output** is read by Smart Model Loader, Save Images, and other pipe-aware nodes
 

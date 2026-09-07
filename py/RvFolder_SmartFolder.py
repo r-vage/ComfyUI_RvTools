@@ -1,8 +1,11 @@
+import math
 import os
 import random
 from datetime import datetime
+
 import folder_paths  # type: ignore
 from comfy_api.latest import io  # type: ignore
+
 from ..core import CATEGORY
 from ..core.common import (
     RESOLUTION_PRESETS,
@@ -58,6 +61,17 @@ def format_variables(string, input_variables):
         return string
 
 
+def align_dimension(value, divisible_by):
+    """Return the nearest in-range pixel dimension aligned to the divisor."""
+    divisor = divisible_by if isinstance(divisible_by, int) else 8
+    divisor = min(512, max(1, divisor))
+    numeric = value if isinstance(value, int) else divisor
+    aligned = math.floor((numeric / divisor) + 0.5) * divisor
+    minimum = math.ceil(16 / divisor) * divisor
+    maximum = math.floor(MAX_RESOLUTION / divisor) * divisor
+    return min(maximum, max(minimum, aligned))
+
+
 class RvFolder_SmartFolder(io.ComfyNode):
 
     @classmethod
@@ -81,7 +95,7 @@ class RvFolder_SmartFolder(io.ComfyNode):
                 ),
                 io.String.Input(
                     "root_folder_video",
-                    default="videos",
+                    default="video",
                     tooltip="Root folder name for video generation.",
                 ),
                 io.Boolean.Input(
@@ -187,6 +201,55 @@ class RvFolder_SmartFolder(io.ComfyNode):
                     max=MAX_RESOLUTION,
                     step=1,
                     tooltip="Video height in pixels.",
+                ),
+                io.Int.Input(
+                    "divisible_by",
+                    default=8,
+                    min=1,
+                    max=512,
+                    step=1,
+                    socketless=True,
+                    tooltip="Align custom image and video dimensions to this multiple.",
+                ),
+                io.Boolean.Input(
+                    "use_vhs",
+                    default=False,
+                    label_on="yes",
+                    label_off="no",
+                    socketless=True,
+                    tooltip="Include VHS-compatible frame loading and selection settings.",
+                ),
+                io.Boolean.Input(
+                    "use_loop",
+                    default=False,
+                    label_on="yes",
+                    label_off="no",
+                    socketless=True,
+                    tooltip="Include video loop count and overlap settings.",
+                ),
+                io.Boolean.Input(
+                    "use_context",
+                    default=True,
+                    label_on="yes",
+                    label_off="no",
+                    socketless=True,
+                    tooltip="Include video context length settings.",
+                ),
+                io.Boolean.Input(
+                    "use_duration",
+                    default=False,
+                    label_on="yes",
+                    label_off="no",
+                    socketless=True,
+                    tooltip="Include optional video duration metadata.",
+                ),
+                io.Float.Input(
+                    "duration",
+                    default=15.0,
+                    min=0.5,
+                    max=180.0,
+                    step=0.5,
+                    tooltip="Optional video duration metadata in seconds.",
                 ),
                 io.Float.Input(
                     "frame_rate",
@@ -311,6 +374,12 @@ class RvFolder_SmartFolder(io.ComfyNode):
         video_size,
         video_width,
         video_height,
+        divisible_by,
+        use_vhs,
+        use_loop,
+        use_context,
+        use_duration,
+        duration,
         frame_rate,
         frame_load_cap,
         context_length,
@@ -344,6 +413,12 @@ class RvFolder_SmartFolder(io.ComfyNode):
             video_width = 576
         if not isinstance(video_height, int) or video_height < 16:
             video_height = 1024
+        if not isinstance(divisible_by, int):
+            divisible_by = 8
+        divisible_by = min(512, max(1, divisible_by))
+        if not isinstance(duration, (int, float)):
+            duration = 15.0
+        duration = min(180.0, max(0.5, float(duration)))
         if not isinstance(frame_rate, (int, float)) or frame_rate < 8:
             frame_rate = 30.0
         if not isinstance(frame_load_cap, int):
@@ -364,6 +439,10 @@ class RvFolder_SmartFolder(io.ComfyNode):
             batch_size = 1
         if not isinstance(batch_number, int) or batch_number < 1:
             batch_number = 1
+
+        # Loop metadata depends on a context length in both the UI and pipe contract.
+        if use_loop:
+            use_context = True
 
         # Ensure control values are valid
         if batch_number_control not in ["fixed", "increment"]:
@@ -407,6 +486,9 @@ class RvFolder_SmartFolder(io.ComfyNode):
             if use_image_size:
                 if image_size in RESOLUTION_MAP:
                     width, height = RESOLUTION_MAP[image_size]
+                else:
+                    width = align_dimension(width, divisible_by)
+                    height = align_dimension(height, divisible_by)
                 pipe["width"] = width
                 pipe["height"] = height
                 # Latent format from preset
@@ -415,35 +497,41 @@ class RvFolder_SmartFolder(io.ComfyNode):
                 pipe["latent_downscale"] = downscale
 
         else:  # Video
-            # Handle video resolution preset
-            if video_size in VIDEO_RESOLUTION_MAP:
-                video_width, video_height = VIDEO_RESOLUTION_MAP[video_size]
+            if use_image_size:
+                if video_size in VIDEO_RESOLUTION_MAP:
+                    video_width, video_height = VIDEO_RESOLUTION_MAP[video_size]
+                else:
+                    video_width = align_dimension(video_width, divisible_by)
+                    video_height = align_dimension(video_height, divisible_by)
 
-            # Handle loop_count override for frame_load_cap
-            if loop_count > 0:
+            # Context-dependent VHS calculations only apply when both groups are active.
+            if use_vhs and use_context and use_loop and loop_count > 0:
                 frame_load_cap = context_length * loop_count
-
-            # Handle skip_calculation
-            if skip_calculation > 0:
+            if use_vhs and use_context and skip_calculation > 0:
                 try:
                     skip_first_frames += context_length * skip_calculation
                 except Exception:
                     skip_first_frames = 0
 
-            # Build Video pipe
             pipe = {
                 "path": path_out,
-                "width": video_width,
-                "height": video_height,
                 "frame_rate": float(frame_rate),
-                "frame_load_cap": frame_load_cap,
-                "context_length": context_length,
-                "loop_count": loop_count,
-                "overlap": overlap,
-                "skip_first_frames": skip_first_frames,
-                "select_every_nth": select_every_nth,
                 "batch_size": batch_size,
             }
+            if use_image_size:
+                pipe["width"] = video_width
+                pipe["height"] = video_height
+            if use_vhs:
+                pipe["frame_load_cap"] = frame_load_cap
+                pipe["skip_first_frames"] = skip_first_frames
+                pipe["select_every_nth"] = select_every_nth
+            if use_loop:
+                pipe["loop_count"] = loop_count
+                pipe["overlap"] = overlap
+            if use_context:
+                pipe["context_length"] = context_length
+            if use_duration:
+                pipe["duration"] = duration
             if use_seed:
                 pipe["seed"] = seed
 

@@ -41,6 +41,7 @@ class RvPipe_Out_SmartFolder(io.ComfyNode):
                 io.Int.Output("select_every_nth"),
                 io.Int.Output("seed"),
                 io.Int.Output("loop_count"),
+                io.Float.Output("duration"),
             ],
         )
 
@@ -95,6 +96,12 @@ class RvPipe_Out_SmartFolder(io.ComfyNode):
         except Exception:
             loop_count = None
 
+        try:
+            duration_val = pipe.get("duration")
+            duration = float(duration_val) if duration_val is not None else None
+        except (TypeError, ValueError):
+            duration = None
+
         return io.NodeOutput(
             path,
             width,
@@ -109,4 +116,5 @@ class RvPipe_Out_SmartFolder(io.ComfyNode):
             select_every_nth,
             seed,
             loop_count,
+            duration,
         )

@@ -5,6 +5,7 @@ import {
     debounce,
     smartResize,
     createWidgetVisibilityManager,
+    isConfiguringGraph,
     isVueMode,
     onVueModeChange,
     notifyVue,
@@ -13,6 +14,7 @@ import {
     injectComboChipCSS,
     createComboChipWidget as _createComboChipWidget
 } from './eclipse-combo-chip.js';
+import { migrateSmartFolderWorkflow } from './eclipse-smart-folder-workflow-migration.js';
 import { storeQueuedSeed, enterGraphToPromptHook, exitGraphToPromptHook, getGraphNodeList, clearNodeQueuedSeed, findWorkflowNode } from './eclipse-seed-utils.js';
 const NODE_NAME = 'Smart Folder [Eclipse]';
 const SPECIAL_SEEDS = [-1, -2, -3];
@@ -22,14 +24,22 @@ const FEATURE_OPTIONS = [
     { label: 'video', tooltip: 'Video generation mode (radio with image)' },
     { label: 'date_time', tooltip: 'Append a date/time subfolder to the output path' },
     { label: 'batch', tooltip: 'Append a batch subfolder for grouped runs' },
-    { label: 'image_size', tooltip: 'Include image size in the folder name' },
+    { label: 'image_size', tooltip: 'Include resolution settings in Image and Video modes' },
+    { label: 'vhs', tooltip: 'Include VHS frame loading, skipping, and selection settings' },
+    { label: 'loop', tooltip: 'Include loop count and overlap (requires Context)' },
+    { label: 'context', tooltip: 'Include model context length' },
+    { label: 'duration', tooltip: 'Include optional video duration metadata' },
     { label: 'seed', tooltip: 'Show the seed widgets' },
 ];
-const DEFAULT_FEATURES = ['image', 'date_time'];
+const DEFAULT_FEATURES = ['image', 'date_time', 'context'];
 const RADIO_GROUPS = [
     ['image', 'video']
 ];
-const BACKING_WIDGETS = ['generation_mode', 'create_date_time_folder', 'create_batch_folder', 'use_image_size', 'use_seed'];
+const FEATURE_LABELS = new Set(FEATURE_OPTIONS.map((option) => option.label));
+const BACKING_WIDGETS = [
+    'generation_mode', 'create_date_time_folder', 'create_batch_folder',
+    'use_image_size', 'use_vhs', 'use_loop', 'use_context', 'use_duration', 'use_seed',
+];
 injectComboChipCSS('sf2');
 
 function syncChipsToBacking(selectedSet, node) {
@@ -41,6 +51,10 @@ function syncChipsToBacking(selectedSet, node) {
     setW('create_date_time_folder', selectedSet.has('date_time'));
     setW('create_batch_folder', selectedSet.has('batch'));
     setW('use_image_size', selectedSet.has('image_size'));
+    setW('use_vhs', selectedSet.has('vhs'));
+    setW('use_loop', selectedSet.has('loop'));
+    setW('use_context', selectedSet.has('context'));
+    setW('use_duration', selectedSet.has('duration'));
     setW('use_seed', selectedSet.has('seed'));
 }
 
@@ -55,8 +69,81 @@ function readChipsFromBacking(node) {
     if (gv('create_date_time_folder')) chips.add('date_time');
     if (gv('create_batch_folder')) chips.add('batch');
     if (gv('use_image_size')) chips.add('image_size');
+    if (gv('use_vhs')) chips.add('vhs');
+    if (gv('use_loop')) chips.add('loop');
+    if (gv('use_context')) chips.add('context');
+    if (gv('use_duration')) chips.add('duration');
     if (gv('use_seed')) chips.add('seed');
     return chips;
+}
+
+function normalizeFeatureDependencies(selectedSet) {
+    const normalized = new Set();
+    for (const feature of selectedSet) {
+        normalized.add(feature);
+        if (feature === 'loop' && !selectedSet.has('context')) normalized.add('context');
+    }
+    return normalized;
+}
+
+function readConfiguredFeatures(value) {
+    const values = Array.isArray(value)
+        ? value
+        : (typeof value === 'string' ? value.split(',') : []);
+    return new Set(values.map((feature) => feature.trim()).filter(
+        (feature) => FEATURE_LABELS.has(feature)
+    ));
+}
+
+function normalizedDivisor(value) {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) return 8;
+    return Math.min(512, Math.max(1, Math.round(parsed)));
+}
+
+function alignDimensionValue(value, divisor) {
+    const numeric = Number(value);
+    const safeValue = Number.isFinite(numeric) ? numeric : divisor;
+    const minimum = Math.ceil(16 / divisor) * divisor;
+    const maximum = Math.floor(32768 / divisor) * divisor;
+    return Math.min(maximum, Math.max(minimum, Math.round(safeValue / divisor) * divisor));
+}
+
+function setDimensionStep(widget, divisor) {
+    if (!widget) return;
+    widget.options ??= {};
+    widget.options.step = divisor * 10;
+    widget.options.step2 = divisor;
+    if (widget._state?.options && widget._state.options !== widget.options) {
+        try {
+            widget._state.options.step = divisor * 10;
+            widget._state.options.step2 = divisor;
+        } catch (_) {}
+    }
+}
+
+function alignActiveCustomDimensions(node, selected) {
+    const divisorWidget = node.widgets?.find((w) => w.name === 'divisible_by');
+    const divisor = normalizedDivisor(divisorWidget?.value);
+    if (divisorWidget && divisorWidget.value !== divisor) divisorWidget.value = divisor;
+    for (const name of ['width', 'height', 'video_width', 'video_height']) {
+        setDimensionStep(node.widgets?.find((w) => w.name === name), divisor);
+    }
+    if (!selected.has('image_size')) {
+        if (isVueMode()) notifyVue(node);
+        return;
+    }
+    const names = selected.has('video')
+        ? (node.widgets?.find((w) => w.name === 'video_size')?.value === 'Custom'
+            ? ['video_width', 'video_height'] : [])
+        : (node.widgets?.find((w) => w.name === 'image_size')?.value === 'Custom'
+            ? ['width', 'height'] : []);
+    for (const name of names) {
+        const widget = node.widgets?.find((w) => w.name === name);
+        if (!widget) continue;
+        widget.value = alignDimensionValue(widget.value, divisor);
+    }
+    if (isVueMode()) notifyVue(node);
 }
 
 function createComboChipWidget(node, initialSet, origIdx) {
@@ -73,15 +160,23 @@ function createComboChipWidget(node, initialSet, origIdx) {
 }
 
 function updateVisibility(node, vis) {
+    if (node.id === -1) return;
     const featW = node.widgets?.find((w) => w.name === '_sf_features');
-    const selected = featW ? new Set(featW.value) : readChipsFromBacking(node);
+    const selected = normalizeFeatureDependencies(
+        featW ? new Set(featW.value) : readChipsFromBacking(node)
+    );
     const isImage = selected.has('image');
     const isVideo = selected.has('video');
     const hasDateTime = selected.has('date_time');
     const hasBatch = selected.has('batch');
     const hasImageSize = selected.has('image_size');
+    const hasVhs = selected.has('vhs');
+    const hasLoop = selected.has('loop');
+    const hasContext = selected.has('context');
+    const hasDuration = selected.has('duration');
     const customImage = vis.getValue('image_size') === 'Custom';
     const customVideo = vis.getValue('video_size') === 'Custom';
+    alignActiveCustomDimensions(node, selected);
     for (const name of BACKING_WIDGETS) vis.setVisible(name, false);
     vis.setVisible('date_time_format', hasDateTime);
     vis.setVisible('date_time_position', hasDateTime);
@@ -95,18 +190,20 @@ function updateVisibility(node, vis) {
     vis.setVisible('latent_type', isImage && hasImageSize);
     vis.setVisible('batch_size', isImage);
     vis.setVisible('root_folder_video', isVideo);
-    vis.setVisible('video_size', isVideo);
-    vis.setVisible('video_width', isVideo && customVideo);
-    vis.setVisible('video_height', isVideo && customVideo);
+    vis.setVisible('video_size', isVideo && hasImageSize);
+    vis.setVisible('video_width', isVideo && hasImageSize && customVideo);
+    vis.setVisible('video_height', isVideo && hasImageSize && customVideo);
+    vis.setVisible('divisible_by', hasImageSize && ((isImage && customImage) || (isVideo && customVideo)));
     vis.setVisible('frame_rate', isVideo);
-    vis.setVisible('frame_load_cap', isVideo);
-    vis.setVisible('context_length', isVideo);
-    vis.setVisible('loop_count', isVideo);
-    vis.setVisible('overlap', isVideo);
-    vis.setVisible('skip_first_frames', isVideo);
-    vis.setVisible('skip_calculation', isVideo);
-    vis.setVisible('skip_calculation_control', isVideo);
-    vis.setVisible('select_every_nth', isVideo);
+    vis.setVisible('frame_load_cap', isVideo && hasVhs);
+    vis.setVisible('context_length', isVideo && hasContext);
+    vis.setVisible('loop_count', isVideo && hasLoop);
+    vis.setVisible('overlap', isVideo && hasLoop);
+    vis.setVisible('skip_first_frames', isVideo && hasVhs);
+    vis.setVisible('skip_calculation', isVideo && hasVhs && hasContext);
+    vis.setVisible('skip_calculation_control', isVideo && hasVhs && hasContext);
+    vis.setVisible('select_every_nth', isVideo && hasVhs);
+    vis.setVisible('duration', isVideo && hasDuration);
     const hasSeed = selected.has('seed');
     vis.setVisible('seed', hasSeed);
     vis.setVisible('_btn_randomize', hasSeed);
@@ -116,6 +213,9 @@ function updateVisibility(node, vis) {
 }
 app.registerExtension({
     name: 'Eclipse.SmartFolderV2',
+    beforeConfigureGraph(graphData) {
+        migrateSmartFolderWorkflow(graphData);
+    },
     async beforeRegisterNodeDef(nodeType, nodeData, _app) {
         if (nodeData.name !== NODE_NAME) return;
         const origOnNodeCreated = nodeType.prototype.onNodeCreated;
@@ -124,34 +224,34 @@ app.registerExtension({
             const node = this;
             const vis = createWidgetVisibilityManager(node);
             node._Eclipse_vis = vis;
-            // Pre-hide widgets hidden at DEFAULT_FEATURES (['image','date_time']):
+            // Pre-hide widgets hidden at DEFAULT_FEATURES (image/date_time/context):
             // no batch, no image_size, no seed, no video.
             vis.hideInitially([
+                ...BACKING_WIDGETS,
                 'batch_folder_name', 'batch_number', 'batch_number_control',
                 'image_size', 'width', 'height', 'latent_type',
                 'root_folder_video', 'video_size', 'video_width', 'video_height',
+                'divisible_by',
                 'frame_rate', 'frame_load_cap', 'context_length', 'loop_count',
                 'overlap', 'skip_first_frames', 'skip_calculation',
-                'skip_calculation_control', 'select_every_nth',
+                'skip_calculation_control', 'select_every_nth', 'duration',
                 'seed',
             ]);
             node._Eclipse_lastBatchNumber = null;
             node._Eclipse_lastSkipFirstFramesCalc = null;
-            const initialSet = readChipsFromBacking(node);
+            const initialSet = normalizeFeatureDependencies(readChipsFromBacking(node));
             const modeW = node.widgets?.find((w) => w.name === 'generation_mode');
             const origIdx = modeW ? node.widgets.indexOf(modeW) : 0;
-            for (const name of BACKING_WIDGETS) {
-                const w = node.widgets?.find((w) => w.name === name);
-                if (w) {
-                    w.hidden = true;
-                    if (w.options) w.options.hidden = true;
-                }
-            }
             const featWidget = createComboChipWidget(node, initialSet, origIdx);
             const origFeatCb = featWidget.callback;
             featWidget.callback = function (value) {
                 origFeatCb?.call(this, value);
-                syncChipsToBacking(new Set(featWidget.value), node);
+                const currentFeatures = Array.isArray(featWidget.value) ? featWidget.value : [];
+                const normalized = normalizeFeatureDependencies(new Set(currentFeatures));
+                if (normalized.size !== currentFeatures.length) {
+                    featWidget.value = [...normalized];
+                }
+                syncChipsToBacking(normalized, node);
                 // Reset seed to stable value when seed chip is deselected
                 const feats = Array.isArray(featWidget.value) ? featWidget.value : [];
                 if (!feats.includes('seed') && node._Eclipse_seedWidget
@@ -230,19 +330,63 @@ app.registerExtension({
                     const origCb = w.callback;
                     w.callback = function (v) {
                         vis.markUserDriven();
+                        alignActiveCustomDimensions(
+                            node,
+                            normalizeFeatureDependencies(new Set(featWidget.value))
+                        );
                         debouncedUpdate();
                         origCb?.call(this, v);
                     };
                 }
             }
+            const divisorWidget = node.widgets?.find((w) => w.name === 'divisible_by');
+            if (divisorWidget) {
+                const origDivisorCb = divisorWidget.callback;
+                divisorWidget.callback = function (v) {
+                    origDivisorCb?.call(divisorWidget, v);
+                    divisorWidget.value = normalizedDivisor(divisorWidget.value);
+                    alignActiveCustomDimensions(
+                        node,
+                        normalizeFeatureDependencies(new Set(featWidget.value))
+                    );
+                };
+            }
+            for (const name of ['width', 'height', 'video_width', 'video_height']) {
+                const widget = node.widgets?.find((w) => w.name === name);
+                if (!widget) continue;
+                const origDimensionCb = widget.callback;
+                widget.callback = function (v) {
+                    const divisor = normalizedDivisor(divisorWidget?.value);
+                    const aligned = alignDimensionValue(v, divisor);
+                    origDimensionCb?.call(widget, aligned);
+                    // ComfyUI's integer callback uses a min-offset step lattice;
+                    // restore the required zero-based divisor lattice afterwards.
+                    widget.value = aligned;
+                    if (isVueMode()) notifyVue(node);
+                };
+            }
             syncChipsToBacking(initialSet, node);
-            updateVisibility(node, vis);
+            if (!node._Eclipse_initialized && !isConfiguringGraph()) {
+                node._Eclipse_initialized = true;
+                requestAnimationFrame(() => {
+                    updateVisibility(node, vis);
+                    const oldHeight = node.size?.[1];
+                    if (!node.size || oldHeight === undefined) return;
+                    node.size[1] = 0;
+                    const computed = node.computeSize?.();
+                    if (computed?.[1] !== oldHeight) node.setSize?.([node.size[0], computed[1]]);
+                    else node.size[1] = oldHeight;
+                });
+            }
             const origConfigure = node.onConfigure;
             node.onConfigure = function (data) {
                 origConfigure?.apply(this, arguments);
                 node._Eclipse_initialized = true;
                 vis.clearCache?.();
-                const chips = readChipsFromBacking(node);
+                const configuredFeatures = readConfiguredFeatures(featWidget.value);
+                const chips = normalizeFeatureDependencies(
+                    configuredFeatures.size ? configuredFeatures : readChipsFromBacking(node)
+                );
                 featWidget.value = [...chips];
                 syncChipsToBacking(chips, node);
                 updateVisibility(node, vis);
@@ -327,7 +471,13 @@ app.registerExtension({
                     }
                     const skipW = node.widgets?.find((w) => w.name === 'skip_calculation');
                     const skipCtrl = node.widgets?.find((w) => w.name === 'skip_calculation_control');
-                    if (skipW && skipCtrl && inputs) {
+                    const modeW = node.widgets?.find((w) => w.name === 'generation_mode');
+                    const vhsW = node.widgets?.find((w) => w.name === 'use_vhs');
+                    const contextW = node.widgets?.find((w) => w.name === 'use_context');
+                    const skipEnabled = modeW?.value === 'Video Mode'
+                        && vhsW?.value === true
+                        && contextW?.value === true;
+                    if (skipEnabled && skipW && skipCtrl && inputs) {
                         if (skipCtrl.value === 'increment') {
                             if (node._Eclipse_lastSkipFirstFramesCalc != null) {
                                 const next = node._Eclipse_lastSkipFirstFramesCalc + 1;
@@ -345,6 +495,8 @@ app.registerExtension({
                         } else {
                             node._Eclipse_lastSkipFirstFramesCalc = skipW.value;
                         }
+                    } else {
+                        node._Eclipse_lastSkipFirstFramesCalc = null;
                     }
                     if (node._Eclipse_seedWidget) {
                         const resolved = node.getSeedToUse();

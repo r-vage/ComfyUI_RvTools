@@ -6,6 +6,28 @@ Entries follow conventional commit prefixes:
 
 ## 2026-09-07
 
+### Version: 4.3.29
+
+- **Feat**
+  - **Smart Folder video groups:** Split VHS loading, Loop, Context, and optional Duration metadata into independent chips with conditional pipe keys, while keeping frame rate always available in Video mode and appending duration to compatible pipe interfaces.
+  - **Shared aligned resolution:** Let the Image Size chip control resolution in both modes, omit disabled dimensions, and align custom sizes with a configurable 1–512 divisor across typed, button, keyboard, and scrub changes.
+- **Fix**
+  - **Smart Folder workflow compatibility:** Migrate legacy widget layouts before configuration so existing video fields remain enabled, cosmetic widget variants and unknown trailing values retain their positions, and repeated loads remain stable.
+- **Docs**
+  - **Smart Folder controls:** Document group ownership, dependencies, conditional pipe fields, custom dimension alignment, and duration metadata.
+
+**Changed files:**
+- `js/eclipse-smart-folder.js`
+- `js/eclipse-smart-folder-workflow-migration.js`
+- `py/RvFolder_SmartFolder.py`
+- `py/RvPipe_Out_SmartFolder.py`
+- `py/RvPipe_IO_Context_Video.py`
+- `py/RvPipe_IO_Context_WanVideoWrapper.py`
+- `Readme/Smart_Folder.md`
+- `pyproject.toml`
+
+## 2026-09-07
+
 ### Version: 4.3.28
 
 - **Feat**

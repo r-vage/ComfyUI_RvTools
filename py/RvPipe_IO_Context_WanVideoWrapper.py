@@ -58,6 +58,7 @@ _all_context_input_output_data = {
     "any_2": ("any_2", "*", "any_2"),
     "path": ("path", "STRING", "path"),
     "purge": ("purge", "BOOLEAN", "purge"),
+    "duration": ("duration", "FLOAT", "duration"),
 }
 
 _force_input_types = {"INT", "STRING", "FLOAT", "BOOLEAN"}
