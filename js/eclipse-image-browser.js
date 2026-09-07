@@ -11,8 +11,9 @@ export const ECLIPSE_IMAGE_BROWSER_STORAGE_KEY = 'Eclipse.ImageBrowser.preferenc
 const VALID_LAYOUTS = new Set(['grid', 'list']);
 const VALID_SORTS = new Set(['default', 'name-asc']);
 const IMAGE_ACCEPT = 'image/png,image/jpeg,image/webp,image/bmp,image/gif,image/tiff,.tif,.tiff';
-const GRID_ITEM_HEIGHT = 126;
-const GRID_ITEM_WIDTH = 96;
+const GRID_MIN_ITEM_HEIGHT = 126;
+const GRID_MIN_ITEM_WIDTH = 100;
+const GRID_SCORING_MIN_SIZE = 100;
 const LIST_ITEM_HEIGHT = 58;
 const RENDER_BUFFER_ROWS = 2;
 const DEFAULT_POPOVER_WIDTH = 420;
@@ -23,6 +24,153 @@ const MAX_POPOVER_WIDTH = 1200;
 const MAX_POPOVER_HEIGHT = 1000;
 let _styleInjected = false;
 let _browserCounter = 0;
+const _thumbnailCache = new Map();
+
+function canonicalThumbnailKey(source, filename) {
+    const normalizedSource = source === 'output' ? 'output' : 'input';
+    const normalizedPath = String(filename || '')
+        .replaceAll('\\', '/')
+        .split('/')
+        .filter((part) => part && part !== '.')
+        .join('/');
+    return `${normalizedSource}:${normalizedPath}`;
+}
+
+function revokeThumbnailEntry(entry) {
+    if (!entry?.objectURL) return;
+    globalThis.URL?.revokeObjectURL?.(entry.objectURL);
+    entry.objectURL = '';
+}
+
+export function requestImageBrowserThumbnail(filename, source, options) {
+    const key = canonicalThumbnailKey(source, filename);
+    const cached = _thumbnailCache.get(key);
+    if (cached?.objectURL) return Promise.resolve(cached);
+    if (cached?.promise) return cached.promise;
+
+    const entry = {
+        key,
+        source: source === 'output' ? 'output' : 'input',
+        filename,
+        objectURL: '',
+        width: 0,
+        height: 0,
+        promise: null,
+    };
+    const requestURL = options.buildThumbnailURL(filename, entry.source);
+    entry.promise = Promise.resolve()
+        .then(() => options.fetchThumbnail(requestURL))
+        .then(async (response) => {
+            if (!response || response.ok === false) {
+                throw new Error(`Thumbnail request failed${response?.status ? ` (${response.status})` : ''}`);
+            }
+            const blob = await response.blob();
+            entry.objectURL = globalThis.URL.createObjectURL(blob);
+            if (_thumbnailCache.get(key) !== entry) {
+                revokeThumbnailEntry(entry);
+                throw new Error('Thumbnail request was invalidated');
+            }
+            entry.promise = null;
+            return entry;
+        })
+        .catch((error) => {
+            if (_thumbnailCache.get(key) === entry) _thumbnailCache.delete(key);
+            revokeThumbnailEntry(entry);
+            throw error;
+        });
+    _thumbnailCache.set(key, entry);
+    return entry.promise;
+}
+
+export function invalidateImageBrowserThumbnail(filename, source) {
+    const key = canonicalThumbnailKey(source, filename);
+    const entry = _thumbnailCache.get(key);
+    if (!entry) return false;
+    _thumbnailCache.delete(key);
+    revokeThumbnailEntry(entry);
+    return true;
+}
+
+export function invalidateImageBrowserThumbnailSource(source) {
+    const normalizedSource = source === 'output' ? 'output' : 'input';
+    for (const [key, entry] of _thumbnailCache) {
+        if (entry.source !== normalizedSource) continue;
+        _thumbnailCache.delete(key);
+        revokeThumbnailEntry(entry);
+    }
+}
+
+export function clearImageBrowserThumbnailCache() {
+    for (const entry of _thumbnailCache.values()) revokeThumbnailEntry(entry);
+    _thumbnailCache.clear();
+}
+
+export function getImageBrowserThumbnailCacheState() {
+    return [..._thumbnailCache.values()].map((entry) => ({
+        key: entry.key,
+        source: entry.source,
+        filename: entry.filename,
+        objectURL: entry.objectURL,
+        width: entry.width,
+        height: entry.height,
+        pending: !!entry.promise,
+    }));
+}
+
+function thumbnailAspect(filename, source) {
+    const entry = _thumbnailCache.get(canonicalThumbnailKey(source, filename));
+    return entry?.width > 0 && entry?.height > 0 ? entry.width / entry.height : null;
+}
+
+function recordThumbnailDimensions(filename, source, width, height) {
+    if (!(width > 0 && height > 0)) return false;
+    const entry = _thumbnailCache.get(canonicalThumbnailKey(source, filename));
+    if (!entry || (entry.width === width && entry.height === height)) return false;
+    entry.width = width;
+    entry.height = height;
+    return true;
+}
+
+export function chooseImageBrowserGridLayout(itemCount, width, height, averageAspect = 1) {
+    const count = Math.max(1, Number(itemCount) || 1);
+    const pad = 8;
+    const gap = 8;
+    const scoringGap = 2;
+    const availableWidth = Math.max(1, (Number(width) || 400) - pad * 2);
+    const availableHeight = Math.max(1, (Number(height) || 500) - pad * 2);
+    const average = Math.min(20, Math.max(0.05, Number(averageAspect) || 1));
+    const minimumCellWidth = Math.max(GRID_MIN_ITEM_WIDTH, GRID_SCORING_MIN_SIZE * average);
+    const minimumArea = minimumCellWidth * GRID_SCORING_MIN_SIZE;
+    const virtualHeight = Math.max(availableHeight, count * minimumArea / availableWidth);
+    const ideal = Math.max(1, Math.round(Math.sqrt(count * availableWidth / virtualHeight / average)));
+    const maxColumns = Math.min(count, Math.max(ideal + 2, 4));
+    let columns = 1;
+    let bestScore = 0;
+    for (let candidate = 1; candidate <= maxColumns; candidate++) {
+        const rows = Math.ceil(count / candidate);
+        const cellWidth = (availableWidth - (candidate - 1) * scoringGap) / candidate;
+        const cellHeight = (virtualHeight - (rows - 1) * scoringGap) / rows;
+        if (cellWidth <= 0 || cellHeight <= 0) continue;
+        const score = average <= cellWidth / cellHeight
+            ? cellHeight * average * cellHeight
+            : cellWidth * (cellWidth / average);
+        if (score > bestScore) {
+            bestScore = score;
+            columns = candidate;
+        }
+    }
+    const rows = Math.ceil(count / columns);
+    const itemWidth = (availableWidth - (columns - 1) * gap) / columns;
+    const rowHeight = Math.max(
+        GRID_MIN_ITEM_HEIGHT,
+        Math.floor((virtualHeight - (rows - 1) * scoringGap) / rows),
+    );
+    return { columns, rowHeight, itemWidth, gap, pad };
+}
+
+if (typeof window !== 'undefined') {
+    window.addEventListener('pagehide', clearImageBrowserThumbnailCache, { once: true });
+}
 
 function normalizePopoverDimension(value, fallback, minimum, maximum) {
     if (typeof value !== 'number' || !Number.isFinite(value)) return fallback;
@@ -111,8 +259,8 @@ function injectBrowserCSS() {
 .eclipse-image-browser-option.selected{border-color:#65a875;box-shadow:inset 0 0 0 1px #65a875;background:#314237}
 .eclipse-image-browser-option.grid{display:flex;flex-direction:column;align-items:stretch;padding:4px}
 .eclipse-image-browser-option.list{display:flex;align-items:center;gap:9px;padding:4px 8px}
-.eclipse-image-browser-thumb{display:block;flex:none;background:#151515;object-fit:cover;border-radius:3px}
-.eclipse-image-browser-option.grid .eclipse-image-browser-thumb{width:100%;height:84px}
+.eclipse-image-browser-thumb{display:block;flex:none;background:#151515;object-fit:contain;border-radius:3px}
+.eclipse-image-browser-option.grid .eclipse-image-browser-thumb{width:100%;min-height:0;flex:1}
 .eclipse-image-browser-option.list .eclipse-image-browser-thumb{width:46px;height:46px}
 .eclipse-image-browser-label{min-width:0;overflow:hidden;text-overflow:ellipsis;color:#ddd}
 .eclipse-image-browser-option.grid .eclipse-image-browser-label{display:-webkit-box;margin-top:5px;font-size:11px;line-height:14px;-webkit-line-clamp:2;-webkit-box-orient:vertical;white-space:normal;word-break:break-word;text-align:center}
@@ -163,6 +311,7 @@ export function createEclipseImageBrowser(options) {
     let destroyed = false;
     let outsidePointerHandler = null;
     let repositionHandler = null;
+    const measuredThumbnailDimensions = new Map();
 
     const root = document.createElement('div');
     root.className = 'eclipse-image-browser-widget';
@@ -225,10 +374,18 @@ export function createEclipseImageBrowser(options) {
         if (layout === 'list') {
             return { columns: 1, rowHeight: LIST_ITEM_HEIGHT, itemWidth: width - 12, gap: 0, pad: 6 };
         }
-        const pad = 8;
-        const gap = 8;
-        const columns = Math.max(1, Math.floor((width - pad * 2 + gap) / (GRID_ITEM_WIDTH + gap)));
-        return { columns, rowHeight: GRID_ITEM_HEIGHT, itemWidth: GRID_ITEM_WIDTH, gap, pad };
+        const knownAspects = filtered
+            .map((filename) => thumbnailAspect(filename, source))
+            .filter((aspect) => aspect !== null);
+        const averageAspect = knownAspects.length
+            ? knownAspects.reduce((sum, aspect) => sum + aspect, 0) / knownAspects.length
+            : 1;
+        return chooseImageBrowserGridLayout(
+            filtered.length,
+            width,
+            viewport?.clientHeight || 500,
+            averageAspect,
+        );
     }
 
     function optionId(index) {
@@ -256,6 +413,7 @@ export function createEclipseImageBrowser(options) {
         const lastRow = Math.min(rows, Math.ceil((viewport.scrollTop + viewportHeight) / metrics.rowHeight) + RENDER_BUFFER_ROWS);
         const start = firstRow * metrics.columns;
         const end = Math.min(filtered.length, lastRow * metrics.columns);
+        const renderedSource = source;
         for (let index = start; index < end; index++) {
             const filename = filtered[index];
             const row = Math.floor(index / metrics.columns);
@@ -279,7 +437,29 @@ export function createEclipseImageBrowser(options) {
             img.loading = 'lazy';
             img.decoding = 'async';
             img.draggable = false;
-            img.src = options.buildPreviewURL(filename, source);
+            img.addEventListener('load', () => {
+                const width = img.naturalWidth;
+                const height = img.naturalHeight;
+                if (!(width > 0 && height > 0)) return;
+                recordThumbnailDimensions(filename, renderedSource, width, height);
+                const key = canonicalThumbnailKey(renderedSource, filename);
+                const signature = `${width}x${height}`;
+                if (measuredThumbnailDimensions.get(key) === signature) return;
+                measuredThumbnailDimensions.set(key, signature);
+                scheduleRender();
+            }, { once: true });
+            if (options.buildThumbnailURL && options.fetchThumbnail) {
+                void requestImageBrowserThumbnail(filename, renderedSource, options)
+                    .then((thumbnail) => {
+                        if (img.isConnected) img.src = thumbnail.objectURL;
+                    })
+                    .catch(() => {
+                        // Failed entries are removed by the shared cache and can
+                        // be retried the next time this virtual row is rendered.
+                    });
+            } else if (options.buildPreviewURL) {
+                img.src = options.buildPreviewURL(filename, renderedSource);
+            }
             const label = document.createElement('span');
             label.className = 'eclipse-image-browser-label';
             label.textContent = filename;

@@ -4,6 +4,21 @@ All notable changes to ComfyUI Eclipse are documented in this file.
 
 Entries follow conventional commit prefixes:
 
+## 2026-09-07
+
+### Version: 4.3.28
+
+- **Feat**
+  - **Load Image picker thumbnails:** Add a read-only endpoint that produces EXIF-corrected, aspect-preserving static WebP thumbnails for supported input and output images while retaining original animated files for selection previews and execution.
+- **Perf**
+  - **Shared virtualized preview cache:** Load only visible picker thumbnails, coalesce requests across both Load Image variants, adapt uncropped grid geometry to thumbnail aspect ratios, and revoke or invalidate object URLs on failure, deletion, refresh, and page unload.
+
+**Changed files:**
+- `core/server_endpoints.py`
+- `js/eclipse-image-browser.js`
+- `js/eclipse-load-image.js`
+- `pyproject.toml`
+
 ## 2026-09-05
 
 ### Version: 4.3.27

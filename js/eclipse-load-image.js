@@ -16,7 +16,9 @@ import {
 import { markEclipseContextMenuOwner } from './eclipse-context-menu-ownership.js';
 import {
     chooseAdjacentImage,
-    createEclipseImageBrowser
+    createEclipseImageBrowser,
+    invalidateImageBrowserThumbnail,
+    invalidateImageBrowserThumbnailSource
 } from './eclipse-image-browser.js';
 const NODE_CONFIGS = {
     'Load Image (Metadata Pipe) [Eclipse]': {
@@ -143,6 +145,19 @@ function buildViewURL(rel, type) {
         subfolder
     });
     return api.apiURL(`/view?${params.toString()}`);
+}
+
+function buildThumbnailURL(rel, type) {
+    const {
+        filename,
+        subfolder
+    } = parseImagePath(rel);
+    const params = new URLSearchParams({
+        filename,
+        type,
+        subfolder
+    });
+    return `/eclipse/load_image/thumbnail?${params.toString()}`;
 }
 async function loadPreview(node, rel, type) {
     const nodeId = String(node.id);
@@ -495,7 +510,8 @@ for (const [nodeName, cfg] of Object.entries(NODE_CONFIGS)) {
                 imageBrowser = createEclipseImageBrowser({
                     source: currentMode === 'output' ? 'output' : 'input',
                     selected: getActiveCombo()?.value || '',
-                    buildPreviewURL: buildViewURL,
+                    buildThumbnailURL,
+                    fetchThumbnail: (url) => api.fetchApi(url, { cache: 'no-store' }),
                     onSelect: async (filename, source) => {
                         const combo = source === 'output' ? getOutputCombo() : getInputCombo();
                         if (!combo) return;
@@ -505,6 +521,7 @@ for (const [nodeName, cfg] of Object.entries(NODE_CONFIGS)) {
                     },
                     onUpload: (files) => handleDroppedFiles(files),
                     onRefresh: async (source) => {
+                        invalidateImageBrowserThumbnailSource(source);
                         invalidateFileListCache(source);
                         await fetchAndApply(source);
                         document.dispatchEvent(new CustomEvent('eclipse-filelist-changed', {
@@ -771,6 +788,7 @@ for (const [nodeName, cfg] of Object.entries(NODE_CONFIGS)) {
                         const result = await resp.json();
                         if (result.success) {
                             console.log(`[Eclipse ${cfg.logPrefix}] ✓ Deleted "${filename}" from ${source}`);
+                            invalidateImageBrowserThumbnail(filename, source);
                             invalidateFileListCache(source);
                             const files = await getCachedFileList(source);
                             combo.options.values = files;

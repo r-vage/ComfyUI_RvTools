@@ -10,6 +10,7 @@ import os
 import re
 import sys
 import time
+from io import BytesIO
 from pathlib import Path
 from typing import Any
 
@@ -22,6 +23,7 @@ if "utils" not in sys.modules:
 
 import folder_paths  # type: ignore
 from aiohttp import web  # type: ignore
+from PIL import Image, ImageOps, UnidentifiedImageError  # type: ignore
 from server import PromptServer  # type: ignore
 
 from .common import (
@@ -52,6 +54,18 @@ _RELOAD_ALL_DEBOUNCE_S = 2.0
 _last_reload_all_ts: float = 0.0
 _last_reload_all_result: dict[str, Any] | None = None
 _MAX_IMAGE_BYTES = 100 * 1024 * 1024
+_LOAD_IMAGE_EXTENSIONS = {
+    ".png",
+    ".jpg",
+    ".jpeg",
+    ".webp",
+    ".bmp",
+    ".gif",
+    ".tiff",
+    ".tif",
+}
+_LOAD_IMAGE_THUMBNAIL_SIZE = (192, 192)
+_LOAD_IMAGE_THUMBNAIL_QUALITY = 80
 _MAX_DANBOORU_USER_ID = 2**53 - 1
 _AUDIO_SLICE_SEMAPHORE = asyncio.Semaphore(2)
 
@@ -73,6 +87,65 @@ except Exception:  # noqa: BLE001 - optional ComfyUI compatibility probe
 def _read_nonempty_text_lines(path: str) -> list[str]:
     with open(path, encoding="utf-8") as file_handle:
         return [line.strip() for line in file_handle if line.strip()]
+
+
+def _resolve_load_image_path(filename: str, subfolder: str, source_type: str) -> str:
+    # Resolve the same input/output tuple used by ComfyUI's /view endpoint while
+    # keeping every thumbnail read inside its selected base directory.
+    if source_type not in {"input", "output"}:
+        raise ValueError("Invalid image type")
+    if (
+        not filename
+        or filename in {".", ".."}
+        or "\x00" in filename
+        or "/" in filename
+        or "\\" in filename
+    ):
+        raise ValueError("Invalid filename")
+    if os.path.splitext(filename)[1].lower() not in _LOAD_IMAGE_EXTENSIONS:
+        raise ValueError("Unsupported image format")
+
+    normalized_subfolder = subfolder
+    if "\x00" in normalized_subfolder or "\\" in normalized_subfolder:
+        raise ValueError("Invalid subfolder")
+    parts = normalized_subfolder.split("/") if normalized_subfolder else []
+    if any(part in {"", ".", ".."} for part in parts):
+        raise ValueError("Invalid subfolder")
+
+    base_dir = (
+        folder_paths.get_input_directory()
+        if source_type == "input"
+        else folder_paths.get_output_directory()
+    )
+    real_base = os.path.realpath(base_dir)
+    real_path = os.path.realpath(os.path.join(real_base, *parts, filename))
+    try:
+        if os.path.commonpath((real_base, real_path)) != real_base:
+            raise ValueError("Invalid image path")
+    except ValueError as error:
+        raise ValueError("Invalid image path") from error
+    return real_path
+
+
+def _render_load_image_thumbnail(image_path: str) -> bytes:
+    # Decode and resize in a worker thread. copy() fixes the selected initial
+    # frame before the source container is closed, including animated formats.
+    with Image.open(image_path) as source_image:
+        source_image.seek(0)
+        frame = ImageOps.exif_transpose(source_image.copy())
+        frame.thumbnail(_LOAD_IMAGE_THUMBNAIL_SIZE, Image.Resampling.LANCZOS)
+        if "A" in frame.getbands() or "transparency" in frame.info:
+            frame = frame.convert("RGBA")
+        else:
+            frame = frame.convert("RGB")
+        output = BytesIO()
+        frame.save(
+            output,
+            format="WEBP",
+            quality=_LOAD_IMAGE_THUMBNAIL_QUALITY,
+            save_all=False,
+        )
+        return output.getvalue()
 
 
 
@@ -1059,6 +1132,55 @@ class LoadImageEndpoints:
                 return web.json_response(
                     {"success": False, "error": str(e)}, status=500
                 )
+
+        @PromptServer.instance.routes.get("/eclipse/load_image/thumbnail")
+        async def load_image_thumbnail_endpoint(request):
+            # GET /eclipse/load_image/thumbnail
+            #
+            # Returns a static, bounded picker thumbnail for an input/output image.
+            # Animated sources deliberately contribute only their initial frame.
+            filename = request.query.get("filename", "")
+            subfolder = request.query.get("subfolder", "")
+            source_type = request.query.get("type", "").strip()
+            try:
+                image_path = _resolve_load_image_path(
+                    filename,
+                    subfolder,
+                    source_type,
+                )
+            except ValueError as error:
+                return web.json_response({"error": str(error)}, status=400)
+
+            if not os.path.isfile(image_path):
+                return web.json_response({"error": "Image not found"}, status=404)
+
+            try:
+                thumbnail = await asyncio.to_thread(
+                    _render_load_image_thumbnail,
+                    image_path,
+                )
+            except FileNotFoundError:
+                return web.json_response({"error": "Image not found"}, status=404)
+            except (OSError, UnidentifiedImageError, ValueError):
+                return web.json_response(
+                    {"error": "Image could not be decoded"},
+                    status=422,
+                )
+            except Exception as error:  # noqa: BLE001 - endpoint boundary
+                log.error(
+                    "LoadImage",
+                    f"Thumbnail generation failed: {type(error).__name__}",
+                )
+                return web.json_response(
+                    {"error": "Thumbnail generation failed"},
+                    status=500,
+                )
+
+            return web.Response(
+                body=thumbnail,
+                content_type="image/webp",
+                headers={"Cache-Control": "no-store"},
+            )
 
         log.debug("LoadImage", "Registered Load Image endpoints")
 
