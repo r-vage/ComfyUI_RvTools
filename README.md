@@ -172,6 +172,7 @@ The three packs have independent settings and private configuration ownership. E
 
 - If a node raises an import error for a package, install the missing package into the same Python environment that runs ComfyUI.
 - If you place the folder under `custom_nodes` but the nodes don't show up, restart ComfyUI and check the server logs for import errors.
+- On startup, Eclipse deactivates Python and JavaScript files that it shipped in older releases but no longer ships. Retired files are preserved beside their original location with a `.bak` suffix and listed in the server log; current files and unlisted fork files are not inspected or changed.
 
 ## Contributing
 

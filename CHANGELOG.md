@@ -6,6 +6,26 @@ Entries follow conventional commit prefixes:
 
 ## 2026-09-08
 
+### Version: 4.3.31
+
+- **Feat**
+  - **Local self-update:** Show the running Eclipse version in its ComfyUI settings and provide a loopback-only, explicitly confirmed update action that replaces tracked files with official `main`, preserves untracked user data, installs requirements, and reports the required restart.
+- **Fix**
+  - **Retired source cleanup:** Before custom-node imports, deactivate Python and JavaScript files that Eclipse shipped historically but no longer ships by moving exact inventoried paths to non-loadable `.bak` files. Preserve modified current sources and unlisted fork files while preventing overlay updates from loading obsolete nodes or frontend extensions.
+- **Docs**
+  - **Recoverable startup cleanup:** Document the retired-file inventory, backup suffix, and server-log report.
+
+**Changed files:**
+- `.eclipse-retired-sources.json` (new)
+- `prestartup_script.py` (new)
+- `core/self_update.py` (new)
+- `core/server_endpoints.py`
+- `js/eclipse-self-update.js` (new)
+- `README.md`
+- `pyproject.toml`
+
+## 2026-09-08
+
 ### Version: 4.3.30
 
 - **Feat**

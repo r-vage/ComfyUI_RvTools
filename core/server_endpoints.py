@@ -39,7 +39,12 @@ from .network_security import (
     read_stream_limited,
     validate_public_http_url,
 )
-from .request_security import global_mutation_denial, read_json_object_request
+from .request_security import (
+    global_mutation_denial,
+    read_json_object_request,
+    request_is_loopback,
+)
+from .self_update import get_update_status, perform_self_update, read_disk_version
 from .wildcard_engine import get_wildcard_list, process, wildcard_load
 
 # Inline pattern to avoid regex_patterns dependency
@@ -68,6 +73,9 @@ _LOAD_IMAGE_THUMBNAIL_SIZE = (192, 192)
 _LOAD_IMAGE_THUMBNAIL_QUALITY = 80
 _MAX_DANBOORU_USER_ID = 2**53 - 1
 _AUDIO_SLICE_SEMAPHORE = asyncio.Semaphore(2)
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+_OFFICIAL_REPOSITORY = "https://github.com/r-vage/ComfyUI_Eclipse.git"
+_running_version = read_disk_version(_REPO_ROOT)
 
 # Detect ComfyUI native dynamic VRAM:
 # 0.18.x: ModelPatcher gained 'model_mmap_residency'
@@ -1983,6 +1991,57 @@ class DanbooruMaintenanceEndpoints:
             )
 
 
+class SelfUpdateEndpoints:
+    """Local-only Eclipse code update endpoints."""
+
+    def __init__(self):
+        self._register_endpoints()
+
+    def _register_endpoints(self):
+        @PromptServer.instance.routes.get("/eclipse/update/status")
+        async def get_self_update_status(request):
+            return web.json_response(get_update_status(_REPO_ROOT, _running_version))
+
+        @PromptServer.instance.routes.post("/eclipse/update")
+        async def run_self_update(request):
+            denial = global_mutation_denial(request)
+            if denial is not None:
+                return denial
+            if not request_is_loopback(request):
+                return web.json_response(
+                    {
+                        "success": False,
+                        "status": "forbidden",
+                        "error": "Self-update is limited to the local ComfyUI browser.",
+                    },
+                    status=403,
+                )
+            data = await read_json_object_request(request)
+            if data.get("confirmed") is not True:
+                return web.json_response(
+                    {
+                        "success": False,
+                        "status": "confirmation_required",
+                        "error": "Explicit update confirmation is required.",
+                    },
+                    status=400,
+                )
+            result = await asyncio.to_thread(
+                perform_self_update,
+                _REPO_ROOT,
+                _OFFICIAL_REPOSITORY,
+                _running_version,
+            )
+            response_status = {
+                "busy": 409,
+                "unsupported": 422,
+                "untracked_conflict": 409,
+                "dependency_failed": 500,
+                "failed": 500,
+            }.get(result.get("status"), 200)
+            return web.json_response(result, status=response_status)
+
+
 def initialize_endpoints(wildcard_path: str | None = None):
     # Initialize all Eclipse server endpoints.
     #
@@ -1999,6 +2058,7 @@ def initialize_endpoints(wildcard_path: str | None = None):
         DanbooruMaintenanceEndpoints()
         ImageSelectorEndpoints()
         AudioSliceEndpoints()
+        SelfUpdateEndpoints()
 
         # Register prompt handler for wildcard preprocessing
         PromptServer.instance.add_on_prompt_handler(onprompt_populate_wildcards)
