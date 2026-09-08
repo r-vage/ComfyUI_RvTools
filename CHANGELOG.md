@@ -4,6 +4,21 @@ All notable changes to ComfyUI Eclipse are documented in this file.
 
 Entries follow conventional commit prefixes:
 
+## 2026-09-08
+
+### Version: 4.3.30
+
+- **Feat**
+  - **Join audio timelines:** Append any number of AUDIO inputs in connection order so consecutive video segments retain audio throughout when the joined track is sent to either Eclipse Save Video node. Resample differing rates to the highest input rate and expand mono clips to match multi-channel inputs.
+- **Docs**
+  - **Sequential versus overlaid audio:** Clarify that Eclipse Join concatenates audio along time, while ComfyUI Merge Audio overlays tracks from the start.
+
+**Changed files:**
+- `py/RvConversion_Join.py`
+- `Readme/Utility_Nodes.md`
+- `README.md`
+- `pyproject.toml`
+
 ## 2026-09-07
 
 ### Version: 4.3.29

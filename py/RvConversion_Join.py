@@ -1,12 +1,14 @@
-import torch  # type: ignore
 import re
+
+import torch  # type: ignore
+import torchaudio  # type: ignore
+from comfy_api.latest import io  # type: ignore
+
 from ..core import CATEGORY
 from ..core.logger import log
-from comfy_api.latest import io  # type: ignore
 
 # Inline pattern to avoid regex_patterns dependency
 RE_NEWLINES = re.compile(r"[\r\n]+", re.IGNORECASE)
-from typing import Any, Tuple
 
 _LOG_PREFIX = "Join"
 
@@ -75,6 +77,74 @@ def _join_masks(inputs):
     return (result,)
 
 
+def _is_audio(value) -> bool:
+    return (
+        isinstance(value, dict)
+        and isinstance(value.get("waveform"), torch.Tensor)
+        and "sample_rate" in value
+    )
+
+
+def _audio_waveform(audio, index: int) -> tuple[torch.Tensor, int]:
+    waveform = audio["waveform"]
+    sample_rate = int(audio["sample_rate"])
+    if sample_rate <= 0:
+        raise ValueError(f"Audio input #{index} has an invalid sample rate.")
+
+    if waveform.ndim == 1:
+        waveform = waveform.unsqueeze(0).unsqueeze(0)
+    elif waveform.ndim == 2:
+        waveform = waveform.unsqueeze(0)
+    elif waveform.ndim != 3:
+        raise ValueError(
+            f"Audio input #{index} must have [batch, channels, samples] shape."
+        )
+    return waveform, sample_rate
+
+
+def _join_audio(inputs):
+    # Append AUDIO clips in input order along their sample/time axis.
+    clips = []
+    for index, audio in enumerate(inputs, start=1):
+        if not _is_audio(audio):
+            raise ValueError(f"Join input #{index} is not a valid AUDIO value.")
+        clips.append(_audio_waveform(audio, index))
+
+    target_sample_rate = max(sample_rate for _, sample_rate in clips)
+    target_batch = max(waveform.shape[0] for waveform, _ in clips)
+    target_channels = max(waveform.shape[1] for waveform, _ in clips)
+    reference = clips[0][0]
+    prepared = []
+
+    for index, (waveform, sample_rate) in enumerate(clips, start=1):
+        batch, channels, _ = waveform.shape
+        if batch not in (1, target_batch):
+            raise ValueError(
+                f"Audio input #{index} has {batch} batches; expected 1 or {target_batch}."
+            )
+        if channels not in (1, target_channels):
+            raise ValueError(
+                f"Audio input #{index} has {channels} channels; expected 1 or {target_channels}."
+            )
+        if sample_rate != target_sample_rate:
+            waveform = torchaudio.functional.resample(
+                waveform, sample_rate, target_sample_rate
+            )
+        waveform = waveform.to(device=reference.device, dtype=reference.dtype)
+        if batch == 1 and target_batch > 1:
+            waveform = waveform.expand(target_batch, -1, -1)
+        if channels == 1 and target_channels > 1:
+            waveform = waveform.expand(-1, target_channels, -1)
+        prepared.append(waveform)
+
+    return (
+        {
+            "waveform": torch.cat(prepared, dim=-1),
+            "sample_rate": target_sample_rate,
+        },
+    )
+
+
 def _join_strings(inputs, delimiter: str):
     # Join STRING values with delimiter
     if delimiter in ("\n", "\\n"):
@@ -134,7 +204,7 @@ class RvConversion_Join(io.ComfyNode):
                     "delimiter",
                     default=", ",
                     optional=True,
-                    tooltip="Delimiter for STRING types. Use \\n for newline. Ignored for IMAGE/MASK.",
+                    tooltip="Delimiter for STRING types. Use \\n for newline. Ignored for IMAGE/MASK/AUDIO.",
                 ),
                 io.AnyType.Input("input_1", optional=True, tooltip="Input #1."),
                 io.AnyType.Input("input_2", optional=True, tooltip="Input #2."),
@@ -159,17 +229,15 @@ class RvConversion_Join(io.ComfyNode):
 
         first_input = inputs[0]
 
+        if _is_audio(first_input):
+            return io.NodeOutput(*_join_audio(inputs))
         if isinstance(first_input, torch.Tensor) and first_input.ndim == 4:
             return io.NodeOutput(*_join_images(inputs))
-        elif isinstance(first_input, torch.Tensor) and first_input.ndim in (2, 3):
+        if isinstance(first_input, torch.Tensor) and first_input.ndim in (2, 3):
             return io.NodeOutput(*_join_masks(inputs))
-        elif isinstance(first_input, str):
+        if isinstance(first_input, str):
             return io.NodeOutput(*_join_strings(inputs, delimiter))
-        elif isinstance(first_input, int):
-            return io.NodeOutput(*_join_primitives(inputs, delimiter))
-        elif isinstance(first_input, float):
-            return io.NodeOutput(*_join_primitives(inputs, delimiter))
-        elif isinstance(first_input, (list, tuple)):
+        if isinstance(first_input, (int, float, list, tuple)):
             return io.NodeOutput(*_join_primitives(inputs, delimiter))
 
         log.warning(

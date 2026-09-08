@@ -207,7 +207,7 @@ Convenience nodes for type conversion, list/batch transforms, string merging, an
 - Convert To Batch - Convert lists of images or masks to a batch tensor.
 - Convert to List - Convert image/mask batches to lists.
 - Image Convert - Convert images between color spaces/modes.
-- Join - Concat strings, lists, or pipes with separator/merge option.
+- Join - Concatenate strings, images, masks, audio timelines, and primitive values.
 - Merge Strings - Merge multiple strings together.
 - RIFE Multiplier - Multiplies/interpolates frames for high framerate video generation.
 - String from List - Retrieve string from list at index.

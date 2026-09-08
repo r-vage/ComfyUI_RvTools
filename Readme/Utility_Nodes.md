@@ -109,8 +109,13 @@ Combines multiple inputs into one. Auto-detects the input type and handles each 
 | **STRING** | Concatenated with delimiter |
 | **IMAGE** | Tensors resized to match first image, then batched (cat along dim 0) |
 | **MASK** | Tensors batched (cat along dim 0) |
+| **AUDIO** | Clips appended in input order along the timeline; differing sample rates are resampled to the highest rate and mono is expanded when needed |
 | **INT / FLOAT** | Converted to strings and joined with delimiter |
 | **LIST** | Flattened and joined with delimiter |
+
+For consecutive video segments, join their audio outputs here before connecting the
+single result to Save Video. ComfyUI's **Merge Audio** overlays tracks from time
+zero; use it for simultaneous layers, not for sequential video segments.
 
 **Category:** `Eclipse > Conversion`
 
