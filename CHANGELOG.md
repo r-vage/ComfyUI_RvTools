@@ -6,6 +6,21 @@ Entries follow conventional commit prefixes:
 
 ## 2026-09-08
 
+### Version: 4.3.32
+
+- **Feat**
+  - **Scrollable Markdown Note:** Add an Eclipse-owned, frontend-only workflow annotation with sanitized Markdown preview, double-click editing, and a resize-constrained scrollbar in both renderers.
+- **Docs**
+  - **Markdown annotation:** Document the Markdown Note in the Text node overview.
+
+**Changed files:**
+- `py/RvText_MarkdownNote.py` (new)
+- `js/eclipse-markdown-note.js` (new)
+- `README.md`
+- `pyproject.toml`
+
+## 2026-09-08
+
 ### Version: 4.3.31
 
 - **Feat**

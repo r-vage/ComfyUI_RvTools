@@ -195,6 +195,7 @@ class EclipseExtension(ComfyExtension):
         from .py.RvText_DeDuplicate import RvText_DeDuplicate
         from .py.RvText_DualText import RvText_DualText
         from .py.RvText_FilterPrompt import RvText_FilterPrompt
+        from .py.RvText_MarkdownNote import RvText_MarkdownNote
         from .py.RvText_Multiline import RvText_Multiline
         from .py.RvText_Multiline_List import RvText_Multiline_List
         from .py.RvText_PromptStyler import RvText_PromptStyler, RvText_PromptStylerV2
@@ -372,6 +373,7 @@ class EclipseExtension(ComfyExtension):
             RvText_DeDuplicate,
             RvText_DualText,
             RvText_FilterPrompt,
+            RvText_MarkdownNote,
             RvText_Multiline_List,
             RvText_Multiline,
             RvText_PromptStyler,

@@ -307,6 +307,7 @@ Nodes for prompt construction, text processing, and string manipulation with adv
 - CLIP Text Encode / Advanced and Conditioning Zero Out - Provided by [ComfyUI Smart Model Loader](https://github.com/r-vage/ComfyUI_SmartModelLoader).
 - DeDuplicate - Remove duplicate words or tags from prompts.
 - Dual Text - Join two prompt strings.
+- Markdown Note - Add a socketless workflow annotation with Markdown preview, double-click editing, and a scrollbar controlled by the node size.
 - Multiline Text / Multiline Text List - Paragraph text inputs.
 - Prompt Styler - Apply styled tags to prompts.
 - Prompt Styler v2 - Apply the same styles with compact feature chips.
