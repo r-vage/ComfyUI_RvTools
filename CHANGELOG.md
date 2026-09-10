@@ -6,6 +6,17 @@ Entries follow conventional commit prefixes:
 
 ## 2026-09-10
 
+### Version: 4.3.34
+
+- **Feat**
+  - **Multiline line wrapping:** Add a per-node `Wrap long lines` menu toggle to String Multiline and String Multiline List, with persisted classic and Nodes 2.0 display behavior and scrollable no-wrap editing.
+
+**Changed files:**
+- `js/eclipse-string-nodes.js`
+- `pyproject.toml`
+
+## 2026-09-10
+
 ### Version: 4.3.33
 
 - **Fix**
