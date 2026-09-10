@@ -4,6 +4,26 @@ All notable changes to ComfyUI Eclipse are documented in this file.
 
 Entries follow conventional commit prefixes:
 
+## 2026-09-10
+
+### Version: 4.3.33
+
+- **Fix**
+  - **Multiline list prefix:** Prepend the connected optional input to every non-empty list item while keeping the full string output unchanged.
+  - **Root folder separators:** Treat forward slashes, backslashes, and mixed separators as the same nested relative path in Folder Path and both Smart Folder modes.
+  - **Join list and batch inputs:** Process all connected lists and image batches in one execution so shorter inputs are not repeated by ComfyUI list mapping, and emit one ordered image batch for preview and downstream nodes.
+- **Docs**
+  - **Smart Folder paths:** Document cross-platform separator support for nested root folders.
+
+**Changed files:**
+- `core/path_helpers.py` (new)
+- `py/RvConversion_Join.py`
+- `py/RvFolder_FolderPath.py`
+- `py/RvFolder_SmartFolder.py`
+- `py/RvText_Multiline_List.py`
+- `Readme/Smart_Folder.md`
+- `pyproject.toml`
+
 ## 2026-09-08
 
 ### Version: 4.3.32

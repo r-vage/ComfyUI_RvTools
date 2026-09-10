@@ -5,6 +5,7 @@ import torchaudio  # type: ignore
 from comfy_api.latest import io  # type: ignore
 
 from ..core import CATEGORY
+from ..core.image_helpers import cat_and_fit_images, flatten_images, unwrap_value
 from ..core.logger import log
 
 # Inline pattern to avoid regex_patterns dependency
@@ -13,34 +14,26 @@ RE_NEWLINES = re.compile(r"[\r\n]+", re.IGNORECASE)
 _LOG_PREFIX = "Join"
 
 
+def _flatten_inputs(inputs):
+    """Flatten ComfyUI list-wrapped inputs while preserving their order."""
+    flattened = []
+
+    def _append(value):
+        if isinstance(value, (list, tuple)):
+            for item in value:
+                _append(item)
+        elif value is not None:
+            flattened.append(value)
+
+    for value in inputs:
+        _append(value)
+    return flattened
+
+
 def _join_images(inputs):
     # Join IMAGE tensors into a batch, resizing to match first image dimensions
-    tensors = []
-    for img in inputs:
-        if isinstance(img, torch.Tensor) and img.ndim == 4:
-            tensors.append(img)
-
-    if not tensors:
-        return (None,)
-
-    target_height = tensors[0].shape[1]
-    target_width = tensors[0].shape[2]
-
-    resized_tensors = []
-    for tensor in tensors:
-        if tensor.shape[1] != target_height or tensor.shape[2] != target_width:
-            tensor_bchw = tensor.permute(0, 3, 1, 2)
-            resized = torch.nn.functional.interpolate(
-                tensor_bchw,
-                size=(target_height, target_width),
-                mode="bilinear",
-                align_corners=False,
-            )
-            tensor = resized.permute(0, 2, 3, 1)
-        resized_tensors.append(tensor)
-
-    result = torch.cat(resized_tensors, dim=0)
-    return (result,)
+    images = flatten_images(inputs)
+    return (cat_and_fit_images(images, _LOG_PREFIX),)
 
 
 def _join_masks(inputs):
@@ -190,6 +183,7 @@ class RvConversion_Join(io.ComfyNode):
             node_id="Join [Eclipse]",
             display_name="Join",
             category=CATEGORY.MAIN.value + CATEGORY.CONVERSION.value,
+            is_input_list=True,
             inputs=[
                 io.Int.Input(
                     "inputcount",
@@ -216,6 +210,8 @@ class RvConversion_Join(io.ComfyNode):
 
     @classmethod
     def execute(cls, inputcount: int, delimiter: str = ", ", **kwargs) -> io.NodeOutput:
+        inputcount = int(unwrap_value(inputcount, 2))
+        delimiter = str(unwrap_value(delimiter, ", "))
         inputs = []
 
         for i in range(1, min(inputcount, 64) + 1):
@@ -223,6 +219,8 @@ class RvConversion_Join(io.ComfyNode):
             v = kwargs.get(key)
             if v is not None:
                 inputs.append(v)
+
+        inputs = _flatten_inputs(inputs)
 
         if not inputs:
             return io.NodeOutput(None)

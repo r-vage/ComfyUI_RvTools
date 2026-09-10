@@ -2,8 +2,10 @@ import os
 from datetime import datetime
 import folder_paths  # type: ignore
 from comfy_api.latest import io  # type: ignore
+
 from ..core import CATEGORY
 from ..core.logger import log
+from ..core.path_helpers import normalize_relative_folder_path
 
 _LOG_PREFIX = "FolderPath"
 
@@ -27,7 +29,7 @@ class RvFolder_FolderPath(io.ComfyNode):
                 io.String.Input(
                     "root_folder",
                     default="images",
-                    tooltip="Root folder name under the ComfyUI output directory.",
+                    tooltip="Relative root folder path under the ComfyUI output directory. Use / or \\ to separate nested folders.",
                 ),
                 io.Boolean.Input(
                     "create_date_time_folder",
@@ -97,6 +99,7 @@ class RvFolder_FolderPath(io.ComfyNode):
 
         if not isinstance(root_folder, str) or not root_folder.strip():
             root_folder = "images"
+        root_folder = normalize_relative_folder_path(root_folder)
         if not isinstance(date_time_format, str) or not date_time_format.strip():
             date_time_format = "%Y-%m-%d"
         if not isinstance(batch_folder_name, str) or not batch_folder_name.strip():

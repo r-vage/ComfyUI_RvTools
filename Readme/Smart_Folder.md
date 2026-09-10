@@ -90,6 +90,8 @@ The output path is built in layers:
 | Image | `root_folder_image` | `images` |
 | Video | `root_folder_video` | `videos` |
 
+Root folders are relative to the ComfyUI output directory. Use either `/` or `\` as the separator for nested folders; for example, `images/dataset` and `images\dataset` resolve to the same path on the backend host.
+
 ### Date/Time Subfolder (`date_time` chip)
 
 | Input | Type | Default | Description |

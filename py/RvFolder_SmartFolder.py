@@ -15,6 +15,7 @@ from ..core.common import (
     LATENT_TYPE_PRESETS,
     LATENT_TYPE_MAP,
 )
+from ..core.path_helpers import normalize_relative_folder_path
 
 MAX_RESOLUTION = 32768
 
@@ -91,12 +92,12 @@ class RvFolder_SmartFolder(io.ComfyNode):
                 io.String.Input(
                     "root_folder_image",
                     default="images",
-                    tooltip="Root folder name for image generation.",
+                    tooltip="Relative root folder path for image generation. Use / or \\ to separate nested folders.",
                 ),
                 io.String.Input(
                     "root_folder_video",
                     default="video",
-                    tooltip="Root folder name for video generation.",
+                    tooltip="Relative root folder path for video generation. Use / or \\ to separate nested folders.",
                 ),
                 io.Boolean.Input(
                     "create_date_time_folder",
@@ -399,6 +400,8 @@ class RvFolder_SmartFolder(io.ComfyNode):
             root_folder_image = "images"
         if not isinstance(root_folder_video, str) or not root_folder_video:
             root_folder_video = "videos"
+        root_folder_image = normalize_relative_folder_path(root_folder_image)
+        root_folder_video = normalize_relative_folder_path(root_folder_video)
         if not isinstance(date_time_format, str) or not date_time_format:
             date_time_format = "%Y-%m-%d"
         if not isinstance(batch_folder_name, str) or not batch_folder_name:

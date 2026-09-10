@@ -1,4 +1,5 @@
 from comfy_api.latest import io  # type: ignore
+
 from ..core import CATEGORY
 
 
@@ -14,13 +15,13 @@ class RvText_Multiline_List(io.ComfyNode):
                     "input_string",
                     optional=True,
                     force_input=True,
-                    tooltip="Optional string input to prepend to the multiline content.",
+                    tooltip="Optional string to prepend to the full output and each list item.",
                 ),
                 io.String.Input(
                     "string",
                     multiline=True,
                     default="",
-                    tooltip="Multiline string input. Splits into a list of lines and returns the full string joined by spaces.",
+                    tooltip="Multiline input split into non-empty list items and joined into one full string.",
                 ),
             ],
             outputs=[
@@ -32,20 +33,29 @@ class RvText_Multiline_List(io.ComfyNode):
     @classmethod
     def execute(cls, string=None, input_string=None):
         # Outputs the input multiline string as a single joined string and as a list of lines.
-        lines = []
-
-        # Add optional input string as first line if provided
-        if isinstance(input_string, str) and input_string.strip():
-            lines.append(input_string.strip())
+        input_prefix = (
+            input_string.strip()
+            if isinstance(input_string, str) and input_string.strip()
+            else ""
+        )
 
         # Process multiline content
+        content_lines = []
         if isinstance(string, str) and string.strip():
-            content_lines = string.strip().split("\n")
-            lines.extend(line.strip() for line in content_lines if line.strip())
+            content_lines = [
+                line.strip() for line in string.strip().split("\n") if line.strip()
+            ]
+
+        joined_parts = ([input_prefix] if input_prefix else []) + content_lines
 
         # If no valid lines found, return empty
-        if not lines:
+        if not joined_parts:
             return io.NodeOutput("", [""])
 
-        joined_string = " ".join(lines)
-        return io.NodeOutput(joined_string, lines)
+        joined_string = " ".join(joined_parts)
+        if input_prefix and content_lines:
+            list_items = [f"{input_prefix} {line}" for line in content_lines]
+        else:
+            list_items = content_lines or [input_prefix]
+
+        return io.NodeOutput(joined_string, list_items)
